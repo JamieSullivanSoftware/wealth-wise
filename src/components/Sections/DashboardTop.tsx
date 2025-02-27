@@ -72,10 +72,7 @@ const DashboardTopSection = () => {
             />
           </div>
         </TablesContainer>
-        <TablesContainer
-          title='Categories'
-          classes='col-span-4 rounded-e-xl dark:bg-dark-1 '
-        >
+        <TablesContainer classes='col-span-4 rounded-e-xl dark:bg-dark-1 '>
           <CategoryChart
             totalNetworth={networth.diffTotal}
             categories={categories}
