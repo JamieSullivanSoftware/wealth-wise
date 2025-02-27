@@ -198,7 +198,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
         title='Transactions'
         link={link}
       />
-      <div>
+      <div className='mt-8 2lg:mt-0'>
         {paginatedTransactions.transactions.map(
           (transaction: ITransactionData, i: number) => {
             const { asset, amount, updatedAt } = transaction;
