@@ -65,8 +65,8 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
     <>
       <TableHeader title='Assets' />
       <div>
-        <div className='grid grid-cols-12 mb-2 text-md font-medium text-black dark:text-white xsm:text-2xl'>
-          <div className='col-span-3 flex sm:col-span-2 items-center'>
+        <div className='grid grid-cols-12 mb-2 text-xs font-medium text-black dark:text-white xsm:text-xs'>
+          <div className='col-span-2 flex items-center'>
             <Button
               text='Date'
               onClick={() => handleSort('updatedAt')}
@@ -74,10 +74,10 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'}
+              classes={`text-sm xsm:text-base ${sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
-          <div className='col-span-3 flex sm:col-span-2 items-center'>
+          <div className='col-span-4 flex justify-center sm:col-span-2 items-center sm:justify-start'>
             <Button
               text='Name'
               onClick={() => handleSort('name')}
@@ -85,10 +85,10 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'name' ? 'font-bold' : 'font-normal'}
+              classes={`text-sm xsm:text-base ${sort.by === 'name' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
-          <div className='col-span-3 flex justify-center items-center sm:col-span-2'>
+          <div className='hidden col-span-3 sm:flex justify-center items-center sm:col-span-2'>
             <Button
               text='Category'
               onClick={() => handleSort('category')}
@@ -96,10 +96,10 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'category' ? 'font-bold' : 'font-normal'}
+              classes={`text-base ${sort.by === 'category' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
-          <div className='col-span-3 flex justify-center items-center sm:col-span-2'>
+          <div className='hidden col-span-3 sm:flex justify-center items-center sm:col-span-2'>
             <Button
               text='Shares'
               onClick={() => handleSort('numShares')}
@@ -107,7 +107,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'numShares' ? 'font-bold' : 'font-normal'}
+              classes={`text-base ${sort.by === 'numShares' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
           <div className='col-span-3 flex justify-center items-center sm:justify-end sm:col-span-2'>
@@ -118,7 +118,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'cost' ? 'font-bold' : 'font-normal'}
+              classes={`text-sm xsm:text-base ${sort.by === 'cost' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
           <div className='col-span-3 flex justify-end items-center sm:col-span-2'>
@@ -129,7 +129,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'value' ? 'font-bold' : 'font-normal'}
+              classes={`text-sm xsm:text-base ${sort.by === 'value' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
         </div>
@@ -141,16 +141,16 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm'
               key={i}
             >
-              <div className='col-span-3 flex flex-wrap items-center sm:col-span-2'>
+              <div className='col-span-2 flex flex-wrap items-center'>
                 {getEuropeanYear(new Date(updatedAt))}
               </div>
-              <div className='col-span-3 flex flex-wrap items-center sm:col-span-2'>
+              <div className='justify-center col-span-4 flex flex-wrap items-center sm:justify-start sm:col-span-2'>
                 {name}
               </div>
-              <div className='col-span-3 flex flex-wrap justify-center items-center sm:col-span-2'>
+              <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-2'>
                 {category}
               </div>
-              <div className='col-span-3 flex flex-wrap justify-center items-center sm:col-span-2'>
+              <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-2'>
                 {numShares}
               </div>
               <div className='col-span-3 flex flex-wrap justify-center items-center sm:justify-end sm:col-span-2'>
