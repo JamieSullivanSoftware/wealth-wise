@@ -15,7 +15,7 @@ export default async function Transactions() {
 
   return (
     <Layout>
-      <div className='hidden 2lg:grid grid-cols-12 mt-8 mb-22 mx-4'>
+      <div className='grid grid-cols-12 mt-8 mb-22 mx-4'>
         <TablesContainer classes='gap-6 col-span-12 rounded-xl dark:bg-dark-4'>
           <TransactionsTable
             transactions={transactions}

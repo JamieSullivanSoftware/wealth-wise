@@ -78,7 +78,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
       <TableHeader title='Transactions' />
       <div>
         <div className='grid grid-cols-12 mb-2 text-xs font-medium text-black dark:text-white xsm:text-sm'>
-          <div className='col-span-3 flex sm:col-span-2 items-center'>
+          <div className='col-span-2 flex items-center'>
             <Button
               text='Date'
               onClick={() => handleSort('updatedAt')}
@@ -89,7 +89,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
               classes={sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'}
             />
           </div>
-          <div className='col-span-3 flex sm:col-span-2 items-center'>
+          <div className='col-span-5 flex sm:col-span-3 items-center'>
             <Button
               text='Amount'
               onClick={() => handleSort('amount')}
@@ -97,10 +97,10 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'name' ? 'font-bold' : 'font-normal'}
+              classes={sort.by === 'amount' ? 'font-bold' : 'font-normal'}
             />
           </div>
-          <div className='col-span-3 flex sm:col-span-2 justify-center items-center'>
+          <div className='col-span-2 flex sm:col-span-1 justify-center items-center'>
             <Button
               text='Type'
               onClick={() => handleSort('type')}
@@ -108,10 +108,10 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'name' ? 'font-bold' : 'font-normal'}
+              classes={sort.by === 'type' ? 'font-bold' : 'font-normal'}
             />
           </div>
-          <div className='col-span-3 flex justify-center items-center sm:col-span-2'>
+          <div className='col-span-3 sm:col-span-2 flex justify-end sm:justify-center items-center'>
             <Button
               text='Category'
               onClick={() => handleSort('assetCategory')}
@@ -119,10 +119,12 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'numShares' ? 'font-bold' : 'font-normal'}
+              classes={
+                sort.by === 'assetCategory' ? 'font-bold' : 'font-normal'
+              }
             />
           </div>
-          <div className='col-span-3 flex justify-end items-center sm:col-span-2'>
+          <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
             <Button
               text='Asset Name'
               onClick={() => handleSort('assetName')}
@@ -130,10 +132,10 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'category' ? 'font-bold' : 'font-normal'}
+              classes={sort.by === 'assetName' ? 'font-bold' : 'font-normal'}
             />
           </div>
-          <div className='col-span-3 flex justify-end items-center sm:col-span-2'>
+          <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
             <Button
               text='Asset Total'
               onClick={() => handleSort('assetTotal')}
@@ -141,7 +143,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={sort.by === 'numShares' ? 'font-bold' : 'font-normal'}
+              classes={sort.by === 'assetTotal' ? 'font-bold' : 'font-normal'}
             />
           </div>
         </div>
@@ -155,25 +157,25 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
                 className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm'
                 key={i}
               >
-                <div className='col-span-3 flex flex-wrap items-center sm:col-span-2'>
+                <div className='col-span-2 flex flex-wrap items-center'>
                   {getEuropeanYear(new Date(updatedAt))}
                 </div>
-                <div className='col-span-3 flex flex-wrap items-center sm:col-span-2'>
+                <div className='col-span-5 flex flex-wrap items-center sm:col-span-3'>
                   <TransactionInfo
                     amount={amount}
                     isFullTable
                   />
                 </div>
-                <div className='col-span-3 flex flex-wrap justify-center items-center sm:col-span-2'>
+                <div className='col-span-2 flex flex-wrap justify-center items-center sm:col-span-1'>
                   {type}
                 </div>
-                <div className='col-span-3 flex flex-wrap justify-center items-center sm:col-span-2'>
+                <div className='col-span-3 flex flex-wrap justify-end sm:justify-center items-center sm:col-span-2'>
                   {asset.category}
                 </div>
-                <div className='col-span-3 flex flex-wrap justify-end items-center sm:col-span-2'>
+                <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                   {asset.name}
                 </div>
-                <div className='col-span-3 flex flex-wrap justify-end items-center sm:col-span-2'>
+                <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                   {currencyFormat.format(assetTotal)}
                 </div>
               </div>

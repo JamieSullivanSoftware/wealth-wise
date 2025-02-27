@@ -17,7 +17,7 @@ const TransactionAmountInfo = ({ amount, assetName, isFullTable }: IProps) => {
       <div className='col-span-2 xsm:col-span-1 flex items-center 2lg:col-span-3 2lg:justify-start mr-4'>
         {
           <div
-            className={`h-8 min-w-8 xsm:h-12 xsm:min-w-12 rounded-md flex items-center justify-center text-xl border border-stroke dark:border-0 ${isPositive ? 'bg-gray-1 text-mid-green dark:bg-dark-green dark:text-light-green' : 'bg-gray-1 text-mid-red dark:bg-dark-red dark:text-light-red'} ${isFullTable ? '2lg:h-10 2lg:min-w-10' : '2lg:h-12 2lg:min-w-12'} `}
+            className={`rounded-md flex items-center justify-center text-xl border border-stroke dark:border-0 ${isPositive ? 'bg-gray-1 text-mid-green dark:bg-dark-green dark:text-light-green' : 'bg-gray-1 text-mid-red dark:bg-dark-red dark:text-light-red'} ${isFullTable ? 'h-10 min-w-10' : '2lg:h-12 2lg:min-w-12'} `}
           >
             <span className='hidden xsm:flex 2lg:hidden'>
               <Icon icon={isPositive ? faArrowUp : faArrowDown} />
