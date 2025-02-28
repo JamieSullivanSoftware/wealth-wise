@@ -108,7 +108,6 @@ const DashboardTopSection = () => {
               />
             </>
           )}
-
           {activeTab === 'Categories' && (
             <CategoryChart
               totalNetworth={networth.diffTotal}

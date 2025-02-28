@@ -12,7 +12,7 @@ interface IProps {
 
 const AssetsChange = ({ diffPercentage }: IProps) => {
   const classNames = clsx(
-    'rounded-md flex gap-2 items-center justify-center font-medium text-xm border bg-gray-1 border-stroke dark:border-0 p-2 min-w-26',
+    'rounded-md flex gap-2 items-center justify-center font-medium text-xm border bg-gray-1 border-stroke dark:border-0 p-2 min-w-24',
     diffPercentage > 0 &&
       'text-mid-green dark:bg-dark-green dark:text-light-green',
     diffPercentage < 0 && 'text-mid-red dark:bg-dark-red dark:text-light-red',
@@ -49,7 +49,7 @@ const AssetsChange = ({ diffPercentage }: IProps) => {
       <span>
         <ChangeIcon />
       </span>
-      <span>{`${diffPercentage.toFixed(2)}%`}</span>
+      <span>{`${diffPercentage.toFixed(1)}%`}</span>
     </div>
   );
 };

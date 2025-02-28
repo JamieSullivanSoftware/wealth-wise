@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import CategoryInfo from '../Common/CategoryInfo';
 import { CATEGORIES } from '@/constants';
 import { toCamelCase } from '@/utils/string';
+import TableHeader from './TableHeader';
 
 const ApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
@@ -29,16 +30,25 @@ const CategoryChart = ({ categories, totalNetworth }: Props) => {
   };
 
   const getPercentageString = (total: number) => {
+    if (total === 0) {
+      return '0.00%';
+    }
     return `${getPercentageValue(total).toFixed(2)}%`;
   };
 
-  const series = categories.map((category: ICategory) => {
-    return Number(getPercentageValue(category.total).toFixed(2));
-  });
+  const series =
+    categories.length > 0
+      ? categories.map((category: ICategory) => {
+          return Number(getPercentageValue(category.total).toFixed(2));
+        })
+      : [100];
 
   const options = {
     chart: {
       toolbar: {
+        show: false,
+      },
+      labels: {
         show: false,
       },
     },
@@ -48,33 +58,38 @@ const CategoryChart = ({ categories, totalNetworth }: Props) => {
     legend: {
       show: false,
     },
+    tooltip: {
+      enabled: categories.length > 0,
+    },
     labels: categories.map((category: ICategory) => category.name),
     fill: {
-      colors: categories.map((category: ICategory) => {
-        const key = toCamelCase(category.name) as keyof ICategories;
-        return categoryColors[key];
-      }),
+      colors:
+        categories.length > 0
+          ? categories.map((category: ICategory) => {
+              const key = toCamelCase(category.name) as keyof ICategories;
+              return categoryColors[key];
+            })
+          : '#a4a6a8',
     },
   };
 
   return (
-    <div className='grid grid-cols-1 gap-8 items-center justify-between justify-items-center'>
+    <div className='grid grid-cols-1 gap-4 items-center justify-between'>
+      <TableHeader title='Categories' />
       <ApexChart
         options={options}
         series={series}
         type='donut'
-        height={250}
+        height={280}
         width={'100%'}
       />
       <div className='grid grid-rows-auto grid-cols-3 gap-6 justify-items-center'>
         {Object.values(CATEGORIES).map((v: string, i: number) => {
-          const foundCategory = categories.find(
-            (c: ICategory) => c.name === v
-          );
+          const foundCategory = categories.find((c: ICategory) => c.name === v);
           const category: ICategory = foundCategory
             ? foundCategory
             : {
-                name: CATEGORIES[v as keyof ICategories],
+                name: v,
                 total: 0,
               };
           return (
