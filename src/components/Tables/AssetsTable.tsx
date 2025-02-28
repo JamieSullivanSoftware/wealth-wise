@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { getAssets } from '@/utils/api';
 import Paginator from './Paginator';
 import TableHeader from './TableHeader';
+import AssetsChange from './AssetsChange';
 
 interface IProps {
   assets: IPaginatedAssets;
@@ -99,15 +100,15 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               classes={`text-base ${sort.by === 'category' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
-          <div className='hidden col-span-3 sm:flex justify-center items-center sm:col-span-2'>
+          <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
             <Button
-              text='Shares'
-              onClick={() => handleSort('numShares')}
+              text='Change'
+              onClick={() => handleSort('diffPercentage')}
               icon={faSort}
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={`text-base ${sort.by === 'numShares' ? 'font-bold' : 'font-normal'}`}
+              classes={`text-base ${sort.by === 'diffPercentage' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
           <div className='col-span-3 flex justify-center items-center sm:justify-end sm:col-span-2'>
@@ -135,7 +136,8 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
         </div>
 
         {paginatedAssets.assets.map((asset: IAssetData, i: number) => {
-          const { updatedAt, name, category, numShares, cost, value } = asset;
+          const { updatedAt, name, category, cost, value, diffPercentage } =
+            asset;
           return (
             <div
               className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm'
@@ -150,8 +152,8 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-2'>
                 {category}
               </div>
-              <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-2'>
-                {numShares}
+              <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
+                <AssetsChange diffPercentage={diffPercentage} />
               </div>
               <div className='col-span-3 flex flex-wrap justify-center items-center sm:justify-end sm:col-span-2'>
                 {currencyFormat.format(cost)}
@@ -181,9 +183,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
       <div className='mt-8 2lg:mt-0'>
         <div className='grid grid-cols-12 text-xs font-medium text-black dark:text-white xsm:text-sm'>
           <div className='col-span-3 flex items-center'>Name</div>
-          <div className='col-span-3 flex justify-center items-center'>
-            Category
-          </div>
+          <div className='col-span-3 flex justify-end items-center'>Change</div>
           <div className='col-span-3 flex justify-center items-center 2lg:justify-end'>
             Cost
           </div>
@@ -191,7 +191,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
         </div>
 
         {paginatedAssets.assets.map((asset: IAssetData, i: number) => {
-          const { name, category, cost, value } = asset;
+          const { name, cost, value, diffPercentage } = asset;
 
           return (
             <div
@@ -201,8 +201,8 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               <div className='col-span-3 flex flex-wrap items-center '>
                 {name}
               </div>
-              <div className='col-span-3 flex flex-wrap justify-center items-center'>
-                {category}
+              <div className='col-span-3 flex flex-wrap justify-end items-center'>
+                <AssetsChange diffPercentage={diffPercentage} />
               </div>
               <div className='col-span-3 flex flex-wrap justify-center items-center 2lg:justify-end'>
                 {currencyFormat.format(cost)}

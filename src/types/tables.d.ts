@@ -20,6 +20,7 @@ declare interface IAssetData {
   numShares: number;
   cost: number;
   value: number;
+  diffPercentage: number;
 }
 
 declare interface ITransationAssetData {
@@ -48,7 +49,8 @@ declare type AssetSortBy =
   | 'category'
   | 'numShares'
   | 'cost'
-  | 'value';
+  | 'value'
+  | 'diffPercentage';
 
 declare type TransactionSortBy =
   | 'updatedAt'

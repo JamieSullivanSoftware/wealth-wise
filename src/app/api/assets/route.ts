@@ -29,9 +29,18 @@ export const GET = async (request: NextRequest) => {
     const skip = (page - 1) * limit;
 
     const pipeline: PipelineStage[] = [
-      { $sort: { [sortBy]: order, _id: order } },
-      { $skip: skip },
-      { $limit: limit },
+      {
+        $addFields: {
+          diffTotal: {
+            $sum: {
+              $subtract: [
+                { $ifNull: ['$value', 0] },
+                { $ifNull: ['$cost', 0] },
+              ],
+            },
+          },
+        },
+      },
       {
         $project: {
           _id: 1,
@@ -41,8 +50,42 @@ export const GET = async (request: NextRequest) => {
           numShares: 1,
           value: 1,
           cost: 1,
+          diffPercentage: {
+            $round: [
+              {
+                $multiply: [
+                  {
+                    $cond: {
+                      if: {
+                        $or: [
+                          { $eq: ['$diffTotal', 0] },
+                          { $eq: ['$cost', 0] },
+                          { $not: ['$cost'] },
+                        ],
+                      },
+                      then: 0,
+                      else: {
+                        $divide: ['$diffTotal', '$cost'],
+                      },
+                    },
+                  },
+                  100,
+                ],
+              },
+              2,
+            ],
+          },
         },
       },
+      {
+        $sort: {
+          ...(sortBy === 'diffPercentage' ? { diffPercentage: order } : {}),
+          ...{ [sortBy]: order },
+          _id: order,
+        },
+      },
+      { $skip: skip },
+      { $limit: limit },
     ];
 
     const assets = await Asset.aggregate(pipeline).exec();
