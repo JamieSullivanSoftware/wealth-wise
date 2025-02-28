@@ -97,7 +97,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={`text-base ${sort.by === 'category' ? 'font-bold' : 'font-normal'}`}
+              classes={`text-sm xsm:text-base ${sort.by === 'category' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
           <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
@@ -108,7 +108,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               iconAlign='right'
               hasBg={false}
               iconSize='xs'
-              classes={`text-base ${sort.by === 'diffPercentage' ? 'font-bold' : 'font-normal'}`}
+              classes={`text-sm xsm:text-base ${sort.by === 'diffPercentage' ? 'font-bold' : 'font-normal'}`}
             />
           </div>
           <div className='col-span-3 flex justify-center items-center sm:justify-end sm:col-span-2'>
@@ -183,7 +183,9 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
       <div className='mt-8 2lg:mt-0'>
         <div className='grid grid-cols-12 text-xs font-medium text-black dark:text-white xsm:text-sm'>
           <div className='col-span-3 flex items-center'>Name</div>
-          <div className='col-span-3 flex justify-end items-center'>Change</div>
+          <div className='col-span-3 flex justify-center 2lg:justify-end items-center'>
+            Change
+          </div>
           <div className='col-span-3 flex justify-center items-center 2lg:justify-end'>
             Cost
           </div>
@@ -201,7 +203,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
               <div className='col-span-3 flex flex-wrap items-center '>
                 {name}
               </div>
-              <div className='col-span-3 flex flex-wrap justify-end items-center'>
+              <div className='col-span-3 flex flex-wrap justify-center 2lg:justify-end items-center'>
                 <AssetsChange diffPercentage={diffPercentage} />
               </div>
               <div className='col-span-3 flex flex-wrap justify-center items-center 2lg:justify-end'>
