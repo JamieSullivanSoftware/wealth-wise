@@ -20,6 +20,8 @@ declare interface IAssetData {
   numShares: number;
   cost: number;
   value: number;
+  numShares: number;
+  detail: string;
   diffPercentage: number;
 }
 

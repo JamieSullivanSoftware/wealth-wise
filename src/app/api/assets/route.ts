@@ -50,6 +50,7 @@ export const GET = async (request: NextRequest) => {
           numShares: 1,
           value: 1,
           cost: 1,
+          detail: 1,
           diffPercentage: {
             $round: [
               {

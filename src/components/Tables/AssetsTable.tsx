@@ -8,6 +8,7 @@ import Paginator from './Paginator';
 import TableHeader from './TableHeader';
 import AssetsChange from './AssetsChange';
 import NoResults from '../Common/NoResults';
+import { CATEGORIES } from '@/constants';
 
 interface IProps {
   assets: IPaginatedAssets;
@@ -62,16 +63,6 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
       fetchAssets();
     }
   }, [sort, sort.by, sort.order, page, limit, showFullData]);
-
-  // if (paginatedAssets.assets.length > 0) {
-  //   return (
-  //     <div className='flex flex-col justify-center items-center min-h-[300px]'>
-  //       <h3 className='text-lg sm:text-xl font-medium text-black dark:text-gray-1'>
-  //         No Assets to Show
-  //       </h3>
-  //     </div>
-  //   );
-  // }
 
   return showFullData ? (
     paginatedAssets.assets.length > 0 ? (
@@ -147,8 +138,16 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
             </div>
           </div>
           {paginatedAssets.assets.map((asset: IAssetData, i: number) => {
-            const { updatedAt, name, category, cost, value, diffPercentage } =
-              asset;
+            const {
+              updatedAt,
+              name,
+              category,
+              cost,
+              value,
+              diffPercentage,
+              detail,
+              numShares,
+            } = asset;
             return (
               <div
                 className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm'
@@ -157,8 +156,14 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                 <div className='col-span-2 flex flex-wrap items-center'>
                   {getEuropeanYear(new Date(updatedAt))}
                 </div>
-                <div className='justify-center col-span-4 flex flex-wrap items-center sm:justify-start sm:col-span-2'>
-                  {name}
+                <div className='justify-center col-span-4 flex flex-col flex-wrap gap-2 sm:justify-start sm:col-span-2'>
+                  <span className='font-medium'>{name}</span>
+                  <span className='font-light'>
+                    {category === CATEGORIES.stocks ||
+                    category === CATEGORIES.crypto
+                      ? `${numShares} Share${numShares > 1 ? 's' : ''}`
+                      : detail}
+                  </span>
                 </div>
                 <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-2'>
                   {category}
@@ -210,14 +215,19 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
           </div>
           <div className='col-span-3 flex justify-end items-center'>Value</div>
         </div>
-
         {paginatedAssets.assets.map((asset: IAssetData, i: number) => (
           <div
             className='grid grid-cols-12 py-4 text-xs text-black dark:text-white xsm:text-sm'
             key={i}
           >
-            <div className='col-span-3 flex flex-wrap items-center '>
-              {asset.name}
+            <div className='col-span-3 flex flex-col gap-2 flex-wrap'>
+              <span className='font-medium'>{asset.name}</span>
+              <span className='font-light'>
+                {asset.category === CATEGORIES.stocks ||
+                asset.category === CATEGORIES.crypto
+                  ? `${asset.numShares} Share${asset.numShares > 1 ? 's' : ''}`
+                  : `${asset.detail}`}
+              </span>
             </div>
             <div className='col-span-3 flex flex-wrap justify-center 2lg:justify-end items-center'>
               <AssetsChange diffPercentage={asset.diffPercentage} />
