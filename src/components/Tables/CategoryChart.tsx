@@ -11,11 +11,11 @@ const ApexChart = dynamic(() => import('react-apexcharts'), {
 });
 
 interface Props {
-  categories: ICategory[];
-  totalNetworth: number;
+  categories?: ICategory[];
+  totalNetworth?: number;
 }
 
-const CategoryChart = ({ categories, totalNetworth }: Props) => {
+const CategoryChart = ({ categories = [], totalNetworth = 0 }: Props) => {
   const categoryColors: ICategories = {
     accounts: '#3E76E0',
     cars: '#67bc8c',
@@ -26,13 +26,13 @@ const CategoryChart = ({ categories, totalNetworth }: Props) => {
   };
 
   const getPercentageValue = (total: number) => {
-    return (total / totalNetworth) * 100;
+    if (totalNetworth > 0) {
+      return (total / totalNetworth) * 100;
+    }
+    return 0;
   };
 
   const getPercentageString = (total: number) => {
-    if (total === 0) {
-      return '0.00%';
-    }
     return `${getPercentageValue(total).toFixed(2)}%`;
   };
 
@@ -76,13 +76,15 @@ const CategoryChart = ({ categories, totalNetworth }: Props) => {
   return (
     <div className='grid grid-cols-1 gap-4 items-center justify-between'>
       <TableHeader title='Categories' />
-      <ApexChart
-        options={options}
-        series={series}
-        type='donut'
-        height={280}
-        width={'100%'}
-      />
+      <div className='min-h-[280px]'>
+        <ApexChart
+          options={options}
+          series={series}
+          type='donut'
+          height={280}
+          width={'100%'}
+        />
+      </div>
       <div className='grid grid-rows-auto grid-cols-3 gap-6 justify-items-center'>
         {Object.values(CATEGORIES).map((v: string, i: number) => {
           const foundCategory = categories.find((c: ICategory) => c.name === v);

@@ -5,16 +5,11 @@ import Link from 'next/link';
 import DarkModeSwitcher from './DarkModeSwitcher';
 import User from './User';
 import HamburgerButton from './HamburgerButton';
-import {
-  ClientSafeProvider,
-  getProviders,
-  LiteralUnion,
-  signIn,
-  useSession,
-} from 'next-auth/react';
-import { BuiltInProviderType } from 'next-auth/providers/index';
+import { getProviders, signIn, useSession } from 'next-auth/react';
 import ProfileImage from './ProfileImage';
 import Button from '../Common/Button';
+
+import type { Providers } from '@/types/auth';
 
 interface IProps {
   sidebarOpen: string | boolean | undefined;
@@ -23,10 +18,7 @@ interface IProps {
 
 const Header = ({ sidebarOpen, setSidebarOpen }: IProps) => {
   const { data: session } = useSession();
-  const [providers, setProviders] = useState<Record<
-    LiteralUnion<BuiltInProviderType, string>,
-    ClientSafeProvider
-  > | null>(null);
+  const [providers, setProviders] = useState<Providers>(null);
 
   useEffect(() => {
     const setAuthProviders = async () => {

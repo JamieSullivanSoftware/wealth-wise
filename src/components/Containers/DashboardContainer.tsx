@@ -3,8 +3,8 @@ import DashboardBottom from '../Sections/DashboardBottom';
 import DashboardTop from '../Sections/DashboardTop';
 
 interface IProps {
-  transactions: ITransaction[];
-  assets: IAsset[];
+  transactions: IPaginatedTransactions;
+  assets: IPaginatedAssets;
 }
 
 const Dashboard = ({ transactions, assets }: IProps) => {
