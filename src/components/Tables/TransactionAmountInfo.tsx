@@ -1,7 +1,5 @@
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { clsx } from 'clsx/lite';
 
-import Icon from '../Common/Icon';
 import { currencyFormat } from '@/utils/string';
 import AmountIcon from './AmountIcon';
 
@@ -28,7 +26,9 @@ const TransactionAmountInfo = ({ amount, assetName, isFullTable }: IProps) => {
 
   return (
     <>
-      <div className='col-span-3 2xsm:col-span-2 xsm:col-span-1 flex items-center 2lg:col-span-3 2lg:justify-start'>
+      <div
+        className={`col-span-3 2xsm:col-span-2 xsm:col-span-1 flex items-center 2lg:col-span-3 2lg:justify-start ${isFullTable ? 'mr-4' : ''}`}
+      >
         {
           <div className={iconClassNames}>
             <span className='hidden xsm:flex 2lg:hidden'>

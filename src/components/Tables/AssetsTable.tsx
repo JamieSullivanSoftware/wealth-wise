@@ -70,7 +70,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
         <TableHeader title='Assets' />
         <div>
           <div className='grid grid-cols-12 mb-2 text-xs font-medium text-black dark:text-white xsm:text-xs'>
-            <div className='col-span-2 flex items-center'>
+            <div className='col-span-3 sm:col-span-2 flex items-center'>
               <Button
                 text='Date'
                 onClick={() => handleSort('updatedAt')}
@@ -81,7 +81,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                 classes={`text-sm xsm:text-base ${sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'}`}
               />
             </div>
-            <div className='col-span-4 flex justify-center sm:col-span-2 items-center sm:justify-start'>
+            <div className='col-span-6 flex sm:col-span-2 items-center'>
               <Button
                 text='Name'
                 onClick={() => handleSort('name')}
@@ -103,7 +103,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                 classes={`text-sm xsm:text-base ${sort.by === 'category' ? 'font-bold' : 'font-normal'}`}
               />
             </div>
-            <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
+            <div className='col-span-3 flex justify-end items-center sm:col-span-2'>
               <Button
                 text='Change'
                 onClick={() => handleSort('diffPercentage')}
@@ -114,7 +114,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                 classes={`text-sm xsm:text-base ${sort.by === 'diffPercentage' ? 'font-bold' : 'font-normal'}`}
               />
             </div>
-            <div className='col-span-3 flex justify-center items-center sm:justify-end sm:col-span-2'>
+            <div className='hidden col-span-3 sm:flex justify-center items-center sm:justify-end sm:col-span-2'>
               <Button
                 text='Cost'
                 onClick={() => handleSort('cost')}
@@ -125,7 +125,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                 classes={`text-sm xsm:text-base ${sort.by === 'cost' ? 'font-bold' : 'font-normal'}`}
               />
             </div>
-            <div className='col-span-3 flex justify-end items-center sm:col-span-2'>
+            <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
               <Button
                 text='Value'
                 onClick={() => handleSort('value')}
@@ -153,10 +153,10 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                 className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm'
                 key={i}
               >
-                <div className='col-span-2 flex flex-wrap items-center'>
+                <div className='col-span-3 sm:col-span-2 flex flex-wrap items-center'>
                   {getEuropeanYear(new Date(updatedAt))}
                 </div>
-                <div className='justify-center col-span-4 flex flex-col flex-wrap gap-2 sm:justify-start sm:col-span-2'>
+                <div className='justify-center col-span-6 flex flex-col flex-wrap gap-2 sm:justify-start sm:col-span-2'>
                   <span className='font-medium'>{name}</span>
                   <span className='font-light'>
                     {category === CATEGORIES.stocks ||
@@ -168,13 +168,13 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                 <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-2'>
                   {category}
                 </div>
-                <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
+                <div className='col-span-3 flex flex-wrap justify-end items-center sm:col-span-2'>
                   <AssetsChange diffPercentage={diffPercentage} />
                 </div>
-                <div className='col-span-3 flex flex-wrap justify-center items-center sm:justify-end sm:col-span-2'>
+                <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:justify-end sm:col-span-2'>
                   {currencyFormat.format(cost)}
                 </div>
-                <div className='col-span-3 flex flex-wrap justify-end items-center sm:col-span-2'>
+                <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                   {currencyFormat.format(value)}
                 </div>
               </div>

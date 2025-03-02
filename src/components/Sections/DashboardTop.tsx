@@ -104,6 +104,7 @@ const DashboardTopSection = () => {
               <DashboardTabButtons
                 handleTabClick={handleTabClick}
                 tabs={['Chart', 'Categories']}
+                activeTab={activeTab}
               />
               {activeTab === 'Chart' && (
                 <>

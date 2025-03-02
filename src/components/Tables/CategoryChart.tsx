@@ -75,7 +75,9 @@ const CategoryChart = ({ categories = [], totalNetworth = 0 }: Props) => {
 
   return (
     <div className='grid grid-cols-1 gap-4 items-center justify-between'>
-      <TableHeader title='Categories' />
+      <div className='hidden md:block'>
+        <TableHeader title='Categories' />
+      </div>
       <div className='min-h-[280px]'>
         <ApexChart
           options={options}

@@ -11,7 +11,7 @@ import {
 import { getTransactions } from '@/utils/api';
 import Button from '../Common/Button';
 import Paginator from './Paginator';
-import TransactionInfo from './TransactionAmountInfo';
+import TransactionAmountInfo from './TransactionAmountInfo';
 import TableHeader from './TableHeader';
 import NoResults from '../Common/NoResults';
 
@@ -80,7 +80,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
         <TableHeader title='Transactions' />
         <div>
           <div className='grid grid-cols-12 mb-2 text-xs font-medium text-black dark:text-white xsm:text-sm'>
-            <div className='col-span-2 flex items-center'>
+            <div className='col-span-3 sm:col-span-2 flex items-center'>
               <Button
                 text='Date'
                 onClick={() => handleSort('updatedAt')}
@@ -91,7 +91,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
                 classes={sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'}
               />
             </div>
-            <div className='col-span-5 flex sm:col-span-3 items-center'>
+            <div className='col-span-6 flex sm:col-span-3 items-center'>
               <Button
                 text='Amount'
                 onClick={() => handleSort('amount')}
@@ -102,7 +102,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
                 classes={sort.by === 'amount' ? 'font-bold' : 'font-normal'}
               />
             </div>
-            <div className='col-span-2 flex sm:col-span-1 justify-center items-center'>
+            <div className='col-span-3 flex sm:col-span-1 justify-end sm:justify-center items-center'>
               <Button
                 text='Type'
                 onClick={() => handleSort('type')}
@@ -113,7 +113,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
                 classes={sort.by === 'type' ? 'font-bold' : 'font-normal'}
               />
             </div>
-            <div className='col-span-3 sm:col-span-2 flex justify-end sm:justify-center items-center'>
+            <div className='hidden col-span-3 sm:col-span-2 sm:flex justify-end sm:justify-center items-center'>
               <Button
                 text='Category'
                 onClick={() => handleSort('assetCategory')}
@@ -160,19 +160,19 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
                   className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm'
                   key={i}
                 >
-                  <div className='col-span-2 flex flex-wrap items-center'>
+                  <div className='col-span-3 sm:col-span-2 flex flex-wrap items-center'>
                     {getEuropeanYear(new Date(updatedAt))}
                   </div>
-                  <div className='col-span-5 flex flex-wrap items-center sm:col-span-3'>
-                    <TransactionInfo
+                  <div className='col-span-6 flex flex-wrap items-center sm:col-span-3'>
+                    <TransactionAmountInfo
                       amount={amount}
                       isFullTable
                     />
                   </div>
-                  <div className='col-span-2 flex flex-wrap justify-center items-center sm:col-span-1'>
-                    {type}
+                  <div className='font-medium col-span-3 flex flex-wrap justify-end sm:justify-center items-center sm:col-span-1'>
+                    {type.toUpperCase()}
                   </div>
-                  <div className='col-span-3 flex flex-wrap justify-end sm:justify-center items-center sm:col-span-2'>
+                  <div className='hidden col-span-3 sm:flex flex-wrap justify-end sm:justify-center items-center sm:col-span-2'>
                     {asset.category}
                   </div>
                   <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
@@ -220,7 +220,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
                 className='grid grid-cols-12 pb-6 text-xs text-black dark:text-white xsm:text-sm'
                 key={i}
               >
-                <TransactionInfo
+                <TransactionAmountInfo
                   amount={amount}
                   assetName={asset.name}
                 />
