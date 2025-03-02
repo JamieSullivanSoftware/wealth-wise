@@ -59,30 +59,44 @@ const Paginator = ({
     return pages;
   };
 
+  const ShowResults = () => (
+    <div>
+      <p className='text-xs xsm:text-sm text-black dark:text-white'>
+        {`Showing ${currentPage} to ${totalPages} of ${totalCount} results`}
+      </p>
+    </div>
+  );
+
   return (
     <div className='flex items-center justify-between text-white'>
-      {/* mobile */}
-      {/* <div className='flex flex-1 justify-between sm:hidden'>
-        <a
-          href='#'
-          className='relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50'
-        >
-          Previous
-        </a>
-        <a
-          href='#'
-          className='relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50'
-        >
-          Next
-        </a>
-      </div> */}
-      {/* mobile */}
-      <div className='hidden sm:flex sm:flex-1 sm:items-center sm:justify-between'>
-        <div>
-          <p className='text-sm text-black dark:text-white'>
-            {`Showing ${currentPage} to ${totalPages} of ${totalCount} results`}
-          </p>
+      {/* md - below 768px */}
+      <div className='flex flex-col flex-1 items-center justify-center md:hidden'>
+        <div className='flex flex-1 justify-between items-center w-full mb-6'>
+          <button
+            disabled={currentPage === 1}
+            onClick={() => onPageChange(currentPage - 1)}
+            className={`rounded-md border border-stroke  dark:border-strokedark focus:z-20 focus:outline-offset-0  px-3.5 py-1.5 ${currentPage > 1 ? `${textClasses} ${hoverClasses}` : 'text-gray-3 dark:text-gray-4 cursor-default'}`}
+          >
+            <Icon icon={faAngleLeft} />
+          </button>
+          <DropdownList
+            heading={`Show ${limit}`}
+            labels={['5', '10', '20']}
+            onClick={onLimitChange}
+          />
+          <button
+            disabled={currentPage === totalPages}
+            onClick={() => onPageChange(currentPage + 1)}
+            className={`rounded-md border border-stroke  dark:border-strokedark focus:z-20 focus:outline-offset-0  px-3.5 py-1.5 ${currentPage < totalPages ? `${textClasses} ${hoverClasses}` : 'text-gray-3 dark:text-gray-4 cursor-default'}`}
+          >
+            <Icon icon={faAngleRight} />
+          </button>
         </div>
+        <ShowResults />
+      </div>
+      {/* md - below 768px */}
+      <div className='hidden md:flex md:flex-1 sm:items-center md:justify-between'>
+        <ShowResults />
         <div className='flex justify-between items-center gap-4'>
           <DropdownList
             heading={`Show ${limit} results`}

@@ -5,16 +5,11 @@ import Link from 'next/link';
 import DarkModeSwitcher from './DarkModeSwitcher';
 import User from './User';
 import HamburgerButton from './HamburgerButton';
-import {
-  ClientSafeProvider,
-  getProviders,
-  LiteralUnion,
-  signIn,
-  useSession,
-} from 'next-auth/react';
-import { BuiltInProviderType } from 'next-auth/providers/index';
+import { getProviders, signIn, useSession } from 'next-auth/react';
 import ProfileImage from './ProfileImage';
 import Button from '../Common/Button';
+
+import type { Providers } from '@/types/auth';
 
 interface IProps {
   sidebarOpen: string | boolean | undefined;
@@ -23,10 +18,7 @@ interface IProps {
 
 const Header = ({ sidebarOpen, setSidebarOpen }: IProps) => {
   const { data: session } = useSession();
-  const [providers, setProviders] = useState<Record<
-    LiteralUnion<BuiltInProviderType, string>,
-    ClientSafeProvider
-  > | null>(null);
+  const [providers, setProviders] = useState<Providers>(null);
 
   useEffect(() => {
     const setAuthProviders = async () => {
@@ -39,7 +31,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }: IProps) => {
   return (
     <header className='sticky top-0 z-999 bg-white drop-shadow-1 dark:bg-dark-3 dark:drop-shadow-none'>
       <div className='flex flex-grow items-center shadow-2 px-4 py-4 md:px-6 2xl:px-11'>
-        <div className='flex items-center justify-between w-full sm:hidden'>
+        <div className='flex items-center justify-between w-full 2lg:hidden'>
           <HamburgerButton
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
@@ -54,7 +46,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }: IProps) => {
           </Link>
         </div>
 
-        <div className='hidden sm:flex w-full items-center justify-between'>
+        <div className='flex w-full items-center justify-end gap-12 2lg:justify-between'>
           <DarkModeSwitcher />
 
           {session ? (
