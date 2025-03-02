@@ -30,7 +30,7 @@ const NetworthSummary = ({
 
   return (
     <>
-      <div className='flex items-center justify-between'>
+      <div className='flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-start sm:justify-between'>
         <h3 className='text-xl font-medium text-black dark:text-gray-3'>
           Total Net Worth
         </h3>
