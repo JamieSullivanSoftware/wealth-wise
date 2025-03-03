@@ -16,11 +16,6 @@ interface IProps {
 }
 
 const AssetsTable = ({ assets, showFullData }: IProps) => {
-  const link: ILink = {
-    href: '/assets',
-    text: 'View All',
-  };
-
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
     order: 'desc',
@@ -202,7 +197,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
     <>
       <TableHeader
         title='Assets'
-        link={link}
+        btnText='Add'
       />
       <div className='mt-8 2lg:mt-0'>
         <div className='grid grid-cols-12 text-xs font-medium text-black dark:text-white xsm:text-sm'>

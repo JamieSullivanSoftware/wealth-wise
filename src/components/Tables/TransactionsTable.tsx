@@ -21,11 +21,6 @@ interface IProps {
 }
 
 const TransactionsTable = ({ transactions, showFullData }: IProps) => {
-  const link: ILink = {
-    href: '/transactions',
-    text: 'View All',
-  };
-
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
     order: 'desc',
@@ -207,7 +202,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
     <>
       <TableHeader
         title='Transactions'
-        link={link}
+        btnText='Add'
       />
       <div className='mt-8 2lg:mt-0'>
         {paginatedTransactions.transactions.map(
@@ -217,7 +212,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
 
             return (
               <div
-                className='grid grid-cols-12 pb-6 text-xs text-black dark:text-white xsm:text-sm'
+                className='grid grid-cols-12 pb-9 text-xs text-black dark:text-white xsm:text-sm'
                 key={i}
               >
                 <TransactionAmountInfo
