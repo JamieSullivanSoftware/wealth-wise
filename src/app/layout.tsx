@@ -5,17 +5,12 @@ import '@/css/satoshi.css';
 import '@/css/style.css';
 import AuthProvider from '@/components/Common/AuthProvider';
 import Script from 'next/script';
-import theme from '@/utils/theme';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const onLoad = () => {
-    console.log('loading');
-  };
-
   return (
     <AuthProvider>
       <html lang='en'>
@@ -26,7 +21,6 @@ export default function RootLayout({
             integrity='sha384-NvKbDTEnL+A8F/AA5Tc5kmMLSJHUO868P+lDtTpJIeQdGYaUIuLr4lVGOEA1OcMy'
             crossOrigin='anonymous'
           />
-          {/* <script>alert("No Ui for you")</script> */}
         </head>
         <body suppressHydrationWarning={true}>
           <Script
