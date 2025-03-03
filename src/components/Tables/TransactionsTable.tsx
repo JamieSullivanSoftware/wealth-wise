@@ -212,7 +212,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
 
             return (
               <div
-                className='grid grid-cols-12 pb-6 text-xs text-black dark:text-white xsm:text-sm'
+                className='grid grid-cols-12 pb-9 text-xs text-black dark:text-white xsm:text-sm'
                 key={i}
               >
                 <TransactionAmountInfo
