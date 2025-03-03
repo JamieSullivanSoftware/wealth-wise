@@ -1,5 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
+import type { ApexOptions } from 'apexcharts';
 
 import CategoryInfo from '../Common/CategoryInfo';
 import { CATEGORIES } from '@/constants';
@@ -43,12 +44,9 @@ const CategoryChart = ({ categories = [], totalNetworth = 0 }: Props) => {
         })
       : [100];
 
-  const options = {
+  const options: ApexOptions = {
     chart: {
       toolbar: {
-        show: false,
-      },
-      labels: {
         show: false,
       },
     },
@@ -69,7 +67,7 @@ const CategoryChart = ({ categories = [], totalNetworth = 0 }: Props) => {
               const key = toCamelCase(category.name) as keyof ICategories;
               return categoryColors[key];
             })
-          : '#a4a6a8',
+          : ['#a4a6a8'],
     },
   };
 

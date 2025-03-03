@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic';
+import type { ApexOptions } from 'apexcharts';
 
 import Loader from '../Common/Loader';
 import { getEuropeanYear, largeCurrencyFormat } from '@/utils/string';
@@ -43,11 +44,11 @@ const NetworthTable = ({
       case 'week':
         return `${new Intl.DateTimeFormat('en', { weekday: 'short' }).format(formattedDate)} ${formattedDate.getDate()}`;
       default:
-        break;
+        return '';
     }
   };
 
-  const options = {
+  const options: ApexOptions = {
     chart: {
       toolbar: {
         show: false,
@@ -59,7 +60,9 @@ const NetworthTable = ({
     legend: {
       show: true,
     },
-    labels: data.map((item: INetworthResult) => getDateLabel(item.date)),
+    labels: data
+      .map((item: INetworthResult) => getDateLabel(item.date))
+      .filter(Boolean) as string[],
     fill: {
       colors: ['#2CE48A'],
     },
@@ -76,14 +79,12 @@ const NetworthTable = ({
       },
     },
     xaxis: {
-      category: 'datetime',
       axisBorder: {
         show: false,
       },
       axisTicks: { show: false },
     },
     yaxis: {
-      category: 'numeric',
       opposite: true,
       min: 0,
       max: maxValue,
