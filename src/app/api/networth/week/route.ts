@@ -3,7 +3,7 @@ import type { PipelineStage } from 'mongoose';
 import {
   formatCategories,
   generateCumulatedNetworth,
-} from '@/app/helpers/routeHelper';
+} from '@/helpers/routeHelper';
 import Asset from '@/models/Asset';
 
 export const GET = async () => {
