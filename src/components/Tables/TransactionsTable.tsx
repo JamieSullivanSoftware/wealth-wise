@@ -21,11 +21,6 @@ interface IProps {
 }
 
 const TransactionsTable = ({ transactions, showFullData }: IProps) => {
-  const link: ILink = {
-    href: '/transactions',
-    text: 'View All',
-  };
-
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
     order: 'desc',
@@ -207,7 +202,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
     <>
       <TableHeader
         title='Transactions'
-        link={link}
+        btnText='Add'
       />
       <div className='mt-8 2lg:mt-0'>
         {paginatedTransactions.transactions.map(
