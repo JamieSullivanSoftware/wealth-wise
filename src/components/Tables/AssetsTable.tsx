@@ -9,6 +9,8 @@ import TableHeader from './TableHeader';
 import AssetsChange from './AssetsChange';
 import NoResults from '../Common/NoResults';
 import { CATEGORIES } from '@/constants';
+import Loader from '../Common/Loader';
+import { useFirstRender } from '@/hooks/useFirstRender';
 
 interface IProps {
   assets: IPaginatedAssets;
@@ -16,10 +18,12 @@ interface IProps {
 }
 
 const AssetsTable = ({ assets, showFullData }: IProps) => {
+  const isFirstRender = useFirstRender();
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
     order: 'desc',
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
   const [paginatedAssets, setPaginatedAssets] =
@@ -54,10 +58,15 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
       const assets = await getAssets(limit, sort.by, sort.order, page);
       setPaginatedAssets(assets);
     };
-    if (showFullData) {
-      fetchAssets();
+    if (!isFirstRender && showFullData) {
+      setIsLoading(true);
+      fetchAssets().finally(() => setIsLoading(false));
     }
-  }, [sort, sort.by, sort.order, page, limit, showFullData]);
+  }, [sort, sort.by, sort.order, page, limit, showFullData, isFirstRender]);
+
+  if (isLoading) {
+    return <Loader isFullScreen />;
+  }
 
   return showFullData ? (
     paginatedAssets.assets.length > 0 ? (

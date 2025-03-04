@@ -44,7 +44,6 @@ const DashboardTopSection = () => {
       .finally(() => {
         setLoading(false);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeFilter]);
 
   return (
@@ -84,7 +83,7 @@ const DashboardTopSection = () => {
         <TablesContainer classes='col-span-4 rounded-e-xl dark:bg-dark-1 '>
           <div className='min-h-[365px]'>
             <CategoryChart
-              totalNetworth={networth?.diffTotal}
+              networthDiffTotal={networth?.diffTotal}
               categories={categories}
             />
           </div>
@@ -124,7 +123,7 @@ const DashboardTopSection = () => {
               )}
               {activeTab === 'Categories' && (
                 <CategoryChart
-                  totalNetworth={networth.diffTotal}
+                  networthDiffTotal={networth.diffTotal}
                   categories={categories}
                 />
               )}

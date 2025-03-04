@@ -13,10 +13,11 @@ const ApexChart = dynamic(() => import('react-apexcharts'), {
 
 interface Props {
   categories?: ICategory[];
-  totalNetworth?: number;
+  networthDiffTotal?: number;
 }
 
-const CategoryChart = ({ categories = [], totalNetworth = 0 }: Props) => {
+const CategoryChart = ({ categories = [], networthDiffTotal = 0 }: Props) => {
+  const hasData = networthDiffTotal > 0 && categories.length > 0;
   const categoryColors: ICategories = {
     accounts: '#3E76E0',
     cars: '#67bc8c',
@@ -27,8 +28,8 @@ const CategoryChart = ({ categories = [], totalNetworth = 0 }: Props) => {
   };
 
   const getPercentageValue = (total: number) => {
-    if (totalNetworth > 0) {
-      return (total / totalNetworth) * 100;
+    if (networthDiffTotal > 0) {
+      return (total / networthDiffTotal) * 100;
     }
     return 0;
   };
@@ -37,12 +38,11 @@ const CategoryChart = ({ categories = [], totalNetworth = 0 }: Props) => {
     return `${getPercentageValue(total).toFixed(2)}%`;
   };
 
-  const series =
-    categories.length > 0
-      ? categories.map((category: ICategory) => {
-          return Number(getPercentageValue(category.total).toFixed(2));
-        })
-      : [100];
+  const series = hasData
+    ? categories.map((category: ICategory) => {
+        return Number(getPercentageValue(category.total).toFixed(2));
+      })
+    : [100];
 
   const options: ApexOptions = {
     chart: {
@@ -57,17 +57,16 @@ const CategoryChart = ({ categories = [], totalNetworth = 0 }: Props) => {
       show: false,
     },
     tooltip: {
-      enabled: categories.length > 0,
+      enabled: hasData,
     },
     labels: categories.map((category: ICategory) => category.name),
     fill: {
-      colors:
-        categories.length > 0
-          ? categories.map((category: ICategory) => {
-              const key = toCamelCase(category.name) as keyof ICategories;
-              return categoryColors[key];
-            })
-          : ['#a4a6a8'],
+      colors: hasData
+        ? categories.map((category: ICategory) => {
+            const key = toCamelCase(category.name) as keyof ICategories;
+            return categoryColors[key];
+          })
+        : ['#a4a6a8'],
     },
   };
 

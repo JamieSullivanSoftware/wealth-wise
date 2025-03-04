@@ -14,6 +14,8 @@ import Paginator from './Paginator';
 import TransactionAmountInfo from './TransactionAmountInfo';
 import TableHeader from './TableHeader';
 import NoResults from '../Common/NoResults';
+import { useFirstRender } from '@/hooks/useFirstRender';
+import Loader from '../Common/Loader';
 
 interface IProps {
   transactions: IPaginatedTransactions;
@@ -21,10 +23,12 @@ interface IProps {
 }
 
 const TransactionsTable = ({ transactions, showFullData }: IProps) => {
+  const isFirstRender = useFirstRender();
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
     order: 'desc',
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
   const [paginatedTransactions, setPaginatedTransactions] =
@@ -55,7 +59,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
   };
 
   useEffect(() => {
-    const fetchAssets = async () => {
+    const fetchTransactions = async () => {
       const transactions = await getTransactions(
         limit,
         sort.by,
@@ -64,10 +68,15 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
       );
       setPaginatedTransactions(transactions);
     };
-    if (showFullData) {
-      fetchAssets();
+    if (!isFirstRender && showFullData) {
+      setIsLoading(true);
+      fetchTransactions().finally(() => setIsLoading(false));
     }
-  }, [sort, sort.by, sort.order, page, limit, showFullData]);
+  }, [sort, sort.by, sort.order, page, limit, showFullData, isFirstRender]);
+
+  if (isLoading) {
+    return <Loader isFullScreen />;
+  }
 
   return showFullData ? (
     paginatedTransactions.transactions.length > 0 ? (
