@@ -29,7 +29,10 @@ const Header = ({ sidebarOpen, setSidebarOpen }: IProps) => {
   }, []);
 
   return (
-    <header className='sticky top-0 z-999 bg-white drop-shadow-1 dark:bg-dark-3 dark:drop-shadow-none'>
+    <header
+      className='sticky top-0 z-10
+     bg-white drop-shadow-1 dark:bg-dark-3 dark:drop-shadow-none'
+    >
       <div className='flex flex-grow items-center shadow-2 px-4 py-4 md:px-6 2xl:px-11'>
         <div className='flex items-center justify-between w-full 2lg:hidden'>
           <HamburgerButton

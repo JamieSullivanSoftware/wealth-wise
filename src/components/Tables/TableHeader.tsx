@@ -7,9 +7,10 @@ import Button from '../Common/Button';
 interface Props {
   title?: string;
   btnText?: string;
+  onBtnClick?: () => void;
 }
 
-const TableHeader = ({ title, btnText }: Props) => {
+const TableHeader = ({ title, btnText, onBtnClick }: Props) => {
   return (
     <div className='flex justify-between items-center'>
       {title && (
@@ -17,12 +18,10 @@ const TableHeader = ({ title, btnText }: Props) => {
           {title}
         </h4>
       )}
-      {btnText && (
+      {btnText && onBtnClick && (
         <Button
           text={btnText}
-          onClick={() => {
-            console.log('Add');
-          }}
+          onClick={onBtnClick}
           icon={faPlus}
           iconSize='lg'
         />
