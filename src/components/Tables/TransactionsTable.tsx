@@ -89,7 +89,10 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
       <Modal
         show={showModal}
         onClose={() => handleToggleModal(false)}
-      />
+        heading='Add Transaction'
+      >
+        <div>Transactions</div>
+      </Modal>
       {showFullData ? (
         paginatedTransactions.transactions.length > 0 ? (
           <>

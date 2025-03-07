@@ -12,6 +12,7 @@ import { CATEGORIES } from '@/constants';
 import Loader from '../Common/Loader';
 import { useFirstRender } from '@/hooks/useFirstRender';
 import Modal from '../Common/Modal';
+import NewAssetForm from '../Forms/NewAssetForm';
 
 interface IProps {
   assets: IPaginatedAssets;
@@ -79,7 +80,10 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
       <Modal
         show={showModal}
         onClose={() => handleToggleModal(false)}
-      />
+        heading='Add Asset'
+      >
+        <NewAssetForm />
+      </Modal>
       {showFullData ? (
         paginatedAssets.assets.length > 0 ? (
           <>

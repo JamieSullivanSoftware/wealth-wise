@@ -17,6 +17,7 @@ interface Props {
   iconColor?: string;
   iconAlign?: BtnIconAlign;
   hasBg?: boolean;
+  isPrimary?: boolean;
   classes?: string;
 }
 
@@ -29,12 +30,15 @@ const Button = ({
   iconSize,
   iconAlign,
   hasBg = true,
+  isPrimary,
   classes = '',
 }: Props) => {
   const classNames = clsx(
-    'rounded-md font-medium',
+    'rounded-md font-medium py-2 px-4',
     hasBg
-      ? 'bg-black text-white hover:bg-opacity-50 dark:text-black dark:bg-gray-1 dark:hover:bg-opacity-75 py-2 px-4'
+      ? isPrimary
+        ? 'text-white bg-primary hover:bg-primary-dark focus:ring-4 focus:outline-none focus:ring-primary-dark'
+        : 'bg-black text-white hover:bg-opacity-50 dark:text-black dark:bg-gray-1 dark:hover:bg-opacity-75 '
       : 'bg-transparent',
     btnSize === 'sm' && 'text-sm',
     btnSize === 'md' && 'text-base',

@@ -1,0 +1,117 @@
+import Label from './Label';
+import Input from './Input';
+import Select from './Select';
+import { CATEGORIES } from '@/constants';
+import Button from '../Common/Button';
+
+const NewAssetForm = () => {
+  return (
+    <form
+      className='space-y-6'
+      action='#'
+    >
+      {/* Asset Name */}
+      <div>
+        <Label
+          htmlFor='asset-name'
+          text='Asset Name'
+        />
+        <Input
+          name='asset-name'
+          id='asset-name'
+          placeholder='e.g. Apple Stock'
+          required
+        />
+      </div>
+
+      {/* Category */}
+      <div>
+        <Label
+          htmlFor='category'
+          text='Category'
+        />
+        <Select
+          name='category'
+          id='category'
+          placeholder='Select a category'
+          options={Object.values(CATEGORIES).map((category) => ({
+            value: category,
+            label: category.charAt(0).toUpperCase() + category.slice(1),
+          }))}
+        />
+      </div>
+
+      {/* Number of Shares */}
+      <div>
+        <Label
+          htmlFor='num-shares'
+          text='Number of Shares/Units'
+        />
+        <Input
+          type='number'
+          name='num-shares'
+          id='num-shares'
+          placeholder='e.g. 10'
+          required
+        />
+      </div>
+
+      {/* Cost */}
+      <div>
+        <Label
+          htmlFor='cost'
+          text='Cost per Share/Unit'
+        />
+        <Input
+          type='number'
+          name='cost'
+          id='cost'
+          placeholder='e.g. 150.00'
+          required
+        />
+      </div>
+
+      {/* Value */}
+      <div>
+        <Label
+          htmlFor='value'
+          text='Value'
+        />
+        <Input
+          type='number'
+          name='value'
+          id='value'
+          placeholder='e.g. 2000.00'
+          required
+        />
+      </div>
+
+      {/* Details*/}
+      <div>
+        <Label
+          htmlFor='details'
+          text='Details (Optional)'
+        />
+        <textarea
+          name='details'
+          id='details'
+          maxLength={100}
+          rows={3}
+          className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white'
+          placeholder='Additional asset details...'
+        />
+      </div>
+
+      {/* Submit Button */}
+      <Button
+        type='submit'
+        classes='w-full  text-center'
+        text='Add Asset'
+        onClick={() => {}}
+        isPrimary
+      />
+    </form>
+  );
+};
+
+export default NewAssetForm;
