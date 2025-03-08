@@ -60,6 +60,12 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
     setShowModal(show);
   };
 
+  const refetchAssets = async () => {
+    const assets = await getAssets(limit, sort.by, sort.order, page);
+    setPaginatedAssets(assets);
+    setShowModal(false);
+  };
+
   useEffect(() => {
     const fetchAssets = async () => {
       const assets = await getAssets(limit, sort.by, sort.order, page);
@@ -82,7 +88,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
         onClose={() => handleToggleModal(false)}
         heading='Add Asset'
       >
-        <NewAssetForm />
+        <NewAssetForm onAssetAdded={refetchAssets} />
       </Modal>
       {showFullData ? (
         paginatedAssets.assets.length > 0 ? (

@@ -4,16 +4,34 @@ import Input from './Input';
 import Select from './Select';
 import { TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
+import addTransaction from '@/app/actions/addTransaction';
+import { useRouter } from 'next/navigation';
 
 interface IProps {
   assetList: IAssetListData[];
+  onTransactionAdded: () => void;
 }
 
-const NewTransactionForm = ({ assetList }: IProps) => {
+const NewTransactionForm = ({ assetList, onTransactionAdded }: IProps) => {
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      await addTransaction(formData);
+      await onTransactionAdded();
+      router.push('/');
+    } catch (error) {
+      console.error('Failed to add transaction:', error);
+    }
+  };
+
   return (
     <form
       className='space-y-6'
-      action='#'
+      onSubmit={handleSubmit}
     >
       {/* Amount */}
       <div>
@@ -37,8 +55,8 @@ const NewTransactionForm = ({ assetList }: IProps) => {
           text='Asset'
         />
         <Select
-          name='asset'
-          id='asset'
+          name='asset-id'
+          id='asset-id'
           placeholder='Select asset'
           options={assetList.map((asset: IAssetListData) => ({
             value: asset._id,
@@ -67,9 +85,8 @@ const NewTransactionForm = ({ assetList }: IProps) => {
       {/* Submit Button */}
       <Button
         type='submit'
-        classes='w-full  text-center'
+        classes='w-full text-center'
         text='Add Transaction'
-        onClick={() => {}}
         isPrimary
       />
     </form>

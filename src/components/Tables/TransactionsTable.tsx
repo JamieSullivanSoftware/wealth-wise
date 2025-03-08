@@ -22,7 +22,7 @@ import NewTransactionForm from '../Forms/NewTransactionForm';
 interface IProps {
   transactions: IPaginatedTransactions;
   showFullData?: boolean;
-  assetList: IAssetListData[];
+  assetList?: IAssetListData[];
 }
 
 const TransactionsTable = ({
@@ -70,6 +70,17 @@ const TransactionsTable = ({
     setShowModal(show);
   };
 
+  const refetchTransactions = async () => {
+    const transactions = await getTransactions(
+      limit,
+      sort.by,
+      sort.order,
+      page
+    );
+    setPaginatedTransactions(transactions);
+    setShowModal(false);
+  };
+
   useEffect(() => {
     const fetchTransactions = async () => {
       const transactions = await getTransactions(
@@ -92,13 +103,18 @@ const TransactionsTable = ({
 
   return (
     <>
-      <Modal
-        show={showModal}
-        onClose={() => handleToggleModal(false)}
-        heading='Add Transaction'
-      >
-        <NewTransactionForm assetList={assetList} />
-      </Modal>
+      {assetList && (
+        <Modal
+          show={showModal}
+          onClose={() => handleToggleModal(false)}
+          heading='Add Transaction'
+        >
+          <NewTransactionForm
+            assetList={assetList}
+            onTransactionAdded={refetchTransactions}
+          />
+        </Modal>
+      )}
       {showFullData ? (
         paginatedTransactions.transactions.length > 0 ? (
           <>

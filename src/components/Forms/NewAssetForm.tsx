@@ -4,12 +4,32 @@ import Select from './Select';
 import { CATEGORIES } from '@/constants';
 import Button from '../Common/Button';
 import addAsset from '@/app/actions/addAsset';
+import { useRouter } from 'next/navigation';
 
-const NewAssetForm = () => {
+interface IProps {
+  onAssetAdded: () => void;
+}
+
+const NewAssetForm = ({ onAssetAdded }: IProps) => {
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      await addAsset(formData);
+      await onAssetAdded();
+      router.push('/');
+    } catch (error) {
+      console.error('Failed to add transaction:', error);
+    }
+  };
+
   return (
     <form
       className='space-y-6'
-      action={addAsset}
+      onSubmit={handleSubmit}
     >
       {/* Asset Name */}
       <div>
