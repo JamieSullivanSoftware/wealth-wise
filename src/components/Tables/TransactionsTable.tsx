@@ -22,9 +22,14 @@ import NewTransactionForm from '../Forms/NewTransactionForm';
 interface IProps {
   transactions: IPaginatedTransactions;
   showFullData?: boolean;
+  assetList: IAssetListData[];
 }
 
-const TransactionsTable = ({ transactions, showFullData }: IProps) => {
+const TransactionsTable = ({
+  transactions,
+  showFullData,
+  assetList,
+}: IProps) => {
   const isFirstRender = useFirstRender();
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
@@ -92,7 +97,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
         onClose={() => handleToggleModal(false)}
         heading='Add Transaction'
       >
-        <NewTransactionForm />
+        <NewTransactionForm assetList={assetList} />
       </Modal>
       {showFullData ? (
         paginatedTransactions.transactions.length > 0 ? (

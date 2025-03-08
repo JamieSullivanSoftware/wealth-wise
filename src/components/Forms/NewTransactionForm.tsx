@@ -1,10 +1,15 @@
+'use client';
 import Label from './Label';
 import Input from './Input';
 import Select from './Select';
-import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
+import { TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
 
-const NewTransactionForm = () => {
+interface IProps {
+  assetList: IAssetListData[];
+}
+
+const NewTransactionForm = ({ assetList }: IProps) => {
   return (
     <form
       className='space-y-6'
@@ -35,9 +40,9 @@ const NewTransactionForm = () => {
           name='asset'
           id='asset'
           placeholder='Select asset'
-          options={Object.values(CATEGORIES).map((category: string) => ({
-            value: category,
-            label: category.charAt(0).toUpperCase() + category.slice(1),
+          options={assetList.map((asset: IAssetListData) => ({
+            value: asset._id,
+            label: asset.name,
           }))}
         />
       </div>

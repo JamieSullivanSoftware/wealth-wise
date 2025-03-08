@@ -38,6 +38,17 @@ export const getAssets = async (
   return data;
 };
 
+export const getAssetList = async () => {
+  if (!apiDomain) {
+    return [];
+  }
+  const res = await fetch(`${apiDomain}/assets/list`, {
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  return data.assetList;
+};
+
 export const getNetWorth = async (filter: DateFilter) => {
   if (!apiDomain) {
     return [];

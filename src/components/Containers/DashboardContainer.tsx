@@ -5,9 +5,10 @@ import DashboardTop from '../Sections/DashboardTop';
 interface IProps {
   transactions: IPaginatedTransactions;
   assets: IPaginatedAssets;
+  assetList: IAssetListData[];
 }
 
-const Dashboard = ({ transactions, assets }: IProps) => {
+const Dashboard = ({ transactions, assets, assetList }: IProps) => {
   return (
     <>
       <PageHeader title='Dashboard' />
@@ -16,6 +17,7 @@ const Dashboard = ({ transactions, assets }: IProps) => {
         <DashboardBottom
           transactions={transactions}
           assets={assets}
+          assetList={assetList}
         />
       </div>
     </>

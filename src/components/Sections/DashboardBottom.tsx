@@ -5,9 +5,14 @@ import TablesContainer from '@/components/Containers/TablesContainer';
 interface IProps {
   transactions: IPaginatedTransactions;
   assets: IPaginatedAssets;
+  assetList: IAssetListData[];
 }
 
-const DashboardBottomSection = ({ transactions, assets }: IProps) => {
+const DashboardBottomSection = ({
+  transactions,
+  assets,
+  assetList,
+}: IProps) => {
   return (
     <>
       {/* Show above 1024px */}
@@ -19,7 +24,10 @@ const DashboardBottomSection = ({ transactions, assets }: IProps) => {
         )}
         {transactions.transactions.length > 0 && (
           <TablesContainer classes='gap-8 col-span-4 rounded-xl dark:bg-dark-4'>
-            <TransactionsTable transactions={transactions} />
+            <TransactionsTable
+              transactions={transactions}
+              assetList={assetList}
+            />
           </TablesContainer>
         )}
       </div>
@@ -35,7 +43,10 @@ const DashboardBottomSection = ({ transactions, assets }: IProps) => {
       {transactions.transactions.length > 0 && (
         <div className='grid grid-cols-12 gap-4 2lg:hidden'>
           <TablesContainer classes='col-span-12 rounded-xl dark:bg-dark-4'>
-            <TransactionsTable transactions={transactions} />
+            <TransactionsTable
+              transactions={transactions}
+              assetList={assetList}
+            />
           </TablesContainer>
         </div>
       )}

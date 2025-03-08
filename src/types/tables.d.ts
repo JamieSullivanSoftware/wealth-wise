@@ -25,6 +25,11 @@ declare interface IAssetData {
   diffPercentage: number;
 }
 
+declare interface IAssetListData {
+  _id: string;
+  name: string;
+}
+
 declare interface ITransationAssetData {
   _id: string;
   name: string;
