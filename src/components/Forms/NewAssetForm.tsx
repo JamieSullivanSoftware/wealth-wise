@@ -34,7 +34,7 @@ const NewAssetForm = () => {
           name='category'
           id='category'
           placeholder='Select a category'
-          options={Object.values(CATEGORIES).map((category) => ({
+          options={Object.values(CATEGORIES).map((category: string) => ({
             value: category,
             label: category.charAt(0).toUpperCase() + category.slice(1),
           }))}
@@ -60,7 +60,7 @@ const NewAssetForm = () => {
       <div>
         <Label
           htmlFor='cost'
-          text='Cost per Share/Unit'
+          text='Cost'
         />
         <Input
           type='number'

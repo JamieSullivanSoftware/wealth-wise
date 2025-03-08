@@ -17,6 +17,7 @@ import NoResults from '../Common/NoResults';
 import { useFirstRender } from '@/hooks/useFirstRender';
 import Loader from '../Common/Loader';
 import Modal from '../Common/Modal';
+import NewTransactionForm from '../Forms/NewTransactionForm';
 
 interface IProps {
   transactions: IPaginatedTransactions;
@@ -91,7 +92,7 @@ const TransactionsTable = ({ transactions, showFullData }: IProps) => {
         onClose={() => handleToggleModal(false)}
         heading='Add Transaction'
       >
-        <div>Transactions</div>
+        <NewTransactionForm />
       </Modal>
       {showFullData ? (
         paginatedTransactions.transactions.length > 0 ? (
