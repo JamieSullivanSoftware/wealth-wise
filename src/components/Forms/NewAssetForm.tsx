@@ -3,12 +3,13 @@ import Input from './Input';
 import Select from './Select';
 import { CATEGORIES } from '@/constants';
 import Button from '../Common/Button';
+import addAsset from '@/app/actions/addAsset';
 
 const NewAssetForm = () => {
   return (
     <form
       className='space-y-6'
-      action='#'
+      action={addAsset}
     >
       {/* Asset Name */}
       <div>
@@ -89,12 +90,12 @@ const NewAssetForm = () => {
       {/* Details*/}
       <div>
         <Label
-          htmlFor='details'
-          text='Details (Optional)'
+          htmlFor='detail'
+          text='Detail (Optional)'
         />
         <textarea
-          name='details'
-          id='details'
+          name='detail'
+          id='detail'
           maxLength={100}
           rows={3}
           className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white'
@@ -107,7 +108,6 @@ const NewAssetForm = () => {
         type='submit'
         classes='w-full  text-center'
         text='Add Asset'
-        onClick={() => {}}
         isPrimary
       />
     </form>

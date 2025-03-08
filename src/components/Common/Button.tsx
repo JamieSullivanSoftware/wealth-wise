@@ -10,7 +10,7 @@ import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
 interface Props {
   text: string;
   type?: BtnType;
-  onClick: () => void;
+  onClick?: () => void;
   btnSize?: BtnSize;
   icon?: IconDefinition;
   iconSize?: SizeProp;
