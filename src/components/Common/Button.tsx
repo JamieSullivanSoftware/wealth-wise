@@ -19,6 +19,7 @@ interface Props {
   hasBg?: boolean;
   isPrimary?: boolean;
   classes?: string;
+  isDisabled?: boolean;
 }
 
 const Button = ({
@@ -32,19 +33,21 @@ const Button = ({
   hasBg = true,
   isPrimary,
   classes = '',
+  isDisabled = false,
 }: Props) => {
   const classNames = clsx(
     'rounded-md font-medium py-2 px-4',
     hasBg
       ? isPrimary
-        ? 'text-white bg-primary hover:bg-primary-dark focus:ring-4 focus:outline-none focus:ring-primary-dark'
-        : 'bg-black text-white hover:bg-opacity-50 dark:text-black dark:bg-gray-1 dark:hover:bg-opacity-75 '
+        ? 'text-white bg-primary enabled:hover:bg-primary-dark focus:ring-4 focus:outline-none focus:ring-primary-dark'
+        : 'bg-black text-white enabled:hover:bg-opacity-50 dark:text-black dark:bg-gray-1 enabled:dark:hover:bg-opacity-75 '
       : 'bg-transparent',
     btnSize === 'sm' && 'text-sm',
     btnSize === 'md' && 'text-base',
     btnSize === 'lg' && 'text-lg',
     icon && 'flex gap-2 justify-between items-center',
-    classes
+    classes,
+    isDisabled && 'opacity-50 cursor-not-allowed'
   );
 
   return (
@@ -52,6 +55,7 @@ const Button = ({
       type={type}
       onClick={onClick}
       className={classNames}
+      disabled={isDisabled}
     >
       {icon && iconAlign !== 'right' && (
         <Icon

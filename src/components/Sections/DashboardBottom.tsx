@@ -17,37 +17,31 @@ const DashboardBottomSection = ({
     <>
       {/* Show above 1024px */}
       <div className='hidden 2lg:grid grid-cols-12 gap-4'>
-        {assets.assets.length > 0 && (
-          <TablesContainer classes='gap-8 col-span-8 rounded-xl dark:bg-dark-4'>
-            <AssetsTable assets={assets} />
-          </TablesContainer>
-        )}
-        {transactions.transactions.length > 0 && (
-          <TablesContainer classes='gap-8 col-span-4 rounded-xl dark:bg-dark-4'>
+        <div className='col-span-8'>
+          {assets.assets.length > 0 && <AssetsTable assets={assets} />}
+        </div>
+        <div className='col-span-4'>
+          {transactions.transactions.length > 0 && (
             <TransactionsTable
               transactions={transactions}
               assetList={assetList}
             />
-          </TablesContainer>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Show below 1024px */}
       {assets.assets.length > 0 && (
         <div className='grid grid-cols-12 gap-4 2lg:hidden'>
-          <TablesContainer classes='col-span-12 rounded-xl dark:bg-dark-4'>
-            <AssetsTable assets={assets} />
-          </TablesContainer>
+          <AssetsTable assets={assets} />
         </div>
       )}
       {transactions.transactions.length > 0 && (
         <div className='grid grid-cols-12 gap-4 2lg:hidden'>
-          <TablesContainer classes='col-span-12 rounded-xl dark:bg-dark-4'>
-            <TransactionsTable
-              transactions={transactions}
-              assetList={assetList}
-            />
-          </TablesContainer>
+          <TransactionsTable
+            transactions={transactions}
+            assetList={assetList}
+          />
         </div>
       )}
     </>

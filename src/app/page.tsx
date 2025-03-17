@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const transactionsData = getTransactions(5);
+  const transactionsData = getTransactions(6);
   const assetsData = getAssets(5);
   const assetListData = getAssetList();
 
