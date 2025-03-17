@@ -1,7 +1,5 @@
 import AssetsTable from '../Tables/AssetsTable';
 import TransactionsTable from '../Tables/TransactionsTable';
-import TablesContainer from '@/components/Containers/TablesContainer';
-
 interface IProps {
   transactions: IPaginatedTransactions;
   assets: IPaginatedAssets;

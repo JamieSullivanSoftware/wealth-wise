@@ -30,7 +30,7 @@ declare interface IAssetListData {
   name: string;
 }
 
-declare interface ITransationAssetData {
+declare interface ITransactionAssetData {
   _id: string;
   name: string;
   category: string;
@@ -41,7 +41,7 @@ declare interface ITransactionData {
   amount: number;
   type: TransactionType;
   updatedAt: Date;
-  asset: ITransationAssetData;
+  asset: ITransactionAssetData;
   assetTotal: number;
 }
 

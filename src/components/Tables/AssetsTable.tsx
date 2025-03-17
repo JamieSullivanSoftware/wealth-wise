@@ -85,6 +85,10 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
       const assets = await getAssets(limit, sort.by, sort.order, page);
       setPaginatedAssets(assets);
     };
+    if (!showFullData) {
+      setIsLoading(false);
+      return;
+    }
     if (!isFirstRender && showFullData) {
       setIsLoading(true);
       fetchAssets().finally(() => setIsLoading(false));

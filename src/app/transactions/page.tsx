@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import Layout from '@/components/Layout/Layout';
 import TransactionsTable from '@/components/Tables/TransactionsTable';
-import { getTransactions } from '@/utils/api';
+import { getAssetList, getTransactions } from '@/utils/api';
 
 export const metadata: Metadata = {
   title: 'Wealth Wise',
@@ -10,7 +10,12 @@ export const metadata: Metadata = {
 };
 
 export default async function Transactions() {
-  const transactions = await getTransactions();
+  const transactionsData = getTransactions();
+  const assetListData = getAssetList();
+  const [transactions, assetList] = await Promise.all([
+    transactionsData,
+    assetListData,
+  ]);
 
   return (
     <Layout>
@@ -18,6 +23,7 @@ export default async function Transactions() {
         <TransactionsTable
           transactions={transactions}
           showFullData
+          assetList={assetList}
         />
       </div>
     </Layout>

@@ -17,7 +17,7 @@ import NoResults from '../Common/NoResults';
 import { useFirstRender } from '@/hooks/useFirstRender';
 import Loader from '../Common/Loader';
 import Modal from '../Common/Modal';
-import NewTransactionForm from '../Forms/NewTransactionForm';
+import TransactionForm from '../Forms/TransactionForm';
 import TablesContainer from '../Containers/TablesContainer';
 
 interface IProps {
@@ -45,6 +45,9 @@ const TransactionsTable = ({
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isEditDisabled, setIsEditDisabled] = useState<boolean>(false);
   const [isDeleteDisabled, setIsDeleteDisabled] = useState<boolean>(false);
+  const [selectedTransactions, setSelectedTransactions] = useState<
+    ITransactionData[]
+  >([]);
 
   const handleSort = (sortBy: TransactionSortBy) => {
     let orderBy = 'desc';
@@ -84,6 +87,16 @@ const TransactionsTable = ({
     });
   };
 
+  const handleOnEdit = () => {
+    const id = selectedIds[0];
+    const transaction = paginatedTransactions.transactions.find(
+      (transaction) => transaction._id === id
+    );
+    if (transaction) {
+      setSelectedTransactions([transaction]);
+    }
+  };
+
   const refetchTransactions = async () => {
     const transactions = await getTransactions(
       limit,
@@ -105,6 +118,10 @@ const TransactionsTable = ({
       );
       setPaginatedTransactions(transactions);
     };
+    if (!showFullData) {
+      setIsLoading(false);
+      return;
+    }
     if (!isFirstRender && showFullData) {
       setIsLoading(true);
       fetchTransactions().finally(() => setIsLoading(false));
@@ -124,6 +141,12 @@ const TransactionsTable = ({
     }
   }, [selectedIds]);
 
+  useEffect(() => {
+    if (selectedTransactions.length === 1) {
+      setShowModal(true);
+    }
+  }, [selectedTransactions]);
+
   if (isLoading) {
     return (
       <div className='grid col-span-12'>
@@ -141,7 +164,7 @@ const TransactionsTable = ({
         <div className='flex justify-end gap-4 col-span-12 mb-4 '>
           <Button
             text='Edit'
-            onClick={() => console.log('Edit')}
+            onClick={handleOnEdit}
             isDisabled={!isEditDisabled}
           />
           <Button
@@ -162,9 +185,14 @@ const TransactionsTable = ({
             onClose={() => handleToggleModal(false)}
             heading='Add Transaction'
           >
-            <NewTransactionForm
+            <TransactionForm
               assetList={assetList}
               onTransactionAdded={refetchTransactions}
+              transaction={
+                selectedTransactions.length === 1
+                  ? selectedTransactions[0]
+                  : undefined
+              }
             />
           </Modal>
         )}
@@ -251,7 +279,7 @@ const TransactionsTable = ({
 
                     return (
                       <div
-                      key={i}
+                        key={i}
                         className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm  hover:bg-gray-1 dark:hover:bg-opacity-10 cursor-pointer px-2 rounded-md'
                         onClick={() => handleOnSelect(_id)}
                       >

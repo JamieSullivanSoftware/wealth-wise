@@ -4,15 +4,20 @@ import Input from './Input';
 import Select from './Select';
 import { TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
-import addTransaction from '@/app/actions/addTransaction';
 import { useRouter } from 'next/navigation';
+import { addTransaction, editTransaction } from '@/app/actions/transactions';
 
 interface IProps {
   assetList: IAssetListData[];
   onTransactionAdded: () => void;
+  transaction?: ITransactionData;
 }
 
-const NewTransactionForm = ({ assetList, onTransactionAdded }: IProps) => {
+const TransactionForm = ({
+  assetList,
+  onTransactionAdded,
+  transaction,
+}: IProps) => {
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -20,13 +25,19 @@ const NewTransactionForm = ({ assetList, onTransactionAdded }: IProps) => {
     const formData = new FormData(e.currentTarget);
 
     try {
-      await addTransaction(formData);
+      if (transaction) {
+        await editTransaction(formData, transaction.asset._id);
+      } else {
+        await addTransaction(formData);
+      }
       await onTransactionAdded();
       router.push('/');
     } catch (error) {
       console.error('Failed to add transaction:', error);
     }
   };
+
+  console.log(transaction);
 
   return (
     <form
@@ -45,6 +56,7 @@ const NewTransactionForm = ({ assetList, onTransactionAdded }: IProps) => {
           id='amount'
           placeholder='e.g. 150.00'
           required
+          defaultValue={transaction?.amount}
         />
       </div>
 
@@ -62,6 +74,7 @@ const NewTransactionForm = ({ assetList, onTransactionAdded }: IProps) => {
             value: asset._id,
             label: asset.name,
           }))}
+          defaultValue={transaction?.asset._id}
         />
       </div>
 
@@ -79,6 +92,7 @@ const NewTransactionForm = ({ assetList, onTransactionAdded }: IProps) => {
             value: type,
             label: type,
           }))}
+          defaultValue={transaction?.type}
         />
       </div>
 
@@ -93,4 +107,4 @@ const NewTransactionForm = ({ assetList, onTransactionAdded }: IProps) => {
   );
 };
 
-export default NewTransactionForm;
+export default TransactionForm;
