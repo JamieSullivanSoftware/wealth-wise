@@ -129,9 +129,7 @@ const TransactionsTable = ({
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={
-                      sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'
-                    }
+                    classes={`${sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                   />
                 </div>
                 <div className='col-span-6 flex sm:col-span-3 items-center'>
@@ -142,7 +140,7 @@ const TransactionsTable = ({
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={sort.by === 'amount' ? 'font-bold' : 'font-normal'}
+                    classes={`${sort.by === 'amount' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                   />
                 </div>
                 <div className='col-span-3 flex sm:col-span-1 justify-end sm:justify-center items-center'>
@@ -153,7 +151,7 @@ const TransactionsTable = ({
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={sort.by === 'type' ? 'font-bold' : 'font-normal'}
+                    classes={`${sort.by === 'type' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                   />
                 </div>
                 <div className='hidden col-span-3 sm:col-span-2 sm:flex justify-end sm:justify-center items-center'>
@@ -164,9 +162,7 @@ const TransactionsTable = ({
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={
-                      sort.by === 'assetCategory' ? 'font-bold' : 'font-normal'
-                    }
+                    classes={`${sort.by === 'assetCategory' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                   />
                 </div>
                 <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
@@ -177,9 +173,7 @@ const TransactionsTable = ({
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={
-                      sort.by === 'assetName' ? 'font-bold' : 'font-normal'
-                    }
+                    classes={`${sort.by === 'assetName' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                   />
                 </div>
                 <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
@@ -190,9 +184,7 @@ const TransactionsTable = ({
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={
-                      sort.by === 'assetTotal' ? 'font-bold' : 'font-normal'
-                    }
+                    classes={`${sort.by === 'assetTotal' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                   />
                 </div>
               </div>

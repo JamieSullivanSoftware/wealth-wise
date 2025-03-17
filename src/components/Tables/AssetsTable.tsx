@@ -104,7 +104,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={`text-sm xsm:text-base ${sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'}`}
+                    classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'}`}
                   />
                 </div>
                 <div className='col-span-6 flex sm:col-span-2 items-center'>
@@ -115,7 +115,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={`text-sm xsm:text-base ${sort.by === 'name' ? 'font-bold' : 'font-normal'}`}
+                    classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'name' ? 'font-bold' : 'font-normal'}`}
                   />
                 </div>
                 <div className='hidden col-span-3 sm:flex justify-center items-center sm:col-span-2'>
@@ -126,7 +126,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={`text-sm xsm:text-base ${sort.by === 'category' ? 'font-bold' : 'font-normal'}`}
+                    classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'category' ? 'font-bold' : 'font-normal'}`}
                   />
                 </div>
                 <div className='col-span-3 flex justify-end items-center sm:col-span-2'>
@@ -137,7 +137,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={`text-sm xsm:text-base ${sort.by === 'diffPercentage' ? 'font-bold' : 'font-normal'}`}
+                    classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'diffPercentage' ? 'font-bold' : 'font-normal'}`}
                   />
                 </div>
                 <div className='hidden col-span-3 sm:flex justify-center items-center sm:justify-end sm:col-span-2'>
@@ -148,7 +148,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={`text-sm xsm:text-base ${sort.by === 'cost' ? 'font-bold' : 'font-normal'}`}
+                    classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'cost' ? 'font-bold' : 'font-normal'}`}
                   />
                 </div>
                 <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
@@ -159,7 +159,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                     iconAlign='right'
                     hasBg={false}
                     iconSize='xs'
-                    classes={`text-sm xsm:text-base ${sort.by === 'value' ? 'font-bold' : 'font-normal'}`}
+                    classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'value' ? 'font-bold' : 'font-normal'}`}
                   />
                 </div>
               </div>
