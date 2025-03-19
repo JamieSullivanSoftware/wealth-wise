@@ -5,6 +5,8 @@ import {
   generateCumulatedNetworth,
 } from '@/helpers/routeHelper';
 import Asset from '@/models/Asset';
+import connectDB from '@/configdatabase';
+import { getSessionUser } from '@/utils/getSessionUser';
 
 export const GET = async () => {
   const today = new Date();
@@ -13,6 +15,15 @@ export const GET = async () => {
   startDate.setUTCHours(0, 0, 0, 0);
 
   try {
+    await connectDB();
+
+    const sessionUser = await getSessionUser();
+    let userId = process.env.DEFAULT_USER_ID;
+
+    if (sessionUser && sessionUser.userId) {
+      userId = sessionUser.userId;
+    }
+
     const pipeline: PipelineStage[] = [
       // Step 1: Filter documents for the base total before start date and all totals after start date
       {
@@ -21,6 +32,7 @@ export const GET = async () => {
             {
               $match: {
                 createdAt: { $lt: startDate },
+                user_id: userId,
               },
             },
             {
