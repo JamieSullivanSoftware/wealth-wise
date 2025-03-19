@@ -10,28 +10,25 @@ import AssetsChange from './AssetsChange';
 import NoResults from '../Common/NoResults';
 import { CATEGORIES } from '@/constants';
 import Loader from '../Common/Loader';
-import { useFirstRender } from '@/hooks/useFirstRender';
 import Modal from '../Common/Modal';
 import NewAssetForm from '../Forms/NewAssetForm';
 import TablesContainer from '../Containers/TablesContainer';
 
 interface IProps {
-  assets: IPaginatedAssets;
   showFullData?: boolean;
 }
 
-const AssetsTable = ({ assets, showFullData }: IProps) => {
-  const isFirstRender = useFirstRender();
+const AssetsTable = ({ showFullData }: IProps) => {
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
     order: 'desc',
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
   const [paginatedAssets, setPaginatedAssets] =
-    useState<IPaginatedAssets>(assets);
+    useState<IPaginatedAssets | null>(null);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isEditDisabled, setIsEditDisabled] = useState<boolean>(false);
   const [isDeleteDisabled, setIsDeleteDisabled] = useState<boolean>(false);
@@ -82,18 +79,13 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
 
   useEffect(() => {
     const fetchAssets = async () => {
+      setIsLoading(true);
       const assets = await getAssets(limit, sort.by, sort.order, page);
       setPaginatedAssets(assets);
     };
-    if (!showFullData) {
-      setIsLoading(false);
-      return;
-    }
-    if (!isFirstRender && showFullData) {
-      setIsLoading(true);
-      fetchAssets().finally(() => setIsLoading(false));
-    }
-  }, [sort, sort.by, sort.order, page, limit, showFullData, isFirstRender]);
+
+    fetchAssets().finally(() => setIsLoading(false));
+  }, [sort, sort.by, sort.order, page, limit]);
 
   useEffect(() => {
     if (selectedIds.length === 1) {
@@ -147,7 +139,7 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
       <TablesContainer
         classes={`gap-6 col-span-12 rounded-xl dark:bg-dark-4 ${showFullData ? 'px-4 py-6' : 'p-6'}`}
       >
-        {showFullData ? (
+        {showFullData && paginatedAssets ? (
           paginatedAssets.assets.length > 0 ? (
             <>
               <TableHeader title='Assets' />
@@ -311,31 +303,32 @@ const AssetsTable = ({ assets, showFullData }: IProps) => {
                   Value
                 </div>
               </div>
-              {paginatedAssets.assets.map((asset: IAssetData, i: number) => (
-                <div
-                  className='grid grid-cols-12 py-4 text-xs text-black dark:text-white xsm:text-sm'
-                  key={i}
-                >
-                  <div className='col-span-3 flex flex-col gap-2 flex-wrap'>
-                    <span className='font-medium'>{asset.name}</span>
-                    <span className='font-light'>
-                      {asset.category === CATEGORIES.stocks ||
-                      asset.category === CATEGORIES.crypto
-                        ? `${asset.numShares} Share${asset.numShares > 1 ? 's' : ''}`
-                        : `${asset.detail}`}
-                    </span>
+              {paginatedAssets &&
+                paginatedAssets.assets.map((asset: IAssetData, i: number) => (
+                  <div
+                    className='grid grid-cols-12 py-4 text-xs text-black dark:text-white xsm:text-sm'
+                    key={i}
+                  >
+                    <div className='col-span-3 flex flex-col gap-2 flex-wrap'>
+                      <span className='font-medium'>{asset.name}</span>
+                      <span className='font-light'>
+                        {asset.category === CATEGORIES.stocks ||
+                        asset.category === CATEGORIES.crypto
+                          ? `${asset.numShares} Share${asset.numShares > 1 ? 's' : ''}`
+                          : `${asset.detail}`}
+                      </span>
+                    </div>
+                    <div className='col-span-3 flex flex-wrap justify-center 2lg:justify-end items-center'>
+                      <AssetsChange diffPercentage={asset.diffPercentage} />
+                    </div>
+                    <div className='col-span-3 flex flex-wrap justify-center items-center 2lg:justify-end'>
+                      {currencyFormat.format(asset.cost)}
+                    </div>
+                    <div className='col-span-3 flex flex-wrap justify-end items-center'>
+                      {currencyFormat.format(asset.value)}
+                    </div>
                   </div>
-                  <div className='col-span-3 flex flex-wrap justify-center 2lg:justify-end items-center'>
-                    <AssetsChange diffPercentage={asset.diffPercentage} />
-                  </div>
-                  <div className='col-span-3 flex flex-wrap justify-center items-center 2lg:justify-end'>
-                    {currencyFormat.format(asset.cost)}
-                  </div>
-                  <div className='col-span-3 flex flex-wrap justify-end items-center'>
-                    {currencyFormat.format(asset.value)}
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           </>
         )}

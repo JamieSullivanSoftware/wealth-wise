@@ -1,6 +1,5 @@
 import Layout from '@/components/Layout/Layout';
 import DashboardContainer from '@/components/Containers/DashboardContainer';
-import { getAssetList, getAssets, getTransactions } from '@/utils/api';
 
 import type { Metadata } from 'next';
 
@@ -10,25 +9,9 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const transactionsData = getTransactions(6);
-  const assetsData = getAssets(5);
-  const assetListData = getAssetList();
-
-  const [transactions, assets, assetsList] = await Promise.all([
-    transactionsData,
-    assetsData,
-    assetListData,
-  ]);
-
   return (
-    <>
-      <Layout>
-        <DashboardContainer
-          transactions={transactions}
-          assets={assets}
-          assetList={assetsList}
-        />
-      </Layout>
-    </>
+    <Layout>
+      <DashboardContainer />
+    </Layout>
   );
 }

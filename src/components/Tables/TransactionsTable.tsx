@@ -8,7 +8,7 @@ import {
   getMonthDate,
   getTime,
 } from '@/utils/string';
-import { getTransactions } from '@/utils/api';
+import { getAssetList, getTransactions } from '@/utils/api';
 import Button from '../Common/Button';
 import Paginator from './Paginator';
 import TransactionAmountInfo from './TransactionAmountInfo';
@@ -21,27 +21,22 @@ import TransactionForm from '../Forms/TransactionForm';
 import TablesContainer from '../Containers/TablesContainer';
 
 interface IProps {
-  transactions: IPaginatedTransactions;
   showFullData?: boolean;
-  assetList?: IAssetListData[];
 }
 
-const TransactionsTable = ({
-  transactions,
-  showFullData,
-  assetList,
-}: IProps) => {
+const TransactionsTable = ({ showFullData }: IProps) => {
   const isFirstRender = useFirstRender();
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
     order: 'desc',
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
   const [paginatedTransactions, setPaginatedTransactions] =
-    useState<IPaginatedTransactions>(transactions);
+    useState<IPaginatedTransactions | null>(null);
+  const [assetList, setAssetList] = useState<IAssetListData[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isEditDisabled, setIsEditDisabled] = useState<boolean>(false);
   const [isDeleteDisabled, setIsDeleteDisabled] = useState<boolean>(false);
@@ -89,7 +84,7 @@ const TransactionsTable = ({
 
   const handleOnEdit = () => {
     const id = selectedIds[0];
-    const transaction = paginatedTransactions.transactions.find(
+    const transaction = paginatedTransactions?.transactions.find(
       (transaction) => transaction._id === id
     );
     if (transaction) {
@@ -110,22 +105,23 @@ const TransactionsTable = ({
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      const transactions = await getTransactions(
+      setIsLoading(true);
+      const transactionsData = getTransactions(
         limit,
         sort.by,
         sort.order,
         page
       );
+      const assetListData = getAssetList();
+      const [transactions, assetsList] = await Promise.all([
+        transactionsData,
+        assetListData,
+      ]);
       setPaginatedTransactions(transactions);
+      setAssetList(assetsList);
     };
-    if (!showFullData) {
-      setIsLoading(false);
-      return;
-    }
-    if (!isFirstRender && showFullData) {
-      setIsLoading(true);
-      fetchTransactions().finally(() => setIsLoading(false));
-    }
+
+    fetchTransactions().finally(() => setIsLoading(false));
   }, [sort, sort.by, sort.order, page, limit, showFullData, isFirstRender]);
 
   useEffect(() => {
@@ -196,7 +192,7 @@ const TransactionsTable = ({
             />
           </Modal>
         )}
-        {showFullData ? (
+        {showFullData && paginatedTransactions ? (
           paginatedTransactions.transactions.length > 0 ? (
             <>
               <div className='px-2'>
@@ -342,37 +338,38 @@ const TransactionsTable = ({
               onBtnClick={() => handleToggleModal(true)}
             />
             <div className='mt-8 2lg:mt-0'>
-              {paginatedTransactions.transactions.map(
-                (transaction: ITransactionData, i: number) => {
-                  const { asset, amount, updatedAt } = transaction;
-                  const date = new Date(updatedAt);
+              {paginatedTransactions &&
+                paginatedTransactions.transactions.map(
+                  (transaction: ITransactionData, i: number) => {
+                    const { asset, amount, updatedAt } = transaction;
+                    const date = new Date(updatedAt);
 
-                  return (
-                    <div
-                      className='grid grid-cols-12 pb-9 text-xs text-black dark:text-white xsm:text-sm'
-                      key={i}
-                    >
-                      <TransactionAmountInfo
-                        amount={amount}
-                        assetName={asset.name}
-                      />
-                      <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
-                        {asset?.name}
+                    return (
+                      <div
+                        className='grid grid-cols-12 pb-9 text-xs text-black dark:text-white xsm:text-sm'
+                        key={i}
+                      >
+                        <TransactionAmountInfo
+                          amount={amount}
+                          assetName={asset.name}
+                        />
+                        <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
+                          {asset?.name}
+                        </div>
+                        <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
+                          {asset?.category}
+                        </div>
+                        <div className='hidden gap-1 col-span-3 justify-end items-center xsm:flex 2lg:hidden'>
+                          {getEuropeanYear(date)}
+                        </div>
+                        <div className='gap-1 col-span-2 flex flex-col justify-center items-end xsm:hidden 2lg:flex'>
+                          <p>{getMonthDate(date)}</p>
+                          <p>{getTime(date)}</p>
+                        </div>
                       </div>
-                      <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
-                        {asset?.category}
-                      </div>
-                      <div className='hidden gap-1 col-span-3 justify-end items-center xsm:flex 2lg:hidden'>
-                        {getEuropeanYear(date)}
-                      </div>
-                      <div className='gap-1 col-span-2 flex flex-col justify-center items-end xsm:hidden 2lg:flex'>
-                        <p>{getMonthDate(date)}</p>
-                        <p>{getTime(date)}</p>
-                      </div>
-                    </div>
-                  );
-                }
-              )}
+                    );
+                  }
+                )}
             </div>
           </>
         )}

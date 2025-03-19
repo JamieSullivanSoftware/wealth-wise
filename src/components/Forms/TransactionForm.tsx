@@ -37,8 +37,6 @@ const TransactionForm = ({
     }
   };
 
-  console.log(transaction);
-
   return (
     <form
       className='space-y-6'
