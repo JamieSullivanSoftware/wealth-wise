@@ -7,13 +7,11 @@ import DashboardTabButtons from './DashboardTabButtons';
 import NetworthSummary from './NetworthSummary';
 import NetworthTable from '../Tables/NetworthTable';
 import DateFilterButtons from './DateFilterButtons';
-import { getCategories, getNetWorth } from '@/utils/api';
+import { getNetWorth } from '@/utils/api';
+import TablesContainer from '@/components/Containers/TablesContainer';
+import NoResults from '../Common/NoResults';
 
-interface IProps {
-  tableClasses: string;
-}
-
-const DashboardTopSection = ({ tableClasses }: IProps) => {
+const DashboardTopSection = () => {
   const [networth, setNetworth] = useState<INetworth | null>(null);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [totalNetworth, setTotalNetworth] = useState<number>(0);
@@ -30,111 +28,115 @@ const DashboardTopSection = ({ tableClasses }: IProps) => {
   };
 
   useEffect(() => {
+    const fetchData = async () => await getNetWorth(activeFilter);
     setLoading(true);
 
-    const fetchData = async () => {
-      const networthData = getNetWorth(activeFilter);
-      const categoriesData = getCategories(activeFilter);
-      const [networth, categories] = await Promise.all([
-        networthData,
-        categoriesData,
-      ]);
-      return { networth, categories };
-    };
-
     fetchData()
-      .then((data) => {
-        const { networth, categories } = data;
+      .then((networth) => {
         const total =
           networth.results.length > 0
             ? networth.results[networth.results.length - 1].total
             : 0;
         setNetworth(networth);
         setTotalNetworth(total);
-        setCategories(categories);
+        setCategories(networth.categories);
       })
       .finally(() => {
         setLoading(false);
       });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeFilter]);
-
-  if (!networth) return <p>No Networth</p>;
 
   return (
     <>
       {/* Show above 768px */}
       <div className='hidden md:grid grid-cols-12'>
-        <div
-          className={`flex flex-col col-span-8 rounded-s-xl border-r-0 dark:bg-dark-3 ${tableClasses}`}
-        >
-          <NetworthSummary
-            diffPercentage={networth.diffPercentage}
-            diffTotal={networth.diffTotal}
-            totalNetworth={totalNetworth}
-          />
-          <DateFilterButtons
-            activeFilter={activeFilter}
-            handleClick={handleFilterClick}
-          />
+        <TablesContainer classes='flex flex-col col-span-8 rounded-s-xl border-r-0 dark:bg-dark-3'>
+          {networth && networth.results?.length ? (
+            <>
+              <NetworthSummary
+                diffPercentage={networth.diffPercentage}
+                diffTotal={networth.diffTotal}
+                totalNetworth={totalNetworth}
+              />
+              <DateFilterButtons
+                activeFilter={activeFilter}
+                handleClick={handleFilterClick}
+              />
+              <div className='min-h-[365px]'>
+                <NetworthTable
+                  isLoading={isLoading}
+                  data={networth.results}
+                  totalNetworth={totalNetworth}
+                  activeFilter={activeFilter}
+                />
+              </div>
+            </>
+          ) : (
+            <div className='flex flex-col justify-center min-h-[365px]'>
+              <NoResults
+                text='No Results Available'
+                btnText='Add Data'
+              />
+            </div>
+          )}
+        </TablesContainer>
+        <TablesContainer classes='col-span-4 rounded-e-xl dark:bg-dark-1 '>
           <div className='min-h-[365px]'>
-            <NetworthTable
-              isLoading={isLoading}
-              data={networth.results}
-              totalNetworth={totalNetworth}
-              activeFilter={activeFilter}
+            <CategoryChart
+              networthDiffTotal={networth?.diffTotal}
+              categories={categories}
             />
           </div>
-        </div>
-        <div
-          className={`col-span-4 rounded-e-xl dark:bg-dark-1 ${tableClasses}`}
-        >
-          <h4 className='text-lg font-medium text-black dark:text-gray-2 mb-8'>
-            Categories
-          </h4>
-          <CategoryChart
-            totalNetworth={networth.diffTotal}
-            categories={categories}
-          />
-        </div>
+        </TablesContainer>
       </div>
 
       {/* Show below 768px */}
       <div className='grid grid-cols-12 md:hidden'>
-        <div
-          className={`flex flex-col col-span-12 rounded-xl border-r-1 dark:bg-dark-3 ${tableClasses}`}
-        >
-          <NetworthSummary
-            diffPercentage={networth.diffPercentage}
-            diffTotal={networth.diffTotal}
-            totalNetworth={totalNetworth}
-          />
-          <DashboardTabButtons
-            handleTabClick={handleTabClick}
-            tabs={['Chart', 'Categories']}
-          />
-          {activeTab === 'Chart' && (
-            <div className='min-h-[365px]'>
-              <NetworthTable
-                isLoading={isLoading}
-                data={networth.results}
+        <TablesContainer classes='flex flex-col col-span-12 rounded-xl border-r-1 dark:bg-dark-3 '>
+          {networth && networth.results?.length ? (
+            <>
+              <NetworthSummary
+                diffPercentage={networth.diffPercentage}
+                diffTotal={networth.diffTotal}
                 totalNetworth={totalNetworth}
-                activeFilter={activeFilter}
+              />
+              <DashboardTabButtons
+                handleTabClick={handleTabClick}
+                tabs={['Chart', 'Categories']}
+                activeTab={activeTab}
+              />
+              {activeTab === 'Chart' && (
+                <>
+                  <div className='min-h-[365px]'>
+                    <NetworthTable
+                      isLoading={isLoading}
+                      data={networth.results}
+                      totalNetworth={totalNetworth}
+                      activeFilter={activeFilter}
+                    />
+                  </div>
+                  <DateFilterButtons
+                    activeFilter={activeFilter}
+                    handleClick={handleFilterClick}
+                  />
+                </>
+              )}
+              {activeTab === 'Categories' && (
+                <CategoryChart
+                  networthDiffTotal={networth.diffTotal}
+                  categories={categories}
+                />
+              )}
+            </>
+          ) : (
+            <div className='flex flex-col justify-center min-h-[365px]'>
+              <NoResults
+                text='No Results Available'
+                btnText='Add Data'
               />
             </div>
           )}
-          <DateFilterButtons
-            activeFilter={activeFilter}
-            handleClick={handleFilterClick}
-          />
-          {activeTab === 'Categories' && (
-            <CategoryChart
-              totalNetworth={networth.diffTotal}
-              categories={categories}
-            />
-          )}
-        </div>
+        </TablesContainer>
       </div>
     </>
   );

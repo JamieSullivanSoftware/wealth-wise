@@ -1,27 +1,50 @@
-export const getTransactions = async (limit: number = 0) => {
+const apiDomain = process.env.NEXT_PUBLIC_API_DOMAIN || null;
+
+export const getTransactions = async (
+  limit: number = 5,
+  sortBy: string = 'updatedAt',
+  order: string = 'desc',
+  page: number = 1
+) => {
+  if (!apiDomain) {
+    return [];
+  }
   const res = await fetch(
-    `http://localhost:3000/api/transactions?limit=${limit}`
+    `${apiDomain}/transactions?limit=${limit}&sortBy=${sortBy}&order=${order}&page=${page}`,
+    {
+      cache: 'no-store',
+    }
   );
   const data = await res.json();
-  return data.transactions;
+  return data;
 };
 
-export const getAssets = async (limit: number = 0) => {
-  const res = await fetch(`http://localhost:3000/api/assets?limit=${limit}`);
-  const data = await res.json();
-  return data.assets;
-};
-
-export const getCategories = async (filter: DateFilter) => {
+export const getAssets = async (
+  limit: number = 5,
+  sortBy: string = 'updatedAt',
+  order: string = 'desc',
+  page: number = 1
+) => {
+  if (!apiDomain) {
+    return [];
+  }
   const res = await fetch(
-    `http://localhost:3000/api/categories?filter=${filter}`
+    `${apiDomain}/assets?limit=${limit}&sortBy=${sortBy}&order=${order}&page=${page}`,
+    {
+      cache: 'no-store',
+    }
   );
   const data = await res.json();
-  return data.categories;
+  return data;
 };
 
 export const getNetWorth = async (filter: DateFilter) => {
-  const res = await fetch(`http://localhost:3000/api/networth/${filter}`);
+  if (!apiDomain) {
+    return [];
+  }
+  const res = await fetch(`${apiDomain}/networth/${filter}`, {
+    cache: 'no-store',
+  });
   const data = await res.json();
   return data.networth;
 };

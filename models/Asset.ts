@@ -23,10 +23,6 @@ export const AssetSchema = new Schema(
       type: Number,
       required: true,
     },
-    detail: {
-      type: Number,
-      required: false,
-    },
     numShares: {
       type: Number,
       required: true,

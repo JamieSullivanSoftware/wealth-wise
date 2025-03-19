@@ -1,16 +1,49 @@
 import type { PipelineStage } from 'mongoose';
 
-import { generateCumulatedNetworth } from '@/app/helpers/routeHelper';
+import {
+  formatCategories,
+  generateCumulatedNetworth,
+} from '@/helpers/routeHelper';
 import Asset from '@/models/Asset';
+import connectDB from '@/configdatabase';
+import { getSessionUser } from '@/utils/getSessionUser';
 
 export const GET = async () => {
   const today = new Date();
+
   try {
+    await connectDB();
+
+    const sessionUser = await getSessionUser();
+    let userId = process.env.DEFAULT_USER_ID;
+
+    if (sessionUser && sessionUser.userId) {
+      userId = sessionUser.userId;
+    }
+
     const pipeline: PipelineStage[] = [
       // Step 1: Filter documents for the base total before start date and all totals after start date
       {
         $facet: {
+          categories: [
+            {
+              $group: {
+                _id: '$category',
+                total: {
+                  $sum: {
+                    $subtract: ['$value', '$cost'],
+                  },
+                },
+              },
+            },
+            ...formatCategories(),
+          ],
           afterStartDateTotals: [
+            {
+              $match: {
+                user_id: userId,
+              },
+            },
             {
               $group: {
                 _id: {
@@ -61,6 +94,7 @@ export const GET = async () => {
         $project: {
           baseNetworth: { $add: [0, 0] },
           existingData: '$afterStartDateTotals',
+          categories: '$categories',
         },
       },
 

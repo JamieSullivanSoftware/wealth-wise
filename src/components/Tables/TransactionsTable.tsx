@@ -1,90 +1,251 @@
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+'use client';
+import { useEffect, useState } from 'react';
+import { faSort } from '@fortawesome/free-solid-svg-icons';
 
-import Icon from '../Common/Icon';
-import TableHeader from './TableHeader';
 import {
   currencyFormat,
   getEuropeanYear,
   getMonthDate,
   getTime,
 } from '@/utils/string';
+import { getTransactions } from '@/utils/api';
+import Button from '../Common/Button';
+import Paginator from './Paginator';
+import TransactionAmountInfo from './TransactionAmountInfo';
+import TableHeader from './TableHeader';
+import NoResults from '../Common/NoResults';
+import { useFirstRender } from '@/hooks/useFirstRender';
+import Loader from '../Common/Loader';
 
 interface IProps {
-  transactions: ITransaction[];
+  transactions: IPaginatedTransactions;
+  showFullData?: boolean;
 }
 
-const TransactionsTable = ({ transactions }: IProps) => {
-  return (
+const TransactionsTable = ({ transactions, showFullData }: IProps) => {
+  const isFirstRender = useFirstRender();
+  const [sort, setSort] = useState<ISort>({
+    by: 'updatedAt',
+    order: 'desc',
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(5);
+  const [paginatedTransactions, setPaginatedTransactions] =
+    useState<IPaginatedTransactions>(transactions);
+
+  const handleSort = (sortBy: TransactionSortBy) => {
+    let orderBy = 'desc';
+    if (sortBy === sort.by && sort.order === 'desc') {
+      orderBy = 'asc';
+    }
+    setSort({
+      by: sortBy,
+      order: orderBy,
+    });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleLimitChange = (limit: string) => {
+    const numLimit = Number(limit);
+    if (isNaN(Number(numLimit))) {
+      return;
+    }
+    setPage(1);
+    setLimit(numLimit);
+  };
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      const transactions = await getTransactions(
+        limit,
+        sort.by,
+        sort.order,
+        page
+      );
+      setPaginatedTransactions(transactions);
+    };
+    if (!isFirstRender && showFullData) {
+      setIsLoading(true);
+      fetchTransactions().finally(() => setIsLoading(false));
+    }
+  }, [sort, sort.by, sort.order, page, limit, showFullData, isFirstRender]);
+
+  if (isLoading) {
+    return <Loader isFullScreen />;
+  }
+
+  return showFullData ? (
+    paginatedTransactions.transactions.length > 0 ? (
+      <>
+        <TableHeader title='Transactions' />
+        <div>
+          <div className='grid grid-cols-12 mb-2 text-xs font-medium text-black dark:text-white xsm:text-sm'>
+            <div className='col-span-3 sm:col-span-2 flex items-center'>
+              <Button
+                text='Date'
+                onClick={() => handleSort('updatedAt')}
+                icon={faSort}
+                iconAlign='right'
+                hasBg={false}
+                iconSize='xs'
+                classes={sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'}
+              />
+            </div>
+            <div className='col-span-6 flex sm:col-span-3 items-center'>
+              <Button
+                text='Amount'
+                onClick={() => handleSort('amount')}
+                icon={faSort}
+                iconAlign='right'
+                hasBg={false}
+                iconSize='xs'
+                classes={sort.by === 'amount' ? 'font-bold' : 'font-normal'}
+              />
+            </div>
+            <div className='col-span-3 flex sm:col-span-1 justify-end sm:justify-center items-center'>
+              <Button
+                text='Type'
+                onClick={() => handleSort('type')}
+                icon={faSort}
+                iconAlign='right'
+                hasBg={false}
+                iconSize='xs'
+                classes={sort.by === 'type' ? 'font-bold' : 'font-normal'}
+              />
+            </div>
+            <div className='hidden col-span-3 sm:col-span-2 sm:flex justify-end sm:justify-center items-center'>
+              <Button
+                text='Category'
+                onClick={() => handleSort('assetCategory')}
+                icon={faSort}
+                iconAlign='right'
+                hasBg={false}
+                iconSize='xs'
+                classes={
+                  sort.by === 'assetCategory' ? 'font-bold' : 'font-normal'
+                }
+              />
+            </div>
+            <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
+              <Button
+                text='Asset Name'
+                onClick={() => handleSort('assetName')}
+                icon={faSort}
+                iconAlign='right'
+                hasBg={false}
+                iconSize='xs'
+                classes={sort.by === 'assetName' ? 'font-bold' : 'font-normal'}
+              />
+            </div>
+            <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
+              <Button
+                text='Asset Total'
+                onClick={() => handleSort('assetTotal')}
+                icon={faSort}
+                iconAlign='right'
+                hasBg={false}
+                iconSize='xs'
+                classes={sort.by === 'assetTotal' ? 'font-bold' : 'font-normal'}
+              />
+            </div>
+          </div>
+
+          {paginatedTransactions.transactions.map(
+            (transaction: ITransactionData, i: number) => {
+              const { asset, amount, type, assetTotal, updatedAt } =
+                transaction;
+
+              return (
+                <div
+                  className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm'
+                  key={i}
+                >
+                  <div className='col-span-3 sm:col-span-2 flex flex-wrap items-center'>
+                    {getEuropeanYear(new Date(updatedAt))}
+                  </div>
+                  <div className='col-span-6 flex flex-wrap items-center sm:col-span-3'>
+                    <TransactionAmountInfo
+                      amount={amount}
+                      isFullTable
+                    />
+                  </div>
+                  <div className='font-medium col-span-3 flex flex-wrap justify-end sm:justify-center items-center sm:col-span-1'>
+                    {type.toUpperCase()}
+                  </div>
+                  <div className='hidden col-span-3 sm:flex flex-wrap justify-end sm:justify-center items-center sm:col-span-2'>
+                    {asset.category}
+                  </div>
+                  <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
+                    {asset.name}
+                  </div>
+                  <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
+                    {currencyFormat.format(assetTotal)}
+                  </div>
+                </div>
+              );
+            }
+          )}
+        </div>
+        <Paginator
+          totalCount={paginatedTransactions.totalCount}
+          totalPages={paginatedTransactions.totalPages}
+          currentPage={paginatedTransactions.currentPage}
+          limit={limit}
+          onPageChange={handlePageChange}
+          onLimitChange={handleLimitChange}
+        />
+      </>
+    ) : (
+      <div className='flex flex-col justify-center min-h-[500px]'>
+        <NoResults
+          text='No Transactions yet'
+          btnText='Add Transaction'
+        />
+      </div>
+    )
+  ) : (
     <>
       <TableHeader
         title='Transactions'
-        linkHref='/transactions'
-        linkText='View All'
+        btnText='Add'
       />
-      <div className='hidden xsm:grid grid-cols-12 mt-4 py-4.5 text-xs font-medium text-black dark:text-white xsm:text-sm 2lg:hidden'>
-        <div className='col-start-2 col-span-2'>Amount</div>
-        <div className='col-span-3 flex justify-center'>Asset</div>
-        <div className='col-span-3 flex justify-center'>Category</div>
-        <div className='col-span-3 flex justify-end'>Created</div>
-      </div>
-      {transactions.map((transaction: ITransaction, i: number) => {
-        const { asset_id, amount, createdAt } = transaction;
-        const date = new Date(createdAt);
-        const isPositive = amount > 0;
+      <div className='mt-8 2lg:mt-0'>
+        {paginatedTransactions.transactions.map(
+          (transaction: ITransactionData, i: number) => {
+            const { asset, amount, updatedAt } = transaction;
+            const date = new Date(updatedAt);
 
-        return (
-          <div
-            className='grid grid-cols-12 py-4.5 text-xs text-black dark:text-white xsm:text-sm'
-            key={i}
-          >
-            <div className='col-span-2 xsm:col-span-1 flex items-center 2lg:col-span-2 2lg:justify-start'>
-              {
-                <div
-                  className={`h-8 min-w-8 xsm:h-10 xsm:min-w-10 rounded-md flex items-center justify-center text-xl border border-stroke dark:border-0 ${isPositive ? 'bg-gray-1 text-mid-green dark:bg-dark-green dark:text-light-green' : 'bg-gray-1 text-mid-red dark:bg-dark-red dark:text-light-red'} 2lg:h-8 2lg:min-w-8`}
-                >
-                  <span className='hidden xsm:flex 2lg:hidden'>
-                    <Icon icon={isPositive ? faArrowUp : faArrowDown} />
-                  </span>
-                  <span className='flex xsm:hidden 2lg:flex'>
-                    <Icon
-                      icon={isPositive ? faArrowUp : faArrowDown}
-                      size='sm'
-                    />
-                  </span>
-                </div>
-              }
-            </div>
-
-            <div className='gap-1 text-xs col-span-8 xsm:col-start-2 xsm:col-span-2 flex flex-col xsm:flex-row justify-center xsm:text-sm xsm:items-center xsm:justify-start 2lg:col-span-8 2lg:flex-col 2lg:items-start'>
-              <span
-                className={`${
-                  isPositive
-                    ? 'text-mid-green dark:text-light-green'
-                    : 'text-mid-red dark:text-light-red'
-                } font-medium `}
+            return (
+              <div
+                className='grid grid-cols-12 pb-9 text-xs text-black dark:text-white xsm:text-sm'
+                key={i}
               >
-                {currencyFormat.format(transaction.amount)}
-              </span>
-              <span className='flex xsm:hidden col-span-3 2lg:flex'>
-                {asset_id?.name}
-              </span>
-            </div>
-            <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
-              {asset_id?.name}
-            </div>
-            <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
-              {asset_id?.category}
-            </div>
-            <div className='hidden gap-1 col-span-3 justify-end items-center xsm:flex 2lg:hidden'>
-              {getEuropeanYear(date)}
-            </div>
-            <div className='gap-1 col-span-2 flex flex-col justify-center items-end xsm:hidden 2lg:flex'>
-              <p>{getMonthDate(date)}</p>
-              <p>{getTime(date)}</p>
-            </div>
-          </div>
-        );
-      })}
+                <TransactionAmountInfo
+                  amount={amount}
+                  assetName={asset.name}
+                />
+                <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
+                  {asset?.name}
+                </div>
+                <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
+                  {asset?.category}
+                </div>
+                <div className='hidden gap-1 col-span-3 justify-end items-center xsm:flex 2lg:hidden'>
+                  {getEuropeanYear(date)}
+                </div>
+                <div className='gap-1 col-span-2 flex flex-col justify-center items-end xsm:hidden 2lg:flex'>
+                  <p>{getMonthDate(date)}</p>
+                  <p>{getTime(date)}</p>
+                </div>
+              </div>
+            );
+          }
+        )}
+      </div>
     </>
   );
 };

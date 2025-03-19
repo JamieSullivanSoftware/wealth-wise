@@ -1,13 +1,11 @@
 'use client';
 
+import { clsx } from 'clsx/lite';
+
 import Icon from './Icon';
 
 import type { SizeProp } from '@fortawesome/fontawesome-svg-core';
 import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
-
-type BtnSize = 'sm' | 'lg';
-type BtnType = 'button' | 'submit' | 'reset' | undefined;
-type BtnIconAlign = 'left' | 'right' | undefined;
 
 interface Props {
   text: string;
@@ -18,24 +16,38 @@ interface Props {
   iconSize?: SizeProp;
   iconColor?: string;
   iconAlign?: BtnIconAlign;
-  isLink?: boolean;
+  hasBg?: boolean;
+  classes?: string;
 }
 
 const Button = ({
   text,
   type = 'button',
   onClick,
-  btnSize = 'lg',
+  btnSize = 'md',
   icon,
   iconSize,
   iconAlign,
+  hasBg = true,
+  classes = '',
 }: Props) => {
+  const classNames = clsx(
+    'rounded-md font-medium',
+    hasBg
+      ? 'bg-black text-white hover:bg-opacity-50 dark:text-black dark:bg-gray-1 dark:hover:bg-opacity-75 py-2 px-4'
+      : 'bg-transparent',
+    btnSize === 'sm' && 'text-sm',
+    btnSize === 'md' && 'text-base',
+    btnSize === 'lg' && 'text-lg',
+    icon && 'flex gap-2 justify-between items-center',
+    classes
+  );
+
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`rounded-md bg-black text-white hover:bg-opacity-50 dark:text-black dark:bg-gray-1 dark:hover:bg-opacity-75  ${icon ? 'flex gap-2 justify-between items-center ' : ''} ${btnSize === 'lg' ? 'text-lg font-medium py-2 px-4' : 'text-md font-medium py-2 px-4'} `}
-      style={{ color: '' }}
+      className={classNames}
     >
       {icon && iconAlign !== 'right' && (
         <Icon

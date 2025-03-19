@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import ClickOutside from '@/components/Common/ClickOutside';
 import useLocalStorage from '@/hooks/useLocalStorage';
-import { MENU_ITEMS } from '@/constants/menu';
+import { MENU_ITEMS } from '@/constants';
 import SidebarItem from './SidebarItem';
 import { IMenuItem } from '@/types/menu';
 import { signOut, useSession } from 'next-auth/react';

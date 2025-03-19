@@ -1,19 +1,24 @@
 'use client';
 import dynamic from 'next/dynamic';
+import type { ApexOptions } from 'apexcharts';
 
-import Category from '../Common/Category';
+import CategoryInfo from '../Common/CategoryInfo';
+import { CATEGORIES } from '@/constants';
+import { toCamelCase } from '@/utils/string';
+import TableHeader from './TableHeader';
 
 const ApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
 
 interface Props {
-  categories: ICategory[];
-  totalNetworth: number;
+  categories?: ICategory[];
+  networthDiffTotal?: number;
 }
 
-const CategoryChart = ({ categories, totalNetworth }: Props) => {
-  const categoryColors: ICategoryColors = {
+const CategoryChart = ({ categories = [], networthDiffTotal = 0 }: Props) => {
+  const hasData = networthDiffTotal > 0 && categories.length > 0;
+  const categoryColors: ICategories = {
     accounts: '#3E76E0',
     cars: '#67bc8c',
     crypto: '#77CAF9',
@@ -23,18 +28,23 @@ const CategoryChart = ({ categories, totalNetworth }: Props) => {
   };
 
   const getPercentageValue = (total: number) => {
-    return (total / totalNetworth) * 100;
+    if (networthDiffTotal > 0) {
+      return (total / networthDiffTotal) * 100;
+    }
+    return 0;
   };
 
   const getPercentageString = (total: number) => {
     return `${getPercentageValue(total).toFixed(2)}%`;
   };
 
-  const series = categories.map((category: ICategory) => {
-    return Number(getPercentageValue(category.total).toFixed(2));
-  });
+  const series = hasData
+    ? categories.map((category: ICategory) => {
+        return Number(getPercentageValue(category.total).toFixed(2));
+      })
+    : [100];
 
-  const options = {
+  const options: ApexOptions = {
     chart: {
       toolbar: {
         show: false,
@@ -46,30 +56,52 @@ const CategoryChart = ({ categories, totalNetworth }: Props) => {
     legend: {
       show: false,
     },
+    tooltip: {
+      enabled: hasData,
+    },
     labels: categories.map((category: ICategory) => category.name),
     fill: {
-      colors: Object.values(categoryColors),
+      colors: hasData
+        ? categories.map((category: ICategory) => {
+            const key = toCamelCase(category.name) as keyof ICategories;
+            return categoryColors[key];
+          })
+        : ['#a4a6a8'],
     },
   };
 
   return (
-    <div className='grid grid-cols-1 gap-8 items-center justify-between justify-items-center'>
-      <ApexChart
-        options={options}
-        series={series}
-        type='donut'
-        height={250}
-        width={'100%'}
-      />
+    <div className='grid grid-cols-1 gap-4 items-center justify-between'>
+      <div className='hidden md:block'>
+        <TableHeader title='Categories' />
+      </div>
+      <div className='min-h-[280px]'>
+        <ApexChart
+          options={options}
+          series={series}
+          type='donut'
+          height={280}
+          width={'100%'}
+        />
+      </div>
       <div className='grid grid-rows-auto grid-cols-3 gap-6 justify-items-center'>
-        {categories.map((category: ICategory, i: number) => (
-          <Category
-            key={i}
-            name={category.name}
-            total={getPercentageString(category.total)}
-            colourKey={Object.keys(categoryColors)[i]}
-          />
-        ))}
+        {Object.values(CATEGORIES).map((v: string, i: number) => {
+          const foundCategory = categories.find((c: ICategory) => c.name === v);
+          const category: ICategory = foundCategory
+            ? foundCategory
+            : {
+                name: v,
+                total: 0,
+              };
+          return (
+            <CategoryInfo
+              key={i}
+              name={category.name}
+              total={getPercentageString(category.total)}
+              colourKey={Object.keys(categoryColors)[i]}
+            />
+          );
+        })}
       </div>
     </div>
   );

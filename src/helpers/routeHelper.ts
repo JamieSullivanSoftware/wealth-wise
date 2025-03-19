@@ -141,6 +141,7 @@ export const generateCumulatedNetworth = (
           2,
         ],
       },
+      categories: '$categories',
       results: {
         $map: {
           input: '$cumulatedTotals.totalsArray',
@@ -161,7 +162,7 @@ export const formatCategories = () => [
     $project: {
       _id: 0,
       name: '$_id',
-      total: '$total',
+      total: { $round: ['$total', 2] },
     },
   },
 ];

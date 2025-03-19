@@ -1,5 +1,8 @@
+declare type TransactionType = 'Buy' | 'Sell';
+
 declare interface ITransaction {
   _id: string;
+  type: TransactionType;
   user_id: string;
   asset_id: IAsset;
   amount: number;
@@ -14,24 +17,7 @@ declare interface IAsset {
   name: string;
   cost: number;
   value: number;
-  detail: string;
   numShares: number;
   createdAt: string;
-  updateAt: string;
-}
-
-declare interface ICategory {
-  name: string;
-  total: number;
-}
-
-declare interface INetworthResult {
-  date: string;
-  total: number;
-}
-
-declare interface INetworth {
-  diffPercentage?: number;
-  diffTotal: number;
-  results: INetworthResult[];
+  updatedAt: string;
 }

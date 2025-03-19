@@ -1,7 +1,12 @@
 import type { PipelineStage } from 'mongoose';
 
-import { generateCumulatedNetworth } from '@/app/helpers/routeHelper';
+import {
+  formatCategories,
+  generateCumulatedNetworth,
+} from '@/helpers/routeHelper';
 import Asset from '@/models/Asset';
+import connectDB from '@/configdatabase';
+import { getSessionUser } from '@/utils/getSessionUser';
 
 export const GET = async () => {
   const today = new Date();
@@ -9,6 +14,15 @@ export const GET = async () => {
   startDate.setFullYear(today.getFullYear() - 1);
 
   try {
+    await connectDB();
+
+    const sessionUser = await getSessionUser();
+    let userId = process.env.DEFAULT_USER_ID;
+
+    if (sessionUser && sessionUser.userId) {
+      userId = sessionUser.userId;
+    }
+
     const pipeline: PipelineStage[] = [
       // Step 1: Filter documents for the base total before start date and all totals after start date
       {
@@ -17,6 +31,7 @@ export const GET = async () => {
             {
               $match: {
                 createdAt: { $lt: startDate },
+                user_id: userId,
               },
             },
             {
@@ -32,6 +47,27 @@ export const GET = async () => {
                 },
               },
             },
+          ],
+          categories: [
+            {
+              $match: {
+                createdAt: {
+                  $gte: startDate,
+                  $lte: today,
+                },
+              },
+            },
+            {
+              $group: {
+                _id: '$category',
+                total: {
+                  $sum: {
+                    $subtract: ['$value', '$cost'],
+                  },
+                },
+              },
+            },
+            ...formatCategories(),
           ],
           afterStartDateTotals: [
             {
@@ -92,6 +128,7 @@ export const GET = async () => {
         $project: {
           baseNetworth: { $arrayElemAt: ['$baseNetworth.total', 0] },
           existingData: '$afterStartDateTotals',
+          categories: '$categories',
         },
       },
 
