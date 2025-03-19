@@ -27,8 +27,8 @@ const DashboardTopSection = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => await getNetWorth(activeFilter);
     setLoading(true);
+    const fetchData = async () => await getNetWorth(activeFilter);
 
     fetchData()
       .then((networth) => {

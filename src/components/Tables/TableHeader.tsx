@@ -1,6 +1,7 @@
 'use client';
 
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { useSession } from 'next-auth/react';
 
 import Button from '../Common/Button';
 
@@ -11,6 +12,9 @@ interface Props {
 }
 
 const TableHeader = ({ title, btnText, onBtnClick }: Props) => {
+  const { data: session, status } = useSession();
+  const isAuthenticated = session && status === 'authenticated';
+
   return (
     <div className='flex justify-between items-center'>
       {title && (
@@ -18,7 +22,7 @@ const TableHeader = ({ title, btnText, onBtnClick }: Props) => {
           {title}
         </h4>
       )}
-      {btnText && onBtnClick && (
+      {btnText && onBtnClick && isAuthenticated && (
         <Button
           text={btnText}
           onClick={onBtnClick}

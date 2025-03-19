@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-import ClickOutside from '@/components/Common/ClickOutside';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import { MENU_ITEMS } from '@/constants';
 import SidebarItem from './SidebarItem';
@@ -10,10 +9,9 @@ import { signOut, useSession } from 'next-auth/react';
 
 interface ISidebarProps {
   sidebarOpen: boolean;
-  setSidebarOpen: (arg: boolean) => void;
 }
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }: ISidebarProps) => {
+const Sidebar = ({ sidebarOpen }: ISidebarProps) => {
   const { data: session } = useSession();
   const [pageName, setPageName] = useLocalStorage('selectedMenu', 'dashboard');
 

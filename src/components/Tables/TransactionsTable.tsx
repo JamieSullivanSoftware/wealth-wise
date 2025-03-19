@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { faSort } from '@fortawesome/free-solid-svg-icons';
+import { useSession } from 'next-auth/react';
 
 import {
   currencyFormat,
@@ -14,7 +15,6 @@ import Paginator from './Paginator';
 import TransactionAmountInfo from './TransactionAmountInfo';
 import TableHeader from './TableHeader';
 import NoResults from '../Common/NoResults';
-import { useFirstRender } from '@/hooks/useFirstRender';
 import Loader from '../Common/Loader';
 import Modal from '../Common/Modal';
 import TransactionForm from '../Forms/TransactionForm';
@@ -25,7 +25,8 @@ interface IProps {
 }
 
 const TransactionsTable = ({ showFullData }: IProps) => {
-  const isFirstRender = useFirstRender();
+  const { data: session, status } = useSession();
+  const isAuthenticated = session && status === 'authenticated';
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
     order: 'desc',
@@ -122,7 +123,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     };
 
     fetchTransactions().finally(() => setIsLoading(false));
-  }, [sort, sort.by, sort.order, page, limit, showFullData, isFirstRender]);
+  }, [sort, sort.by, sort.order, page, limit]);
 
   useEffect(() => {
     if (selectedIds.length === 1) {
@@ -156,7 +157,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
 
   return (
     <>
-      {showFullData && (
+      {showFullData && isAuthenticated && (
         <div className='flex justify-end gap-4 col-span-12 mb-4 '>
           <Button
             text='Edit'

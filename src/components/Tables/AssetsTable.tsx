@@ -1,8 +1,10 @@
 'use client';
+import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
+
 import { currencyFormat, getEuropeanYear } from '@/utils/string';
 import Button from '../Common/Button';
 import { faSort } from '@fortawesome/free-solid-svg-icons';
-import { useEffect, useState } from 'react';
 import { getAssets } from '@/utils/api';
 import Paginator from './Paginator';
 import TableHeader from './TableHeader';
@@ -19,6 +21,8 @@ interface IProps {
 }
 
 const AssetsTable = ({ showFullData }: IProps) => {
+  const { data: session, status } = useSession();
+  const isAuthenticated = session && status === 'authenticated';
   const [sort, setSort] = useState<ISort>({
     by: 'updatedAt',
     order: 'desc',
@@ -113,7 +117,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
 
   return (
     <>
-      {showFullData && (
+      {showFullData && isAuthenticated && (
         <div className='flex justify-end gap-4 col-span-12 mb-4 '>
           <Button
             text='Edit'
