@@ -326,7 +326,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
           ) : (
             <div className='flex flex-col justify-center min-h-[500px]'>
               <NoResults
-                text='No Transactions yet'
+                title='No Transactions Available'
                 btnText='Add Transaction'
               />
             </div>
@@ -336,10 +336,16 @@ const TransactionsTable = ({ showFullData }: IProps) => {
             <TableHeader
               title='Transactions'
               btnText='Add'
-              onBtnClick={() => handleToggleModal(true)}
+              onBtnClick={
+                paginatedTransactions &&
+                paginatedTransactions.transactions.length > 0
+                  ? () => handleToggleModal(true)
+                  : undefined
+              }
             />
             <div className='mt-8 2lg:mt-0'>
               {paginatedTransactions &&
+              paginatedTransactions.transactions.length > 0 ? (
                 paginatedTransactions.transactions.map(
                   (transaction: ITransactionData, i: number) => {
                     const { asset, amount, updatedAt } = transaction;
@@ -370,7 +376,25 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       </div>
                     );
                   }
-                )}
+                )
+              ) : (
+                <div className='flex flex-col justify-center min-h-[500px]'>
+                  <NoResults
+                    title='No Transactions Yet'
+                    subtitle={
+                      assetList && assetList.length === 0
+                        ? 'Please create an asset first'
+                        : undefined
+                    }
+                    btnText={
+                      assetList && assetList.length > 0
+                        ? 'Add Transaction'
+                        : undefined
+                    }
+                    onClick={() => handleToggleModal(true)}
+                  />
+                </div>
+              )}
             </div>
           </>
         )}

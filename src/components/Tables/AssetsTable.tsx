@@ -282,7 +282,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
           ) : (
             <div className='flex flex-col justify-center min-h-[500px]'>
               <NoResults
-                text='No Assets yet'
+                title='No Assets Available'
                 btnText='Add Asset'
               />
             </div>
@@ -292,26 +292,32 @@ const AssetsTable = ({ showFullData }: IProps) => {
             <TableHeader
               title='Assets'
               btnText='Add'
-              onBtnClick={() => handleToggleModal(true)}
+              onBtnClick={
+                paginatedAssets && paginatedAssets.assets.length > 0
+                  ? () => handleToggleModal(true)
+                  : undefined
+              }
             />
             <div className='mt-8 2lg:mt-0'>
-              <div className='grid grid-cols-12 text-xs font-medium text-black dark:text-white xsm:text-sm'>
-                <div className='col-span-3 flex items-center'>Name</div>
-                <div className='col-span-3 flex justify-center 2lg:justify-end items-center'>
-                  Change
+              {paginatedAssets && paginatedAssets.assets.length > 0 && (
+                <div className='grid grid-cols-12 text-xs font-medium text-black dark:text-white xsm:text-sm'>
+                  <div className='col-span-3 flex items-center'>Name</div>
+                  <div className='col-span-3 flex justify-center 2lg:justify-end items-center'>
+                    Change
+                  </div>
+                  <div className='col-span-3 flex justify-center items-center 2lg:justify-end'>
+                    Cost
+                  </div>
+                  <div className='col-span-3 flex justify-end items-center'>
+                    Value
+                  </div>
                 </div>
-                <div className='col-span-3 flex justify-center items-center 2lg:justify-end'>
-                  Cost
-                </div>
-                <div className='col-span-3 flex justify-end items-center'>
-                  Value
-                </div>
-              </div>
-              {paginatedAssets &&
+              )}
+              {paginatedAssets && paginatedAssets.assets.length > 0 ? (
                 paginatedAssets.assets.map((asset: IAssetData, i: number) => (
                   <div
-                    className='grid grid-cols-12 py-4 text-xs text-black dark:text-white xsm:text-sm'
                     key={i}
+                    className='grid grid-cols-12 py-4 text-xs text-black dark:text-white xsm:text-sm'
                   >
                     <div className='col-span-3 flex flex-col gap-2 flex-wrap'>
                       <span className='font-medium'>{asset.name}</span>
@@ -332,7 +338,16 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       {currencyFormat.format(asset.value)}
                     </div>
                   </div>
-                ))}
+                ))
+              ) : (
+                <div className='flex flex-col justify-center min-h-[500px]'>
+                  <NoResults
+                    title='No Assets Yet'
+                    btnText='Add Asset'
+                    onClick={() => handleToggleModal(true)}
+                  />
+                </div>
+              )}
             </div>
           </>
         )}
