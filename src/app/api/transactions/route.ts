@@ -3,10 +3,18 @@ import type { PipelineStage } from 'mongoose';
 
 import connectDB from '../../../../config/database';
 import Transaction from '../../../../models/Transaction';
+import { getSessionUser } from '@/utils/getSessionUser';
 
 export const GET = async (request: NextRequest) => {
   try {
     await connectDB();
+
+    const sessionUser = await getSessionUser();
+    let userId = process.env.DEFAULT_USER_ID;
+
+    if (sessionUser && sessionUser.userId) {
+      userId = sessionUser.userId;
+    }
 
     // Extract query parameters
     const limit = Number(request.nextUrl.searchParams.get('limit')) || 5;
@@ -29,6 +37,11 @@ export const GET = async (request: NextRequest) => {
     const skip = (page - 1) * limit;
 
     const pipeline: PipelineStage[] = [
+      {
+        $match: {
+          user_id: userId,
+        },
+      },
       {
         $addFields: {
           asset_id: { $toObjectId: '$asset_id' },
