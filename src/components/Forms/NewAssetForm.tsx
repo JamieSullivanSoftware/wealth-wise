@@ -3,7 +3,7 @@ import Input from './Input';
 import Select from './Select';
 import { CATEGORIES } from '@/constants';
 import Button from '../Common/Button';
-import addAsset from '@/app/actions/addAsset';
+import { addAsset } from '@/app/actions/addAsset';
 import { useRouter } from 'next/navigation';
 
 interface IProps {

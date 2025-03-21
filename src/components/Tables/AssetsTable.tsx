@@ -15,6 +15,7 @@ import Loader from '../Common/Loader';
 import Modal from '../Common/Modal';
 import NewAssetForm from '../Forms/NewAssetForm';
 import TablesContainer from '../Containers/TablesContainer';
+import { deleteAssets } from '@/app/actions/addAsset';
 
 interface IProps {
   showFullData?: boolean;
@@ -81,8 +82,9 @@ const AssetsTable = ({ showFullData }: IProps) => {
     setShowModal(false);
   };
 
-  const handleDeleteAsset = () => {
-    console.log(selectedIds);
+  const handleDeleteAssets = async () => {
+    await deleteAssets(selectedIds);
+    await refetchAssets();
   };
 
   useEffect(() => {
@@ -130,7 +132,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
           />
           <Button
             text='Delete'
-            onClick={handleDeleteAsset}
+            onClick={handleDeleteAssets}
             classes='bg-danger dark:bg-danger dark:text-white'
             hasBg
             isDisabled={!isDeleteDisabled}

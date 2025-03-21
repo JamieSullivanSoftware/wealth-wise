@@ -2,11 +2,13 @@
 
 import connectDB from '@/configdatabase';
 import Asset from '@/modelsAsset';
+import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
+import { Types } from 'mongoose';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
-async function addAsset(formData: FormData) {
+export const addAsset = async (formData: FormData) => {
   await connectDB();
 
   const sessionUser = await getSessionUser();
@@ -27,11 +29,35 @@ async function addAsset(formData: FormData) {
     detail: formData.get('detail'),
   };
 
-  const newAsset = new Asset(assetData);
-  await newAsset.save();
+  try {
+    const newAsset = new Asset(assetData);
+    await newAsset.save();
+  } catch (error) {
+    console.log(error);
+    return new Response('Asset not saved', { status: 500 });
+  }
 
   revalidatePath('/', 'layout');
   redirect('/');
-}
+};
 
-export default addAsset;
+export const deleteAssets = async (assetIds: string[]) => {
+  await connectDB();
+
+  const sessionUser = await getSessionUser();
+
+  if (!sessionUser) {
+    throw new Error('You must be logged in to delete an asset');
+  }
+
+  try {
+    const updatedIds = assetIds.map((id) => new Types.ObjectId(id));
+    await Asset.deleteMany({ _id: { $in: updatedIds } });
+    await Transaction.deleteMany({
+      asset_id: { $in: updatedIds },
+    });
+  } catch (error) {
+    console.log(error);
+    return new Response('Assets not deleted', { status: 500 });
+  }
+};
