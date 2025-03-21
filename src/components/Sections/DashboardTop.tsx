@@ -73,7 +73,7 @@ const DashboardTopSection = () => {
           ) : (
             <div className='flex flex-col justify-center min-h-[365px]'>
               <NoResults
-                text='No Results Available'
+                title='No Results Available'
                 btnText='Add Data'
               />
             </div>
@@ -130,7 +130,7 @@ const DashboardTopSection = () => {
           ) : (
             <div className='flex flex-col justify-center min-h-[365px]'>
               <NoResults
-                text='No Results Available'
+                title='No Results Available'
                 btnText='Add Data'
               />
             </div>

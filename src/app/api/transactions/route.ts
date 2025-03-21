@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import type { PipelineStage } from 'mongoose';
+import { Types, type PipelineStage } from 'mongoose';
 
 import connectDB from '../../../../config/database';
 import Transaction from '../../../../models/Transaction';
@@ -11,11 +11,10 @@ export const GET = async (request: NextRequest) => {
 
     // Check if the user is logged in
     const sessionUser = await getSessionUser();
-    let userId = process.env.DEFAULT_USER_ID;
-
-    if (sessionUser && sessionUser.userId) {
-      userId = sessionUser.userId;
-    }
+    const userId =
+      sessionUser && sessionUser.userId
+        ? new Types.ObjectId(sessionUser.userId)
+        : new Types.ObjectId(process.env.DEFAULT_USER_ID);
 
     // Extract query parameters
     const limit = Number(request.nextUrl.searchParams.get('limit')) || 5;
@@ -123,9 +122,9 @@ export const GET = async (request: NextRequest) => {
     const totalCount = data[0].count;
     const totalPages = Math.ceil(totalCount / limit);
     const emptyDataResponse = {
-      totalCount,
-      totalPages,
-      currentPage: page,
+      totalCount: 0,
+      totalPages: 0,
+      currentPage: 1,
       transactions: [],
     };
 
@@ -141,7 +140,7 @@ export const GET = async (request: NextRequest) => {
     if (transactions.length === 0) {
       console.log('No transactions found');
       return new Response(JSON.stringify(emptyDataResponse), {
-        status: 204,
+        status: 200,
       });
     }
 
@@ -155,6 +154,7 @@ export const GET = async (request: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
+    console.log(error);
     return new Response('Something went wrong', { status: 500 });
   }
 };

@@ -123,7 +123,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     };
 
     fetchTransactions().finally(() => setIsLoading(false));
-  }, [sort, sort.by, sort.order, page, limit]);
+  }, [sort.by, sort.order, page, limit]);
 
   useEffect(() => {
     if (selectedIds.length === 1) {

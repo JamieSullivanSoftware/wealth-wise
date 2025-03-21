@@ -1,4 +1,4 @@
-import type { PipelineStage } from 'mongoose';
+import { Types, type PipelineStage } from 'mongoose';
 
 import connectDB from '@/config/database';
 import Asset from '@/models/Asset';
@@ -9,11 +9,10 @@ export const GET = async () => {
     await connectDB();
 
     const sessionUser = await getSessionUser();
-    let userId = process.env.DEFAULT_USER_ID;
-
-    if (sessionUser && sessionUser.userId) {
-      userId = sessionUser.userId;
-    }
+    const userId =
+      sessionUser && sessionUser.userId
+        ? new Types.ObjectId(sessionUser.userId)
+        : new Types.ObjectId(process.env.DEFAULT_USER_ID);
 
     const pipeline: PipelineStage[] = [
       {

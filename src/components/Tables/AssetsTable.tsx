@@ -81,6 +81,10 @@ const AssetsTable = ({ showFullData }: IProps) => {
     setShowModal(false);
   };
 
+  const handleDeleteAsset = () => {
+    console.log(selectedIds);
+  };
+
   useEffect(() => {
     const fetchAssets = async () => {
       setIsLoading(true);
@@ -89,7 +93,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
     };
 
     fetchAssets().finally(() => setIsLoading(false));
-  }, [sort, sort.by, sort.order, page, limit]);
+  }, [sort.by, sort.order, page, limit]);
 
   useEffect(() => {
     if (selectedIds.length === 1) {
@@ -126,7 +130,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
           />
           <Button
             text='Delete'
-            onClick={() => console.log('Edit')}
+            onClick={handleDeleteAsset}
             classes='bg-danger dark:bg-danger dark:text-white'
             hasBg
             isDisabled={!isDeleteDisabled}
