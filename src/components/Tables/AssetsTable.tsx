@@ -313,7 +313,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   </div>
                 </div>
               )}
-              {paginatedAssets && paginatedAssets.assets.length > 0 ? (
+              {paginatedAssets && paginatedAssets.assets?.length > 0 ? (
                 paginatedAssets.assets.map((asset: IAssetData, i: number) => (
                   <div
                     key={i}
@@ -321,7 +321,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   >
                     <div className='col-span-3 flex flex-col gap-2 flex-wrap'>
                       <span className='font-medium'>{asset.name}</span>
-                      <span className='font-light'>
+                      <span className='font-light overflow-hidden whitespace-nowrap text-ellipsis w-[200px] inline-block'>
                         {asset.category === CATEGORIES.stocks ||
                         asset.category === CATEGORIES.crypto
                           ? `${asset.numShares} Share${asset.numShares > 1 ? 's' : ''}`

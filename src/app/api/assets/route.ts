@@ -9,6 +9,7 @@ export const GET = async (request: NextRequest) => {
   try {
     await connectDB();
 
+    // Check if the user is logged in
     const sessionUser = await getSessionUser();
     let userId = process.env.DEFAULT_USER_ID;
 
@@ -22,87 +23,127 @@ export const GET = async (request: NextRequest) => {
     const order = request.nextUrl.searchParams.get('order') === 'asc' ? 1 : -1;
     const page = Number(request.nextUrl.searchParams.get('page')) || 1;
 
-    // Get total count of documents
-    const totalCount = await Asset.countDocuments();
-    const totalPages = Math.ceil(totalCount / limit);
-
-    // Ensure the page is within valid range
-    if (page < 1 || page > totalPages) {
-      return new Response(JSON.stringify({ error: 'Invalid page number' }), {
-        status: 400,
-      });
-    }
-
     // Calculate the number of documents to skip
     const skip = (page - 1) * limit;
 
     const pipeline: PipelineStage[] = [
       {
-        $match: {
-          user_id: userId,
-        },
-      },
-      {
-        $addFields: {
-          diffTotal: {
-            $sum: {
-              $subtract: [
-                { $ifNull: ['$value', 0] },
-                { $ifNull: ['$cost', 0] },
-              ],
+        $facet: {
+          assets: [
+            {
+              $match: {
+                user_id: userId,
+              },
             },
-          },
+            {
+              $addFields: {
+                diffTotal: {
+                  $sum: {
+                    $subtract: [
+                      { $ifNull: ['$value', 0] },
+                      { $ifNull: ['$cost', 0] },
+                    ],
+                  },
+                },
+              },
+            },
+            {
+              $project: {
+                _id: 1,
+                user_id: 1,
+                updatedAt: 1,
+                name: 1,
+                category: 1,
+                numShares: 1,
+                value: 1,
+                cost: 1,
+                detail: 1,
+                diffPercentage: {
+                  $round: [
+                    {
+                      $multiply: [
+                        {
+                          $cond: {
+                            if: {
+                              $or: [
+                                { $eq: ['$diffTotal', 0] },
+                                { $eq: ['$cost', 0] },
+                                { $not: ['$cost'] },
+                              ],
+                            },
+                            then: 0,
+                            else: {
+                              $divide: ['$diffTotal', '$cost'],
+                            },
+                          },
+                        },
+                        100,
+                      ],
+                    },
+                    2,
+                  ],
+                },
+              },
+            },
+            {
+              $sort: {
+                ...(sortBy === 'diffPercentage'
+                  ? { diffPercentage: order }
+                  : {}),
+                ...{ [sortBy]: order },
+                _id: order,
+              },
+            },
+            { $skip: skip },
+            { $limit: limit },
+          ],
+          count: [
+            {
+              $match: {
+                user_id: userId,
+              },
+            },
+            {
+              $count: 'count',
+            },
+          ],
         },
       },
       {
         $project: {
-          _id: 1,
-          updatedAt: 1,
-          name: 1,
-          category: 1,
-          numShares: 1,
-          value: 1,
-          cost: 1,
-          detail: 1,
-          diffPercentage: {
-            $round: [
-              {
-                $multiply: [
-                  {
-                    $cond: {
-                      if: {
-                        $or: [
-                          { $eq: ['$diffTotal', 0] },
-                          { $eq: ['$cost', 0] },
-                          { $not: ['$cost'] },
-                        ],
-                      },
-                      then: 0,
-                      else: {
-                        $divide: ['$diffTotal', '$cost'],
-                      },
-                    },
-                  },
-                  100,
-                ],
-              },
-              2,
-            ],
-          },
+          assets: 1,
+          count: { $arrayElemAt: ['$count.count', 0] },
         },
       },
-      {
-        $sort: {
-          ...(sortBy === 'diffPercentage' ? { diffPercentage: order } : {}),
-          ...{ [sortBy]: order },
-          _id: order,
-        },
-      },
-      { $skip: skip },
-      { $limit: limit },
     ];
 
-    const assets = await Asset.aggregate(pipeline).exec();
+    // Extract data from the aggregation pipeline
+    const data = await Asset.aggregate(pipeline).exec();
+    const assets = data[0].assets;
+    const totalCount = data[0].count;
+    const totalPages = Math.ceil(totalCount / limit);
+    const emptyDataResponse = {
+      totalCount,
+      totalPages,
+      currentPage: page,
+      assets: [],
+    };
+
+    // Check if the page number is valid
+    if (page < 1 || page > totalPages) {
+      console.log('Invalid page number');
+      return new Response(JSON.stringify(emptyDataResponse), {
+        status: 400,
+      });
+    }
+
+    // Check for empty data
+    if (assets.length === 0) {
+      console.log('No assets found');
+      return new Response(JSON.stringify(emptyDataResponse), {
+        status: 204,
+      });
+    }
 
     return new Response(
       JSON.stringify({
