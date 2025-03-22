@@ -8,7 +8,6 @@ import NetworthTable from '../Tables/NetworthTable';
 import DateFilterButtons from './DateFilterButtons';
 import { getNetWorth } from '@/utils/api';
 import TablesContainer from '@/components/Containers/TablesContainer';
-import NoResults from '../Common/NoResults';
 
 const DashboardTopSection = () => {
   const [networth, setNetworth] = useState<INetworth | null>(null);
@@ -50,7 +49,7 @@ const DashboardTopSection = () => {
       {/* Show above 768px */}
       <div className='hidden md:grid grid-cols-12'>
         <TablesContainer classes='flex flex-col col-span-8 rounded-s-xl border-r-0 dark:bg-dark-3 p-6'>
-          {networth && networth.results?.length ? (
+          {networth && networth.results?.length && (
             <>
               <NetworthSummary
                 diffPercentage={networth.diffPercentage}
@@ -70,13 +69,6 @@ const DashboardTopSection = () => {
                 />
               </div>
             </>
-          ) : (
-            <div className='flex flex-col justify-center min-h-[365px]'>
-              <NoResults
-                title='No Results Available'
-                btnText='Add Data'
-              />
-            </div>
           )}
         </TablesContainer>
         <TablesContainer classes='col-span-4 rounded-e-xl dark:bg-dark-1 p-6'>
@@ -92,7 +84,7 @@ const DashboardTopSection = () => {
       {/* Show below 768px */}
       <div className='grid grid-cols-12 md:hidden'>
         <TablesContainer classes='flex flex-col col-span-12 rounded-xl border-r-1 dark:bg-dark-3 p-6'>
-          {networth && networth.results?.length ? (
+          {networth && networth.results?.length && (
             <>
               <NetworthSummary
                 diffPercentage={networth.diffPercentage}
@@ -127,13 +119,6 @@ const DashboardTopSection = () => {
                 />
               )}
             </>
-          ) : (
-            <div className='flex flex-col justify-center min-h-[365px]'>
-              <NoResults
-                title='No Results Available'
-                btnText='Add Data'
-              />
-            </div>
           )}
         </TablesContainer>
       </div>

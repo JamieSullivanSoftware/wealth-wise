@@ -28,6 +28,7 @@ const TableHeader = ({ title, btnText, onBtnClick }: Props) => {
           onClick={onBtnClick}
           icon={faPlus}
           iconSize='lg'
+          classes='bg-black text-white dark:text-black dark:bg-gray-100'
         />
       )}
     </div>

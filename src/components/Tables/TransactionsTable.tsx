@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { faSort } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
 import { useSession } from 'next-auth/react';
 
 import {
@@ -44,6 +44,12 @@ const TransactionsTable = ({ showFullData }: IProps) => {
   const [selectedTransactions, setSelectedTransactions] = useState<
     ITransactionData[]
   >([]);
+
+  const showHeaderButtons =
+    showFullData &&
+    isAuthenticated &&
+    paginatedTransactions &&
+    paginatedTransactions.transactions.length > 0;
 
   const handleSort = (sortBy: TransactionSortBy) => {
     let orderBy = 'desc';
@@ -91,6 +97,10 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     if (transaction) {
       setSelectedTransactions([transaction]);
     }
+  };
+
+  const handleOnDelete = () => {
+    console.log('delete');
   };
 
   const refetchTransactions = async () => {
@@ -157,20 +167,32 @@ const TransactionsTable = ({ showFullData }: IProps) => {
 
   return (
     <>
-      {showFullData && isAuthenticated && (
-        <div className='flex justify-end gap-4 col-span-12 mb-4 '>
-          <Button
-            text='Edit'
-            onClick={handleOnEdit}
-            isDisabled={!isEditDisabled}
-          />
-          <Button
-            text='Delete'
-            onClick={() => console.log('Edit')}
-            classes='bg-danger dark:bg-danger dark:text-white'
-            hasBg
-            isDisabled={!isDeleteDisabled}
-          />
+      {showHeaderButtons && (
+        <div className='flex justify-between items-center col-span-12 mb-4'>
+          <div>
+            <Button
+              text='Add'
+              onClick={() => handleToggleModal(true)}
+              icon={faPlus}
+              iconSize='lg'
+              classes='bg-black text-white dark:text-black dark:bg-gray-100'
+            />
+          </div>
+          <div className='flex gap-4'>
+            <Button
+              text='Edit'
+              onClick={handleOnEdit}
+              classes='bg-black text-white dark:text-black dark:bg-gray-100'
+              isDisabled={!isEditDisabled}
+            />
+            <Button
+              text='Delete'
+              onClick={handleOnDelete}
+              classes='text-white bg-danger dark:bg-danger'
+              hasBg
+              isDisabled={!isDeleteDisabled}
+            />
+          </div>
         </div>
       )}
       <TablesContainer

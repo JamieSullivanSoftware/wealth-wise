@@ -40,7 +40,7 @@ const Button = ({
     hasBg
       ? isPrimary
         ? 'text-white bg-primary enabled:hover:bg-primary-dark focus:ring-4 focus:outline-none focus:ring-primary-dark'
-        : 'bg-black text-white enabled:hover:bg-opacity-50 dark:text-black dark:bg-gray-1 enabled:dark:hover:bg-opacity-75 '
+        : 'enabled:hover:bg-opacity-50 enabled:dark:hover:bg-opacity-75'
       : 'bg-transparent',
     btnSize === 'sm' && 'text-sm',
     btnSize === 'md' && 'text-base',

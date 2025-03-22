@@ -4,15 +4,12 @@ import Select from './Select';
 import { CATEGORIES } from '@/constants';
 import Button from '../Common/Button';
 import { addAsset } from '@/app/actions/addAsset';
-import { useRouter } from 'next/navigation';
 
 interface IProps {
   onAssetAdded: () => void;
 }
 
-const NewAssetForm = ({ onAssetAdded }: IProps) => {
-  const router = useRouter();
-
+const AssetForm = ({ onAssetAdded }: IProps) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -20,7 +17,6 @@ const NewAssetForm = ({ onAssetAdded }: IProps) => {
     try {
       await addAsset(formData);
       await onAssetAdded();
-      router.push('/');
     } catch (error) {
       console.error('Failed to add transaction:', error);
     }
@@ -134,4 +130,4 @@ const NewAssetForm = ({ onAssetAdded }: IProps) => {
   );
 };
 
-export default NewAssetForm;
+export default AssetForm;

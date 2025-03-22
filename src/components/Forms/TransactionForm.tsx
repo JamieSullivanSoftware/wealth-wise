@@ -4,7 +4,6 @@ import Input from './Input';
 import Select from './Select';
 import { TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
-import { useRouter } from 'next/navigation';
 import { addTransaction, editTransaction } from '@/app/actions/transactions';
 
 interface IProps {
@@ -18,8 +17,6 @@ const TransactionForm = ({
   onTransactionAdded,
   transaction,
 }: IProps) => {
-  const router = useRouter();
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -31,7 +28,6 @@ const TransactionForm = ({
         await addTransaction(formData);
       }
       await onTransactionAdded();
-      router.push('/');
     } catch (error) {
       console.error('Failed to add transaction:', error);
     }

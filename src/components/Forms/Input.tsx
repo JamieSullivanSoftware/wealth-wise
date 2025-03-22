@@ -7,7 +7,7 @@ interface IProps {
   classes?: string;
   placeholder?: string;
   required?: boolean;
-  defaultValue: number | string | undefined;
+  defaultValue?: number | string | undefined;
 }
 
 const Input = ({

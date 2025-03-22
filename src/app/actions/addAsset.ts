@@ -5,8 +5,6 @@ import Asset from '@/modelsAsset';
 import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
 import { Types } from 'mongoose';
-import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 export const addAsset = async (formData: FormData) => {
   await connectDB();
@@ -36,9 +34,6 @@ export const addAsset = async (formData: FormData) => {
     console.log(error);
     return new Response('Asset not saved', { status: 500 });
   }
-
-  revalidatePath('/', 'layout');
-  redirect('/');
 };
 
 export const deleteAssets = async (assetIds: string[]) => {

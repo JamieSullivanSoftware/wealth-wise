@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 
 import { currencyFormat, getEuropeanYear } from '@/utils/string';
 import Button from '../Common/Button';
-import { faSort } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
 import { getAssets } from '@/utils/api';
 import Paginator from './Paginator';
 import TableHeader from './TableHeader';
@@ -13,7 +13,7 @@ import NoResults from '../Common/NoResults';
 import { CATEGORIES } from '@/constants';
 import Loader from '../Common/Loader';
 import Modal from '../Common/Modal';
-import NewAssetForm from '../Forms/NewAssetForm';
+import AssetForm from '../Forms/AssetForm';
 import TablesContainer from '../Containers/TablesContainer';
 import { deleteAssets } from '@/app/actions/addAsset';
 
@@ -37,6 +37,12 @@ const AssetsTable = ({ showFullData }: IProps) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isEditDisabled, setIsEditDisabled] = useState<boolean>(false);
   const [isDeleteDisabled, setIsDeleteDisabled] = useState<boolean>(false);
+
+  const showHeaderButtons =
+    showFullData &&
+    isAuthenticated &&
+    paginatedAssets &&
+    paginatedAssets.assets.length > 0;
 
   const handleSort = (sortBy: AssetSortBy) => {
     let orderBy = 'desc';
@@ -82,7 +88,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
     setShowModal(false);
   };
 
-  const handleDeleteAssets = async () => {
+  const handleOnDelete = async () => {
     await deleteAssets(selectedIds);
     await refetchAssets();
   };
@@ -123,20 +129,32 @@ const AssetsTable = ({ showFullData }: IProps) => {
 
   return (
     <>
-      {showFullData && isAuthenticated && (
-        <div className='flex justify-end gap-4 col-span-12 mb-4 '>
-          <Button
-            text='Edit'
-            onClick={() => console.log('Edit')}
-            isDisabled={!isEditDisabled}
-          />
-          <Button
-            text='Delete'
-            onClick={handleDeleteAssets}
-            classes='bg-danger dark:bg-danger dark:text-white'
-            hasBg
-            isDisabled={!isDeleteDisabled}
-          />
+      {showHeaderButtons && (
+        <div className='flex justify-between items-center col-span-12 mb-4'>
+          <div>
+            <Button
+              text='Add'
+              onClick={() => handleToggleModal(true)}
+              icon={faPlus}
+              iconSize='lg'
+              classes='bg-black text-white dark:text-black dark:bg-gray-100'
+            />
+          </div>
+          <div className='flex gap-4'>
+            <Button
+              text='Edit'
+              onClick={() => console.log('Edit')}
+              classes='bg-black text-white dark:text-black dark:bg-gray-100'
+              isDisabled={!isEditDisabled}
+            />
+            <Button
+              text='Delete'
+              onClick={handleOnDelete}
+              classes='text-white bg-danger dark:bg-danger'
+              hasBg
+              isDisabled={!isDeleteDisabled}
+            />
+          </div>
         </div>
       )}
       <Modal
@@ -144,7 +162,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
         onClose={() => handleToggleModal(false)}
         heading='Add Asset'
       >
-        <NewAssetForm onAssetAdded={refetchAssets} />
+        <AssetForm onAssetAdded={refetchAssets} />
       </Modal>
       <TablesContainer
         classes={`gap-6 col-span-12 rounded-xl dark:bg-dark-4 ${showFullData ? 'px-4 py-6' : 'p-6'}`}
@@ -290,6 +308,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
               <NoResults
                 title='No Assets Available'
                 btnText='Add Asset'
+                onClick={() => handleToggleModal(true)}
               />
             </div>
           )
@@ -327,7 +346,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   >
                     <div className='col-span-3 flex flex-col gap-2 flex-wrap'>
                       <span className='font-medium'>{asset.name}</span>
-                      <span className='font-light overflow-hidden whitespace-nowrap text-ellipsis w-[200px] inline-block'>
+                      <span className='font-light overflow-hidden whitespace-nowrap text-ellipsis 2xsm:inline-block hidden 2lg:w-[180px] md:w-[200px] xsm:w-[140px] 2xsm:w-[90px]'>
                         {asset.category === CATEGORIES.stocks ||
                         asset.category === CATEGORIES.crypto
                           ? `${asset.numShares} Share${asset.numShares > 1 ? 's' : ''}`

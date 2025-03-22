@@ -28,6 +28,7 @@ const NoResults = ({ title, subtitle, btnText, onClick }: IProps) => {
         <Button
           text={btnText}
           onClick={onClick}
+          classes='bg-black text-white dark:text-black dark:bg-gray-100'
         />
       )}
     </div>
