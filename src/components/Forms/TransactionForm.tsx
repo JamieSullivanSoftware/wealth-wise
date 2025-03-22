@@ -72,6 +72,21 @@ const TransactionForm = ({
         />
       </div>
 
+      {/* Number of Shares */}
+      <div>
+        <Label
+          htmlFor='num-shares'
+          text='Number of Shares'
+        />
+        <Input
+          type='number'
+          name='num-shares'
+          id='num-shares'
+          placeholder='e.g. 10'
+          required
+        />
+      </div>
+
       {/* Type */}
       <div>
         <Label

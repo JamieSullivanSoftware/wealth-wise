@@ -1,6 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPencil,
+  faPlus,
+  faSort,
+  faTrash,
+} from '@fortawesome/free-solid-svg-icons';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -12,6 +17,7 @@ import {
 } from '@/utils/string';
 import { getAssetList, getTransactions } from '@/utils/api';
 import Button from '../Common/Button';
+import IconButton from '../Common/IconButton';
 import Paginator from './Paginator';
 import TransactionAmountInfo from './TransactionAmountInfo';
 import TableHeader from './TableHeader';
@@ -20,6 +26,7 @@ import Loader from '../Common/Loader';
 import Modal from '../Common/Modal';
 import TransactionForm from '../Forms/TransactionForm';
 import TablesContainer from '../Containers/TablesContainer';
+import { deleteTransaction } from '@/app/actions/transactions';
 
 interface IProps {
   showFullData?: boolean;
@@ -34,18 +41,14 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     order: 'desc',
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
   const [paginatedTransactions, setPaginatedTransactions] =
     useState<IPaginatedTransactions | null>(null);
   const [assetList, setAssetList] = useState<IAssetListData[]>([]);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isEditDisabled, setIsEditDisabled] = useState<boolean>(false);
-  const [isDeleteDisabled, setIsDeleteDisabled] = useState<boolean>(false);
-  const [selectedTransactions, setSelectedTransactions] = useState<
-    ITransactionData[]
-  >([]);
+  const [selectedId, setSelectedId] = useState<string>('');
 
   const showHeaderButtons =
     showFullData &&
@@ -78,32 +81,13 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     setLimit(numLimit);
   };
 
-  const handleToggleModal = (show: boolean) => {
-    setShowModal(show);
+  const handleOnEdit = (id: string) => {
+    console.log('ID:', id);
   };
 
-  const handleOnSelect = (_id: string) => {
-    setSelectedIds((prevSelectedIds) => {
-      if (prevSelectedIds.includes(_id)) {
-        return prevSelectedIds.filter((id) => id !== _id);
-      } else {
-        return [...prevSelectedIds, _id];
-      }
-    });
-  };
-
-  const handleOnEdit = () => {
-    const id = selectedIds[0];
-    const transaction = paginatedTransactions?.transactions.find(
-      (transaction) => transaction._id === id
-    );
-    if (transaction) {
-      setSelectedTransactions([transaction]);
-    }
-  };
-
-  const handleOnDelete = () => {
-    console.log('delete');
+  const handleOnDelete = async () => {
+    await deleteTransaction(selectedId);
+    await refetchTransactions();
   };
 
   const refetchTransactions = async () => {
@@ -114,7 +98,8 @@ const TransactionsTable = ({ showFullData }: IProps) => {
       page
     );
     setPaginatedTransactions(transactions);
-    setShowModal(false);
+    setShowAddModal(false);
+    setShowDeleteModal(false);
   };
 
   useEffect(() => {
@@ -139,21 +124,8 @@ const TransactionsTable = ({ showFullData }: IProps) => {
   }, [sort.by, sort.order, page, limit]);
 
   useEffect(() => {
-    if (selectedIds.length === 1) {
-      setIsEditDisabled(true);
-    } else {
-      setIsEditDisabled(false);
-    }
-    if (selectedIds.length >= 1) {
-      setIsDeleteDisabled(true);
-    } else {
-      setIsDeleteDisabled(false);
-    }
-  }, [selectedIds]);
-
-  useEffect(() => {
     if (selectedTransactions.length === 1) {
-      setShowModal(true);
+      setShowAddModal(true);
     }
   }, [selectedTransactions]);
 
@@ -171,31 +143,14 @@ const TransactionsTable = ({ showFullData }: IProps) => {
   return (
     <>
       {showHeaderButtons && (
-        <div className='flex justify-between items-center col-span-12 mb-4'>
-          <div>
-            <Button
-              text='Add'
-              onClick={() => handleToggleModal(true)}
-              icon={faPlus}
-              iconSize='lg'
-              classes='bg-black text-white dark:text-black dark:bg-gray-100'
-            />
-          </div>
-          <div className='flex gap-4'>
-            <Button
-              text='Edit'
-              onClick={handleOnEdit}
-              classes='bg-black text-white dark:text-black dark:bg-gray-100'
-              isDisabled={!isEditDisabled}
-            />
-            <Button
-              text='Delete'
-              onClick={handleOnDelete}
-              classes='text-white bg-danger dark:bg-danger'
-              hasBg
-              isDisabled={!isDeleteDisabled}
-            />
-          </div>
+        <div className='flex justify-end items-center col-span-12 mb-4'>
+          <Button
+            text='Add'
+            onClick={() => setShowAddModal(true)}
+            icon={faPlus}
+            iconSize='lg'
+            classes='bg-black text-white dark:text-black dark:bg-gray-100'
+          />
         </div>
       )}
       <TablesContainer
@@ -203,8 +158,8 @@ const TransactionsTable = ({ showFullData }: IProps) => {
       >
         {assetList && (
           <Modal
-            show={showModal}
-            onClose={() => handleToggleModal(false)}
+            show={showAddModal}
+            onClose={() => setShowAddModal(false)}
             heading='Add Transaction'
           >
             <TransactionForm
@@ -218,6 +173,27 @@ const TransactionsTable = ({ showFullData }: IProps) => {
             />
           </Modal>
         )}
+        <Modal
+          show={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          heading='Delete Transaction'
+        >
+          <p className='text-gray-900 dark:text-white'>
+            Are you sure you want to delete this transaction?
+          </p>
+          <div className='flex gap-4 justify-end items-center mt-5'>
+            <Button
+              text='Confirm'
+              onClick={handleOnDelete}
+              classes='rounded-md font-medium py-2 px-4 text-white bg-danger dark:bg-danger'
+            />
+            <Button
+              text='Cancel'
+              onClick={() => setShowDeleteModal(false)}
+              classes='rounded-md font-medium py-2 px-4 bg-black text-white dark:text-black dark:bg-gray-100'
+            />
+          </div>
+        </Modal>
         {showFullData && paginatedTransactions ? (
           paginatedTransactions.transactions.length > 0 ? (
             <>
@@ -248,9 +224,9 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'amount' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
-                  <div className='col-span-2 flex sm:col-span-1 justify-end sm:justify-center items-center'>
+                  <div className='col-span-2 flex sm:col-span-2 justify-center items-center'>
                     <Button
-                      text='Type'
+                      text='Details'
                       onClick={() => handleSort('type')}
                       icon={faSort}
                       iconAlign='right'
@@ -259,20 +235,9 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'type' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
-                  <div className='hidden col-span-3 sm:col-span-2 sm:flex justify-end sm:justify-center items-center'>
-                    <Button
-                      text='Category'
-                      onClick={() => handleSort('assetCategory')}
-                      icon={faSort}
-                      iconAlign='right'
-                      hasBg={false}
-                      iconSize='xs'
-                      classes={`${sort.by === 'assetCategory' ? 'font-bold' : 'font-normal'} py-0 px-0`}
-                    />
-                  </div>
                   <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
                     <Button
-                      text='Asset Name'
+                      text='Asset'
                       onClick={() => handleSort('assetName')}
                       icon={faSort}
                       iconAlign='right'
@@ -283,7 +248,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                   </div>
                   <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
                     <Button
-                      text='Asset Total'
+                      text='Value'
                       onClick={() => handleSort('assetTotal')}
                       icon={faSort}
                       iconAlign='right'
@@ -292,6 +257,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'assetTotal' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
+                  <div className='col-span-1' />
                 </div>
 
                 {paginatedTransactions.transactions.map(
@@ -302,19 +268,10 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                     return (
                       <div
                         key={i}
-                        className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm  hover:bg-gray-1 dark:hover:bg-opacity-10 cursor-pointer px-2 rounded-md'
-                        onClick={() => handleOnSelect(_id)}
+                        className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm px-2 rounded-md'
                       >
-                        <div className='col-span-4 sm:col-span-2 flex flex-wrap items-center'>
-                          <span>
-                            <input
-                              readOnly
-                              type='checkbox'
-                              className='mt-1 mr-4'
-                              checked={selectedIds.includes(_id)}
-                            />
-                          </span>
-                          <span>{getEuropeanYear(new Date(updatedAt))}</span>
+                        <div className='col-span-4 flex flex-wrap items-center sm:col-span-2'>
+                          {getEuropeanYear(new Date(updatedAt))}
                         </div>
                         <div className='col-span-6 flex flex-wrap items-center sm:col-span-3'>
                           <TransactionAmountInfo
@@ -322,17 +279,38 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                             isFullTable
                           />
                         </div>
-                        <div className='font-medium col-span-2 flex flex-wrap justify-end sm:justify-center items-center sm:col-span-1'>
-                          {type.toUpperCase()}
-                        </div>
-                        <div className='hidden col-span-3 sm:flex flex-wrap justify-end sm:justify-center items-center sm:col-span-2'>
-                          {asset.category}
+                        <div className='col-span-2 flex flex-col flex-wrap justify-center items-center gap-1 sm:col-span-2'>
+                          <span className='font-medium text-sm'>
+                            {type.toUpperCase()}
+                          </span>
+                          <span className='text-xs text-gray-3 dark:text-white'>
+                            {'2 Shares'}
+                          </span>
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                           {asset.name}
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                           {currencyFormat.format(assetTotal)}
+                        </div>
+                        <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
+                          <IconButton
+                            onClick={() => handleOnEdit(_id)}
+                            icon={faPencil}
+                            iconSize='sm'
+                            iconColor='#197f4c'
+                            classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
+                          />
+                          <IconButton
+                            onClick={() => {
+                              setSelectedId(_id);
+                              setShowDeleteModal(true);
+                            }}
+                            icon={faTrash}
+                            iconSize='sm'
+                            iconColor='#e52020'
+                            classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
+                          />
                         </div>
                       </div>
                     );
@@ -358,7 +336,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                 btnText={hasAssetList ? 'Add Transaction' : 'Add Asset'}
                 onClick={
                   hasAssetList
-                    ? () => handleToggleModal(true)
+                    ? () => setShowAddModal(true)
                     : () => router.push('/assets')
                 }
               />
@@ -372,7 +350,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
               onBtnClick={
                 paginatedTransactions &&
                 paginatedTransactions.transactions.length > 0
-                  ? () => handleToggleModal(true)
+                  ? () => setShowAddModal(true)
                   : undefined
               }
             />
@@ -424,7 +402,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         ? 'Add Transaction'
                         : undefined
                     }
-                    onClick={() => handleToggleModal(true)}
+                    onClick={() => setShowAddModal(true)}
                   />
                 </div>
               )}

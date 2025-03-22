@@ -36,7 +36,7 @@ export const addAsset = async (formData: FormData) => {
   }
 };
 
-export const deleteAssets = async (assetIds: string[]) => {
+export const deleteAssets = async (ids: string[]) => {
   await connectDB();
 
   const sessionUser = await getSessionUser();
@@ -46,11 +46,12 @@ export const deleteAssets = async (assetIds: string[]) => {
   }
 
   try {
-    const updatedIds = assetIds.map((id) => new Types.ObjectId(id));
-    await Asset.deleteMany({ _id: { $in: updatedIds } });
-    await Transaction.deleteMany({
+    const updatedIds = ids.map((id) => new Types.ObjectId(id));
+    const deleteAssets = Asset.deleteMany({ _id: { $in: updatedIds } });
+    const deleteTransactions = Transaction.deleteMany({
       asset_id: { $in: updatedIds },
     });
+    await Promise.all([deleteAssets, deleteTransactions]);
   } catch (error) {
     console.log(error);
     return new Response('Assets not deleted', { status: 500 });

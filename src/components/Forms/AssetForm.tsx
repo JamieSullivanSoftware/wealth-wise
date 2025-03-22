@@ -62,7 +62,7 @@ const AssetForm = ({ onAssetAdded }: IProps) => {
       <div>
         <Label
           htmlFor='num-shares'
-          text='Number of Shares/Units'
+          text='Number of Shares'
         />
         <Input
           type='number'
