@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 import {
   currencyFormat,
@@ -25,6 +26,7 @@ interface IProps {
 }
 
 const TransactionsTable = ({ showFullData }: IProps) => {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const isAuthenticated = session && status === 'authenticated';
   const [sort, setSort] = useState<ISort>({
@@ -50,6 +52,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     isAuthenticated &&
     paginatedTransactions &&
     paginatedTransactions.transactions.length > 0;
+  const hasAssetList = assetList && assetList.length > 0;
 
   const handleSort = (sortBy: TransactionSortBy) => {
     let orderBy = 'desc';
@@ -349,7 +352,15 @@ const TransactionsTable = ({ showFullData }: IProps) => {
             <div className='flex flex-col justify-center min-h-[500px]'>
               <NoResults
                 title='No Transactions Available'
-                btnText='Add Transaction'
+                subtitle={
+                  hasAssetList ? undefined : 'Please create an asset first'
+                }
+                btnText={hasAssetList ? 'Add Transaction' : 'Add Asset'}
+                onClick={
+                  hasAssetList
+                    ? () => handleToggleModal(true)
+                    : () => router.push('/assets')
+                }
               />
             </div>
           )

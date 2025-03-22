@@ -15,7 +15,7 @@ import Loader from '../Common/Loader';
 import Modal from '../Common/Modal';
 import AssetForm from '../Forms/AssetForm';
 import TablesContainer from '../Containers/TablesContainer';
-import { deleteAssets } from '@/app/actions/addAsset';
+import { deleteAssets } from '@/app/actions/assets';
 
 interface IProps {
   showFullData?: boolean;
