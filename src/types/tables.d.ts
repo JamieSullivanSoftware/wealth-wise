@@ -28,6 +28,7 @@ declare interface IAssetData {
 declare interface IAssetListData {
   _id: string;
   name: string;
+  category: string;
 }
 
 declare interface ITransactionAssetData {

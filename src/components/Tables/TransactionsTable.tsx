@@ -1,11 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import {
-  faPencil,
-  faPlus,
-  faSort,
-  faTrash,
-} from '@fortawesome/free-solid-svg-icons';
+import { faPencilAlt, faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -27,6 +22,7 @@ import Modal from '../Common/Modal';
 import TransactionForm from '../Forms/TransactionForm';
 import TablesContainer from '../Containers/TablesContainer';
 import { deleteTransaction } from '@/app/actions/transactions';
+import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 
 interface IProps {
   showFullData?: boolean;
@@ -42,13 +38,16 @@ const TransactionsTable = ({ showFullData }: IProps) => {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
   const [paginatedTransactions, setPaginatedTransactions] =
     useState<IPaginatedTransactions | null>(null);
   const [assetList, setAssetList] = useState<IAssetListData[]>([]);
-  const [selectedId, setSelectedId] = useState<string>('');
+  const [selectedTransaction, setSelectedTransaction] = useState<
+    ITransactionData | undefined
+  >(undefined);
 
   const showHeaderButtons =
     showFullData &&
@@ -81,13 +80,11 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     setLimit(numLimit);
   };
 
-  const handleOnEdit = (id: string) => {
-    console.log('ID:', id);
-  };
-
   const handleOnDelete = async () => {
-    await deleteTransaction(selectedId);
-    await refetchTransactions();
+    if (selectedTransaction) {
+      await deleteTransaction(selectedTransaction._id);
+      await refetchTransactions();
+    }
   };
 
   const refetchTransactions = async () => {
@@ -123,12 +120,6 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     fetchTransactions().finally(() => setIsLoading(false));
   }, [sort.by, sort.order, page, limit]);
 
-  useEffect(() => {
-    if (selectedTransactions.length === 1) {
-      setShowAddModal(true);
-    }
-  }, [selectedTransactions]);
-
   if (isLoading) {
     return (
       <div className='grid col-span-12'>
@@ -157,21 +148,29 @@ const TransactionsTable = ({ showFullData }: IProps) => {
         classes={`gap-6 col-span-12 rounded-xl dark:bg-dark-4 h-full items-start ${showFullData ? 'px-4 py-6' : 'p-6'}`}
       >
         {assetList && (
-          <Modal
-            show={showAddModal}
-            onClose={() => setShowAddModal(false)}
-            heading='Add Transaction'
-          >
-            <TransactionForm
-              assetList={assetList}
-              onTransactionAdded={refetchTransactions}
-              transaction={
-                selectedTransactions.length === 1
-                  ? selectedTransactions[0]
-                  : undefined
-              }
-            />
-          </Modal>
+          <>
+            <Modal
+              show={showAddModal}
+              onClose={() => setShowAddModal(false)}
+              heading='Add Transaction'
+            >
+              <TransactionForm
+                assetList={assetList}
+                onTransactionAdded={refetchTransactions}
+              />
+            </Modal>
+            <Modal
+              show={showEditModal}
+              onClose={() => setShowEditModal(false)}
+              heading='Edit Transaction'
+            >
+              <TransactionForm
+                assetList={assetList}
+                onTransactionAdded={refetchTransactions}
+                transaction={selectedTransaction}
+              />
+            </Modal>
+          </>
         )}
         <Modal
           show={showDeleteModal}
@@ -262,7 +261,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
 
                 {paginatedTransactions.transactions.map(
                   (transaction: ITransactionData, i: number) => {
-                    const { _id, asset, amount, type, assetTotal, updatedAt } =
+                    const { asset, amount, type, assetTotal, updatedAt } =
                       transaction;
 
                     return (
@@ -295,18 +294,21 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         </div>
                         <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
                           <IconButton
-                            onClick={() => handleOnEdit(_id)}
-                            icon={faPencil}
+                            onClick={() => {
+                              setSelectedTransaction(transaction);
+                              setShowEditModal(true);
+                            }}
+                            icon={faPencilAlt}
                             iconSize='sm'
                             iconColor='#197f4c'
                             classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
                           />
                           <IconButton
                             onClick={() => {
-                              setSelectedId(_id);
+                              setSelectedTransaction(transaction);
                               setShowDeleteModal(true);
                             }}
-                            icon={faTrash}
+                            icon={faTrashAlt}
                             iconSize='sm'
                             iconColor='#e52020'
                             classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'

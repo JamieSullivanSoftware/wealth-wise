@@ -2,9 +2,10 @@
 import Label from './Label';
 import Input from './Input';
 import Select from './Select';
-import { TRANSACTION_TYPES } from '@/constants';
+import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
 import { addTransaction, editTransaction } from '@/app/actions/transactions';
+import { useEffect, useState } from 'react';
 
 interface IProps {
   assetList: IAssetListData[];
@@ -17,6 +18,10 @@ const TransactionForm = ({
   onTransactionAdded,
   transaction,
 }: IProps) => {
+  const [selectedAsset, setSelectedAsset] = useState<
+    IAssetListData | undefined
+  >(undefined);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
@@ -32,6 +37,17 @@ const TransactionForm = ({
       console.error('Failed to add transaction:', error);
     }
   };
+
+  const handleOnSelect = (assetId: string) => {
+    const asset = assetList.find(
+      (asset: IAssetListData) => asset._id === assetId
+    );
+    setSelectedAsset(asset);
+  };
+
+  useEffect(() => {
+    setSelectedAsset(transaction?.asset);
+  }, [transaction?.asset]);
 
   return (
     <form
@@ -68,24 +84,28 @@ const TransactionForm = ({
             value: asset._id,
             label: asset.name,
           }))}
-          defaultValue={transaction?.asset._id}
+          defaultValue={selectedAsset?._id}
+          onSelect={handleOnSelect}
         />
       </div>
 
       {/* Number of Shares */}
-      <div>
-        <Label
-          htmlFor='num-shares'
-          text='Number of Shares'
-        />
-        <Input
-          type='number'
-          name='num-shares'
-          id='num-shares'
-          placeholder='e.g. 10'
-          required
-        />
-      </div>
+      {(selectedAsset?.category === CATEGORIES.stocks ||
+        selectedAsset?.category === CATEGORIES.crypto) && (
+        <div>
+          <Label
+            htmlFor='num-shares'
+            text='Number of Shares'
+          />
+          <Input
+            type='number'
+            name='num-shares'
+            id='num-shares'
+            placeholder='e.g. 10'
+            required
+          />
+        </div>
+      )}
 
       {/* Type */}
       <div>

@@ -24,6 +24,7 @@ export const GET = async () => {
         $project: {
           _id: 1,
           name: 1,
+          category: 1,
         },
       },
     ];
