@@ -43,7 +43,8 @@ declare interface ITransactionData {
   type: TransactionType;
   updatedAt: Date;
   asset: ITransactionAssetData;
-  assetTotal: number;
+  updatedAssetCost: number;
+  numShares: number;
 }
 
 declare interface ISort {
@@ -66,4 +67,4 @@ declare type TransactionSortBy =
   | 'type'
   | 'assetName'
   | 'assetCategory'
-  | 'assetTotal';
+  | 'updatedAssetCost';

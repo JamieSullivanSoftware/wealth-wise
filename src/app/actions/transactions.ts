@@ -26,8 +26,8 @@ export const addTransaction = async (formData: FormData) => {
   const type = formData.get('type');
   const numShares = parseFloat(formData.get('num-shares')?.toString() || '0');
   const asset = await Asset.findById(formData.get('asset-id'));
-  let updatedNumShares = 0;
-  let updatedCost = 0;
+  let updatedAssetNumShares = 0;
+  let updatedAssetCost = 0;
 
   if (!asset) {
     throw new Error('Asset not found');
@@ -39,35 +39,37 @@ export const addTransaction = async (formData: FormData) => {
 
   if (hasCategoryGotShares(asset) && numShares) {
     if (type === TRANSACTION_TYPES.buy) {
-      updatedNumShares = asset.numShares + numShares;
-      updatedCost = asset.cost + amount;
+      updatedAssetNumShares = asset.numShares + numShares;
+      updatedAssetCost = asset.cost + amount;
     }
 
     if (type === TRANSACTION_TYPES.sell && asset.numShares > 0) {
-      updatedNumShares = asset.numShares - numShares;
-      updatedCost = asset.cost - amount;
+      updatedAssetNumShares = asset.numShares - numShares;
+      updatedAssetCost = asset.cost - amount;
     }
   }
 
   try {
-    const updateAsset = Asset.updateOne(
+    const updatedAsset = Asset.updateOne(
       { _id: asset._id },
       {
         $set: {
-          numShares: updatedNumShares,
-          cost: updatedCost,
+          numShares: updatedAssetNumShares,
+          cost: updatedAssetCost,
         },
       }
     );
 
-    const updateTransaction = new Transaction({
+    const transaction = new Transaction({
       user_id: user.id,
       asset_id: asset._id,
       amount,
       type,
+      updatedAssetCost,
+      numShares,
     }).save();
 
-    await Promise.all([updateAsset, updateTransaction]);
+    await Promise.all([updatedAsset, transaction]);
   } catch (error) {
     console.log(error);
     return new Response('Transaction not created', { status: 500 });
@@ -93,14 +95,12 @@ export const deleteTransaction = async (id: string) => {
     throw new Error('Asset not found');
   }
 
-  const { amount, type } = transaction;
-  const { numShares } = asset;
+  const { amount, type, numShares } = transaction;
   let updatedNumShares = 0;
   let updatedCost = 0;
 
-  if (hasCategoryGotShares(asset) && numShares) {
+  if (hasCategoryGotShares(asset) && asset.numShares) {
     if (type === TRANSACTION_TYPES.buy) {
-      // TODO update to transaction shares
       updatedNumShares = asset.numShares - numShares;
       updatedCost = asset.cost - amount;
     }

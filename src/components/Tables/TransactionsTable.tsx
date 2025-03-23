@@ -247,13 +247,13 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                   </div>
                   <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
                     <Button
-                      text='Value'
-                      onClick={() => handleSort('assetTotal')}
+                      text='Cost'
+                      onClick={() => handleSort('updatedAssetCost')}
                       icon={faSort}
                       iconAlign='right'
                       hasBg={false}
                       iconSize='xs'
-                      classes={`${sort.by === 'assetTotal' ? 'font-bold' : 'font-normal'} py-0 px-0`}
+                      classes={`${sort.by === 'updatedAssetCost' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
                   <div className='col-span-1' />
@@ -261,8 +261,14 @@ const TransactionsTable = ({ showFullData }: IProps) => {
 
                 {paginatedTransactions.transactions.map(
                   (transaction: ITransactionData, i: number) => {
-                    const { asset, amount, type, assetTotal, updatedAt } =
-                      transaction;
+                    const {
+                      asset,
+                      amount,
+                      type,
+                      updatedAssetCost,
+                      updatedAt,
+                      numShares,
+                    } = transaction;
 
                     return (
                       <div
@@ -282,15 +288,17 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                           <span className='font-medium text-sm'>
                             {type.toUpperCase()}
                           </span>
-                          <span className='text-xs text-gray-3 dark:text-white'>
-                            {'2 Shares'}
-                          </span>
+                          {numShares && (
+                            <span className='text-xs text-gray-3 dark:text-white'>
+                              {`${numShares} ${numShares > 1 ? `Shares` : 'Share'}`}
+                            </span>
+                          )}
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                           {asset.name}
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
-                          {currencyFormat.format(assetTotal)}
+                          {currencyFormat.format(updatedAssetCost)}
                         </div>
                         <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
                           <IconButton

@@ -101,7 +101,7 @@ const TransactionForm = ({
             type='number'
             name='num-shares'
             id='num-shares'
-            placeholder='e.g. 10'
+            placeholder='5'
             required
           />
         </div>

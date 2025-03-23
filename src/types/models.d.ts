@@ -6,6 +6,8 @@ declare interface ITransaction {
   user_id: string;
   asset_id: IAsset;
   amount: number;
+  updatedAssetCost: number;
+  numShares?: number;
   createdAt: string;
   updateAt: string;
 }
@@ -17,7 +19,7 @@ declare interface IAsset {
   name: string;
   cost: number;
   value: number;
-  numShares: number;
+  numShares?: number;
   createdAt: string;
   updatedAt: string;
 }
