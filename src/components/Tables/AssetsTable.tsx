@@ -129,34 +129,6 @@ const AssetsTable = ({ showFullData }: IProps) => {
 
   return (
     <>
-      {showHeaderButtons && (
-        <div className='flex justify-between items-center col-span-12 mb-4'>
-          <div>
-            <Button
-              text='Add'
-              onClick={() => handleToggleModal(true)}
-              icon={faPlus}
-              iconSize='lg'
-              classes='bg-black text-white dark:text-black dark:bg-gray-100'
-            />
-          </div>
-          <div className='flex gap-4'>
-            <Button
-              text='Edit'
-              onClick={() => console.log('Edit')}
-              classes='bg-black text-white dark:text-black dark:bg-gray-100'
-              isDisabled={!isEditDisabled}
-            />
-            <Button
-              text='Delete'
-              onClick={handleOnDelete}
-              classes='text-white bg-danger dark:bg-danger'
-              hasBg
-              isDisabled={!isDeleteDisabled}
-            />
-          </div>
-        </div>
-      )}
       <Modal
         show={showModal}
         onClose={() => handleToggleModal(false)}
@@ -164,6 +136,17 @@ const AssetsTable = ({ showFullData }: IProps) => {
       >
         <AssetForm onAssetAdded={refetchAssets} />
       </Modal>
+      {showHeaderButtons && (
+        <div className='flex justify-end items-center col-span-12 mb-4'>
+          <Button
+            text='Add'
+            onClick={() => handleToggleModal(true)}
+            icon={faPlus}
+            iconSize='lg'
+            classes='bg-black text-white dark:text-black dark:bg-gray-100 py-2 px-4'
+          />
+        </div>
+      )}
       <TablesContainer
         classes={`gap-6 col-span-12 rounded-xl dark:bg-dark-4 ${showFullData ? 'px-4 py-6' : 'p-6'}`}
       >

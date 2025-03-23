@@ -140,7 +140,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
             onClick={() => setShowAddModal(true)}
             icon={faPlus}
             iconSize='lg'
-            classes='bg-black text-white dark:text-black dark:bg-gray-100'
+            classes='bg-black text-white dark:text-black dark:bg-gray-100 py-2 px-4'
           />
         </div>
       )}

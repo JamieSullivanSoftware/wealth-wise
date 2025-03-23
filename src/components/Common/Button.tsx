@@ -32,11 +32,11 @@ const Button = ({
   iconAlign,
   hasBg = true,
   isPrimary,
-  classes = 'rounded-md py-2 px-4',
+  classes = 'py-2 px-4',
   isDisabled = false,
 }: Props) => {
   const classNames = clsx(
-    'font-medium',
+    'font-medium rounded-md ',
     hasBg
       ? isPrimary
         ? 'text-white bg-primary enabled:hover:bg-primary-dark focus:ring-4 focus:outline-none focus:ring-primary-dark'

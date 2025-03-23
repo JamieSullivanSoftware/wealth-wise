@@ -128,7 +128,7 @@ const TransactionForm = ({
       {/* Submit Button */}
       <Button
         type='submit'
-        classes='w-full text-center'
+        classes='w-full text-center py-2 px-4'
         text='Add Transaction'
         isPrimary
       />
