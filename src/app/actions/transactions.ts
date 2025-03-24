@@ -85,33 +85,33 @@ export const deleteTransaction = async (id: string) => {
     throw new Error('You must be logged in to delete a transaction');
   }
 
-  const transaction = await Transaction.findById(id);
-  if (!transaction) {
-    throw new Error('Transaction not found');
-  }
-
-  const asset = await Asset.findById(transaction.asset_id);
-  if (!asset) {
-    throw new Error('Asset not found');
-  }
-
-  const { amount, type, numShares } = transaction;
-  let updatedNumShares = 0;
-  let updatedCost = 0;
-
-  if (hasCategoryGotShares(asset) && asset.numShares) {
-    if (type === TRANSACTION_TYPES.buy) {
-      updatedNumShares = asset.numShares - numShares;
-      updatedCost = asset.cost - amount;
-    }
-
-    if (type === TRANSACTION_TYPES.sell && asset.numShares > 0) {
-      updatedNumShares = asset.numShares + numShares;
-      updatedCost = asset.cost + amount;
-    }
-  }
-
   try {
+    const transaction = await Transaction.findById(id);
+    if (!transaction) {
+      throw new Error('Transaction not found');
+    }
+
+    const asset = await Asset.findById(transaction.asset_id);
+    if (!asset) {
+      throw new Error('Asset not found');
+    }
+
+    const { amount, type, numShares } = transaction;
+    let updatedNumShares = 0;
+    let updatedCost = 0;
+
+    if (hasCategoryGotShares(asset) && asset.numShares) {
+      if (type === TRANSACTION_TYPES.buy) {
+        updatedNumShares = asset.numShares - numShares;
+        updatedCost = asset.cost - amount;
+      }
+
+      if (type === TRANSACTION_TYPES.sell && asset.numShares > 0) {
+        updatedNumShares = asset.numShares + numShares;
+        updatedCost = asset.cost + amount;
+      }
+    }
+
     const updateAsset = Asset.updateOne(
       { _id: asset._id },
       {

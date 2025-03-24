@@ -36,7 +36,7 @@ export const addAsset = async (formData: FormData) => {
   }
 };
 
-export const deleteAssets = async (ids: string[]) => {
+export const deleteAsset = async (id: string) => {
   await connectDB();
 
   const sessionUser = await getSessionUser();
@@ -46,12 +46,17 @@ export const deleteAssets = async (ids: string[]) => {
   }
 
   try {
-    const updatedIds = ids.map((id) => new Types.ObjectId(id));
-    const deleteAssets = Asset.deleteMany({ _id: { $in: updatedIds } });
-    const deleteTransactions = Transaction.deleteMany({
-      asset_id: { $in: updatedIds },
+    const asset = await Asset.findById(id);
+    if (!asset) {
+      throw new Error('Asset not found');
+    }
+
+    const deleteTransactions = await Transaction.deleteMany({
+      asset_id: id,
     });
-    await Promise.all([deleteAssets, deleteTransactions]);
+    const deleteAsset = await Asset.deleteOne({ _id: id });
+
+    await Promise.all([deleteAsset, deleteTransactions]);
   } catch (error) {
     console.log(error);
     return new Response('Assets not deleted', { status: 500 });

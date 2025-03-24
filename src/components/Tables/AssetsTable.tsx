@@ -4,7 +4,12 @@ import { useSession } from 'next-auth/react';
 
 import { currencyFormat, getEuropeanYear } from '@/utils/string';
 import Button from '../Common/Button';
-import { faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
+import {
+  faPencilAlt,
+  faPlus,
+  faSort,
+  faTrashAlt,
+} from '@fortawesome/free-solid-svg-icons';
 import { getAssets } from '@/utils/api';
 import Paginator from './Paginator';
 import TableHeader from './TableHeader';
@@ -15,7 +20,8 @@ import Loader from '../Common/Loader';
 import Modal from '../Common/Modal';
 import AssetForm from '../Forms/AssetForm';
 import TablesContainer from '../Containers/TablesContainer';
-import { deleteAssets } from '@/app/actions/assets';
+import { deleteAsset } from '@/app/actions/assets';
+import IconButton from '../Common/IconButton';
 
 interface IProps {
   showFullData?: boolean;
@@ -29,14 +35,16 @@ const AssetsTable = ({ showFullData }: IProps) => {
     order: 'desc',
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
   const [paginatedAssets, setPaginatedAssets] =
     useState<IPaginatedAssets | null>(null);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isEditDisabled, setIsEditDisabled] = useState<boolean>(false);
-  const [isDeleteDisabled, setIsDeleteDisabled] = useState<boolean>(false);
+  const [selectedAsset, setSelectedAsset] = useState<IAssetData | undefined>(
+    undefined
+  );
 
   const showHeaderButtons =
     showFullData &&
@@ -68,29 +76,18 @@ const AssetsTable = ({ showFullData }: IProps) => {
     setLimit(numLimit);
   };
 
-  const handleToggleModal = (show: boolean) => {
-    setShowModal(show);
-  };
-
-  const handleOnSelect = (_id: string) => {
-    setSelectedIds((prevSelectedIds) => {
-      if (prevSelectedIds.includes(_id)) {
-        return prevSelectedIds.filter((id) => id !== _id);
-      } else {
-        return [...prevSelectedIds, _id];
-      }
-    });
-  };
-
   const refetchAssets = async () => {
     const assets = await getAssets(limit, sort.by, sort.order, page);
     setPaginatedAssets(assets);
-    setShowModal(false);
+    setShowAddModal(false);
+    setShowDeleteModal(false);
   };
 
   const handleOnDelete = async () => {
-    await deleteAssets(selectedIds);
-    await refetchAssets();
+    if (selectedAsset) {
+      await deleteAsset(selectedAsset._id);
+      await refetchAssets();
+    }
   };
 
   useEffect(() => {
@@ -102,19 +99,6 @@ const AssetsTable = ({ showFullData }: IProps) => {
 
     fetchAssets().finally(() => setIsLoading(false));
   }, [sort.by, sort.order, page, limit]);
-
-  useEffect(() => {
-    if (selectedIds.length === 1) {
-      setIsEditDisabled(true);
-    } else {
-      setIsEditDisabled(false);
-    }
-    if (selectedIds.length >= 1) {
-      setIsDeleteDisabled(true);
-    } else {
-      setIsDeleteDisabled(false);
-    }
-  }, [selectedIds]);
 
   if (isLoading) {
     return (
@@ -130,17 +114,48 @@ const AssetsTable = ({ showFullData }: IProps) => {
   return (
     <>
       <Modal
-        show={showModal}
-        onClose={() => handleToggleModal(false)}
+        show={showAddModal}
+        onClose={() => setShowAddModal(false)}
         heading='Add Asset'
       >
         <AssetForm onAssetAdded={refetchAssets} />
+      </Modal>
+      <Modal
+        show={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        heading='Edit Transaction'
+      >
+        <AssetForm
+          onAssetAdded={refetchAssets}
+          asset={selectedAsset}
+        />
+      </Modal>
+      <Modal
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        heading='Delete Asset'
+      >
+        <p className='text-gray-900 dark:text-white'>
+          Are you sure you want to delete this asset?
+        </p>
+        <div className='flex gap-4 justify-end items-center mt-5'>
+          <Button
+            text='Confirm'
+            onClick={handleOnDelete}
+            classes='rounded-md font-medium py-2 px-4 text-white bg-danger dark:bg-danger'
+          />
+          <Button
+            text='Cancel'
+            onClick={() => setShowDeleteModal(false)}
+            classes='rounded-md font-medium py-2 px-4 bg-black text-white dark:text-black dark:bg-gray-100'
+          />
+        </div>
       </Modal>
       {showHeaderButtons && (
         <div className='flex justify-end items-center col-span-12 mb-4'>
           <Button
             text='Add'
-            onClick={() => handleToggleModal(true)}
+            onClick={() => setShowAddModal(true)}
             icon={faPlus}
             iconSize='lg'
             classes='bg-black text-white dark:text-black dark:bg-gray-100 py-2 px-4'
@@ -178,7 +193,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'name' ? 'font-bold' : 'font-normal'}`}
                     />
                   </div>
-                  <div className='hidden col-span-3 sm:flex justify-center items-center sm:col-span-2'>
+                  <div className='hidden col-span-3 sm:flex justify-center items-center sm:col-span-1'>
                     <Button
                       text='Category'
                       onClick={() => handleSort('category')}
@@ -222,10 +237,10 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'value' ? 'font-bold' : 'font-normal'}`}
                     />
                   </div>
+                  <div className='col-span-1' />
                 </div>
                 {paginatedAssets.assets.map((asset: IAssetData, i: number) => {
                   const {
-                    _id,
                     updatedAt,
                     name,
                     category,
@@ -238,19 +253,10 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   return (
                     <div
                       key={i}
-                      className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm hover:bg-gray-1 dark:hover:bg-opacity-10 cursor-pointer px-2 rounded-md'
-                      onClick={() => handleOnSelect(_id)}
+                      className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm px-2 rounded-md'
                     >
                       <div className='col-span-3 sm:col-span-2 flex flex-wrap items-center'>
-                        <span>
-                          <input
-                            readOnly
-                            type='checkbox'
-                            className='mt-1 mr-4'
-                            checked={selectedIds.includes(_id)}
-                          />
-                        </span>
-                        <span>{getEuropeanYear(new Date(updatedAt))}</span>
+                        {getEuropeanYear(new Date(updatedAt))}
                       </div>
                       <div className='justify-center col-span-6 flex flex-col flex-wrap gap-2 sm:justify-start sm:col-span-2'>
                         <span className='font-medium'>{name}</span>
@@ -261,7 +267,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                             : detail}
                         </span>
                       </div>
-                      <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-2'>
+                      <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-1'>
                         {category}
                       </div>
                       <div className='col-span-3 flex flex-wrap justify-end items-center sm:col-span-2'>
@@ -272,6 +278,28 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       </div>
                       <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                         {currencyFormat.format(value)}
+                      </div>
+                      <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
+                        <IconButton
+                          onClick={() => {
+                            setSelectedAsset(asset);
+                            setShowEditModal(true);
+                          }}
+                          icon={faPencilAlt}
+                          iconSize='sm'
+                          iconColor='#197f4c'
+                          classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
+                        />
+                        <IconButton
+                          onClick={() => {
+                            setSelectedAsset(asset);
+                            setShowDeleteModal(true);
+                          }}
+                          icon={faTrashAlt}
+                          iconSize='sm'
+                          iconColor='#e52020'
+                          classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
+                        />
                       </div>
                     </div>
                   );
@@ -291,7 +319,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
               <NoResults
                 title='No Assets Available'
                 btnText='Add Asset'
-                onClick={() => handleToggleModal(true)}
+                onClick={() => setShowAddModal(true)}
               />
             </div>
           )
@@ -302,7 +330,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
               btnText='Add'
               onBtnClick={
                 paginatedAssets && paginatedAssets.assets.length > 0
-                  ? () => handleToggleModal(true)
+                  ? () => setShowAddModal(true)
                   : undefined
               }
             />
@@ -352,7 +380,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   <NoResults
                     title='No Assets Yet'
                     btnText='Add Asset'
-                    onClick={() => handleToggleModal(true)}
+                    onClick={() => setShowAddModal(true)}
                   />
                 </div>
               )}

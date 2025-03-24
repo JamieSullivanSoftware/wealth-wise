@@ -7,9 +7,10 @@ import { addAsset } from '@/app/actions/assets';
 
 interface IProps {
   onAssetAdded: () => void;
+  asset?: IAssetData;
 }
 
-const AssetForm = ({ onAssetAdded }: IProps) => {
+const AssetForm = ({ onAssetAdded, asset }: IProps) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
