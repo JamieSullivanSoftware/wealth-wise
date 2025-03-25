@@ -62,3 +62,27 @@ export const deleteAsset = async (id: string) => {
     return new Response('Assets not deleted', { status: 500 });
   }
 };
+
+export const editAsset = async (formData: FormData, id: string) => {
+  await connectDB();
+
+  const sessionUser = await getSessionUser();
+
+  if (!sessionUser) {
+    throw new Error('You must be logged in to edit an asset');
+  }
+
+  const assetData = {
+    name: formData.get('asset-name'),
+    category: formData.get('category'),
+    value: formData.get('value'),
+    detail: formData.get('detail'),
+  };
+
+  try {
+    await Asset.updateOne({ _id: id }, { $set: assetData });
+  } catch (error) {
+    console.log(error);
+    return new Response('Asset not updated', { status: 500 });
+  }
+};

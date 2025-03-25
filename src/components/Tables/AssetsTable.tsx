@@ -81,6 +81,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
     setPaginatedAssets(assets);
     setShowAddModal(false);
     setShowDeleteModal(false);
+    setShowEditModal(false);
   };
 
   const handleOnDelete = async () => {
@@ -123,7 +124,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
       <Modal
         show={showEditModal}
         onClose={() => setShowEditModal(false)}
-        heading='Edit Transaction'
+        heading='Edit Asset'
       >
         <AssetForm
           onAssetAdded={refetchAssets}
@@ -263,7 +264,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                         <span className='font-light'>
                           {category === CATEGORIES.stocks ||
                           category === CATEGORIES.crypto
-                            ? `${numShares} Share${numShares > 1 ? 's' : ''}`
+                            ? `${numShares} Share${numShares === 1 ? '' : 's'}`
                             : detail}
                         </span>
                       </div>

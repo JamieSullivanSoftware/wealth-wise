@@ -18,9 +18,9 @@ const TransactionForm = ({
   onTransactionAdded,
   transaction,
 }: IProps) => {
-  const [selectedAsset, setSelectedAsset] = useState<
-    IAssetListData | undefined
-  >(undefined);
+  const [selectedAsset, setSelectedAsset] = useState<IAssetListData | null>(
+    null
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ const TransactionForm = ({
       }
       await onTransactionAdded();
     } catch (error) {
-      console.error('Failed to add transaction:', error);
+      console.error('Failed to submit transaction:', error);
     }
   };
 
@@ -42,11 +42,15 @@ const TransactionForm = ({
     const asset = assetList.find(
       (asset: IAssetListData) => asset._id === assetId
     );
-    setSelectedAsset(asset);
+    if (asset) {
+      setSelectedAsset(asset);
+    }
   };
 
   useEffect(() => {
-    setSelectedAsset(transaction?.asset);
+    if (transaction?.asset) {
+      setSelectedAsset(transaction.asset);
+    }
   }, [transaction?.asset]);
 
   return (
@@ -84,7 +88,7 @@ const TransactionForm = ({
             value: asset._id,
             label: asset.name,
           }))}
-          defaultValue={selectedAsset?._id}
+          value={selectedAsset?._id}
           onSelect={handleOnSelect}
         />
       </div>
@@ -121,7 +125,7 @@ const TransactionForm = ({
             value: type,
             label: type,
           }))}
-          defaultValue={transaction?.type}
+          value={transaction?.type}
         />
       </div>
 
@@ -129,7 +133,7 @@ const TransactionForm = ({
       <Button
         type='submit'
         classes='w-full text-center py-2 px-4'
-        text='Add Transaction'
+        text={transaction ? 'Edit Transaction' : 'Add Transaction'}
         isPrimary
       />
     </form>

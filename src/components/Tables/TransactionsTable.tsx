@@ -96,6 +96,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     );
     setPaginatedTransactions(transactions);
     setShowAddModal(false);
+    setShowEditModal(false);
     setShowDeleteModal(false);
   };
 
@@ -290,7 +291,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                           </span>
                           {numShares && (
                             <span className='text-xs text-gray-3 dark:text-white'>
-                              {`${numShares} ${numShares > 1 ? `Shares` : 'Share'}`}
+                              {`${numShares} ${numShares === 1 ? `Share` : 'Shares'}`}
                             </span>
                           )}
                         </div>
