@@ -6,6 +6,7 @@ import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
 import { addTransaction, editTransaction } from '@/app/actions/transactions';
 import { useEffect, useState } from 'react';
+import { hasCategoryGotShares } from '@/utils/misc';
 
 interface IProps {
   assetList: IAssetListData[];
@@ -28,7 +29,7 @@ const TransactionForm = ({
 
     try {
       if (transaction) {
-        await editTransaction(formData, transaction.asset._id);
+        await editTransaction(formData, transaction._id);
       } else {
         await addTransaction(formData);
       }
@@ -74,28 +75,29 @@ const TransactionForm = ({
         />
       </div>
 
-      {/* Asset */}
-      <div>
-        <Label
-          htmlFor='asset'
-          text='Asset'
-        />
-        <Select
-          name='asset-id'
-          id='asset-id'
-          placeholder='Select asset'
-          options={assetList.map((asset: IAssetListData) => ({
-            value: asset._id,
-            label: asset.name,
-          }))}
-          value={selectedAsset?._id}
-          onSelect={handleOnSelect}
-        />
-      </div>
+      {/* Asset - Only Show on Add Modal */}
+      {!transaction && (
+        <div>
+          <Label
+            htmlFor='asset'
+            text='Asset'
+          />
+          <Select
+            name='asset-id'
+            id='asset-id'
+            placeholder='Select asset'
+            options={assetList.map((asset: IAssetListData) => ({
+              value: asset._id,
+              label: asset.name,
+            }))}
+            value={selectedAsset?._id}
+            onSelect={handleOnSelect}
+          />
+        </div>
+      )}
 
-      {/* Number of Shares */}
-      {(selectedAsset?.category === CATEGORIES.stocks ||
-        selectedAsset?.category === CATEGORIES.crypto) && (
+      {/* Asset & Number of Shares Only Show on Add Modal */}
+      {selectedAsset && hasCategoryGotShares(selectedAsset.category) && (
         <div>
           <Label
             htmlFor='num-shares'
@@ -133,7 +135,7 @@ const TransactionForm = ({
       <Button
         type='submit'
         classes='w-full text-center py-2 px-4'
-        text={transaction ? 'Edit Transaction' : 'Add Transaction'}
+        text={transaction ? 'Confirm' : 'Add Transaction'}
         isPrimary
       />
     </form>

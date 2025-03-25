@@ -5,6 +5,7 @@ import { CATEGORIES } from '@/constants';
 import Button from '../Common/Button';
 import { addAsset, editAsset } from '@/app/actions/assets';
 import { useEffect, useState } from 'react';
+import { hasCategoryGotShares } from '@/utils/misc';
 
 interface IProps {
   onAssetAdded: () => void;
@@ -84,8 +85,7 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
       {/* Number of Shares & Cost Only Show on Add Modal */}
       {!asset && (
         <>
-          {(selectedCategory === CATEGORIES.stocks ||
-            selectedCategory === CATEGORIES.crypto) && (
+          {hasCategoryGotShares(selectedCategory) && (
             <div>
               <Label
                 htmlFor='num-shares'
@@ -153,7 +153,7 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
       <Button
         type='submit'
         classes='w-full text-center py-2 px-4'
-        text={asset ? 'Edit Asset' : 'Add Asset'}
+        text={asset ? 'Confirm' : 'Add Asset'}
         isPrimary
       />
     </form>

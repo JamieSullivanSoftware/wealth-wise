@@ -4,7 +4,6 @@ import connectDB from '@/configdatabase';
 import Asset from '@/modelsAsset';
 import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
-import { Types } from 'mongoose';
 
 export const addAsset = async (formData: FormData) => {
   await connectDB();
@@ -21,9 +20,9 @@ export const addAsset = async (formData: FormData) => {
     user_id: user.id,
     name: formData.get('asset-name'),
     category: formData.get('category'),
-    numShares: formData.get('num-shares'),
-    cost: formData.get('cost'),
-    value: formData.get('value'),
+    numShares: parseFloat(formData.get('numShares')?.toString() || '0'),
+    cost: parseFloat(formData.get('cost')?.toString() || '0'),
+    value: parseFloat(formData.get('value')?.toString() || '0'),
     detail: formData.get('detail'),
   };
 
@@ -75,7 +74,7 @@ export const editAsset = async (formData: FormData, id: string) => {
   const assetData = {
     name: formData.get('asset-name'),
     category: formData.get('category'),
-    value: formData.get('value'),
+    value: parseFloat(formData.get('value')?.toString() || '0'),
     detail: formData.get('detail'),
   };
 
