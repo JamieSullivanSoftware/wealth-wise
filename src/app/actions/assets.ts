@@ -1,6 +1,7 @@
 'use server';
 
 import connectDB from '@/configdatabase';
+import { TRANSACTION_TYPES } from '@/constants';
 import Asset from '@/modelsAsset';
 import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
@@ -20,15 +21,26 @@ export const addAsset = async (formData: FormData) => {
     user_id: user.id,
     name: formData.get('asset-name'),
     category: formData.get('category'),
-    numShares: parseFloat(formData.get('numShares')?.toString() || '0'),
+    numShares: parseFloat(formData.get('num-shares')?.toString() || '0'),
     cost: parseFloat(formData.get('cost')?.toString() || '0'),
     value: parseFloat(formData.get('value')?.toString() || '0'),
     detail: formData.get('detail'),
   };
 
   try {
-    const newAsset = new Asset(assetData);
-    await newAsset.save();
+    const asset = new Asset(assetData);
+    const newAsset = await asset.save();
+
+    const transaction = {
+      user_id: user.id,
+      asset_id: newAsset._id,
+      amount: assetData.cost,
+      type: TRANSACTION_TYPES.buy,
+      updatedAssetCost: assetData.cost,
+      numShares: assetData.numShares,
+      isFirst: true,
+    };
+    await new Transaction(transaction).save();
   } catch (error) {
     console.log(error);
     return new Response('Asset not saved', { status: 500 });

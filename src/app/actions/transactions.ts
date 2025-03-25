@@ -5,7 +5,7 @@ import { TRANSACTION_TYPES } from '@/constants';
 import Asset from '@/models/Asset';
 import Transaction from '@/models/Transaction';
 import { getSessionUser } from '@/utils/getSessionUser';
-import { hasCategoryGotShares } from '@/utils/misc';
+import { hasCategoryGotShares, isBuyType } from '@/utils/misc';
 
 export const addTransaction = async (formData: FormData) => {
   await connectDB();
@@ -56,7 +56,7 @@ export const addTransaction = async (formData: FormData) => {
       asset_id: asset._id,
       amount: addData.amount,
       type: addData.type,
-      updatedCost,
+      updatedAssetCost: updatedCost,
       numShares: addData.numShares,
     }).save();
 
@@ -120,49 +120,71 @@ export const editTransaction = async (formData: FormData, id: string) => {
     throw new Error('You must be logged in to edit a transaction');
   }
 
-  const updateData = {
+  const transactionFormData = {
     amount: parseFloat(formData.get('amount')?.toString() || '0'),
     type: formData.get('type')?.toString() || '',
     numShares: parseFloat(formData.get('num-shares')?.toString() || '0'),
   };
 
-  if (updateData.amount <= 0) {
+  if (transactionFormData.amount <= 0) {
     throw new Error('Amount must be greater than 0');
   }
 
-  const transaction = await Transaction.findById(id);
-  if (!transaction) {
+  const originalTransaction = await Transaction.findById(id);
+  if (!originalTransaction) {
     throw new Error('Transaction not found');
   }
 
-  const asset = await Asset.findById(transaction.asset_id);
+  const asset = await Asset.findById(originalTransaction.asset_id);
   if (!asset) {
     throw new Error('Asset not found');
   }
 
   try {
-    const { amount } = transaction;
-    const { updatedNumShares, updatedCost } = calculateUpdatedSharesAndCost(
-      asset,
-      amount,
-      updateData.numShares,
-      updateData.type
-    );
+    // Use form type if it has changed, otherwise use the original type
+    const type =
+      transactionFormData.type !== originalTransaction.type
+        ? transactionFormData.type
+        : originalTransaction.type;
 
-    const updateAsset = Asset.updateOne(
+    // Invert the cost and shares if the type is sell
+    const cost = isBuyType(type)
+      ? transactionFormData.amount
+      : -transactionFormData.amount;
+    const numShares = isBuyType(type)
+      ? transactionFormData.numShares
+      : -transactionFormData.numShares;
+
+    // Calculate the original cost and shares in the associated asset
+    const originalAssetCost = isBuyType(originalTransaction.type)
+      ? asset.cost - originalTransaction.amount
+      : asset.cost + originalTransaction.amount;
+    const originalAssetShares = isBuyType(originalTransaction.type)
+      ? asset.numShares - originalTransaction.numShares
+      : asset.numShares + originalTransaction.numShares;
+
+    const updateData = {
+      amount: transactionFormData.amount,
+      type: transactionFormData.type,
+      numShares: originalAssetShares + numShares,
+      updatedAssetCost: originalAssetCost + cost,
+    };
+
+    const updatedAsset = Asset.updateOne(
       { _id: asset._id },
       {
         $set: {
-          numShares: updatedNumShares,
-          cost: updatedCost,
+          numShares: updateData.numShares,
+          cost: updateData.updatedAssetCost,
         },
       }
     );
-    const updateTransaction = Transaction.updateOne(
+
+    const updatedTransaction = Transaction.updateOne(
       { _id: id },
       { $set: updateData }
     );
-    await Promise.all([updateAsset, updateTransaction]);
+    await Promise.all([updatedAsset, updatedTransaction]);
   } catch (error) {
     console.log(error);
     return new Response('Transaction not updated', { status: 500 });

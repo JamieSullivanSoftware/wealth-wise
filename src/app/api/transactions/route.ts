@@ -62,6 +62,7 @@ export const GET = async (request: NextRequest) => {
                 'asset.name': 1,
                 'asset.category': 1,
                 updatedAssetCost: 1,
+                isFirst: 1,
               },
             },
             {

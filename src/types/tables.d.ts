@@ -45,6 +45,7 @@ declare interface ITransactionData {
   asset: ITransactionAssetData;
   updatedAssetCost: number;
   numShares: number;
+  isFirst: boolean;
 }
 
 declare interface ISort {

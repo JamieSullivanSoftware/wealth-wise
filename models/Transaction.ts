@@ -28,6 +28,10 @@ const TransactionSchema = new Schema(
       type: Number,
       required: false,
     },
+    isFirst: {
+      type: Boolean,
+      required: false,
+    },
   },
   {
     timestamps: true,

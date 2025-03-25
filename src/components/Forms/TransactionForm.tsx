@@ -22,6 +22,9 @@ const TransactionForm = ({
   const [selectedAsset, setSelectedAsset] = useState<IAssetListData | null>(
     null
   );
+  const [selectedType, setSelectedType] = useState<string>(
+    transaction?.type || ''
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,7 +42,7 @@ const TransactionForm = ({
     }
   };
 
-  const handleOnSelect = (assetId: string) => {
+  const handleOnAssetSelect = (assetId: string) => {
     const asset = assetList.find(
       (asset: IAssetListData) => asset._id === assetId
     );
@@ -48,11 +51,16 @@ const TransactionForm = ({
     }
   };
 
+  const handleOnTypeSelect = (type: string) => {
+    setSelectedType(type);
+  };
+
   useEffect(() => {
-    if (transaction?.asset) {
+    if (transaction) {
+      setSelectedType(transaction.type);
       setSelectedAsset(transaction.asset);
     }
-  }, [transaction?.asset]);
+  }, [transaction?.type, transaction?.asset]);
 
   return (
     <form
@@ -91,7 +99,7 @@ const TransactionForm = ({
               label: asset.name,
             }))}
             value={selectedAsset?._id}
-            onSelect={handleOnSelect}
+            onSelect={handleOnAssetSelect}
           />
         </div>
       )}
@@ -109,6 +117,7 @@ const TransactionForm = ({
             id='num-shares'
             placeholder='5'
             required
+            defaultValue={transaction?.numShares}
           />
         </div>
       )}
@@ -127,7 +136,8 @@ const TransactionForm = ({
             value: type,
             label: type,
           }))}
-          value={transaction?.type}
+          value={selectedType}
+          onSelect={handleOnTypeSelect}
         />
       </div>
 

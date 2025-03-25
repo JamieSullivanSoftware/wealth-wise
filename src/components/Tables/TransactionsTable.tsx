@@ -269,6 +269,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       updatedAssetCost,
                       updatedAt,
                       numShares,
+                      isFirst,
                     } = transaction;
 
                     return (
@@ -301,28 +302,30 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                           {currencyFormat.format(updatedAssetCost)}
                         </div>
-                        <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
-                          <IconButton
-                            onClick={() => {
-                              setSelectedTransaction(transaction);
-                              setShowEditModal(true);
-                            }}
-                            icon={faPencilAlt}
-                            iconSize='sm'
-                            iconColor='#197f4c'
-                            classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
-                          />
-                          <IconButton
-                            onClick={() => {
-                              setSelectedTransaction(transaction);
-                              setShowDeleteModal(true);
-                            }}
-                            icon={faTrashAlt}
-                            iconSize='sm'
-                            iconColor='#e52020'
-                            classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
-                          />
-                        </div>
+                        {!isFirst && (
+                          <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
+                            <IconButton
+                              onClick={() => {
+                                setSelectedTransaction(transaction);
+                                setShowEditModal(true);
+                              }}
+                              icon={faPencilAlt}
+                              iconSize='sm'
+                              iconColor='#197f4c'
+                              classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
+                            />
+                            <IconButton
+                              onClick={() => {
+                                setSelectedTransaction(transaction);
+                                setShowDeleteModal(true);
+                              }}
+                              icon={faTrashAlt}
+                              iconSize='sm'
+                              iconColor='#e52020'
+                              classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
+                            />
+                          </div>
+                        )}
                       </div>
                     );
                   }
