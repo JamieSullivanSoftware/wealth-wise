@@ -9,7 +9,7 @@ declare interface ITransaction {
   updatedAssetCost: number;
   numShares?: number;
   createdAt: string;
-  updateAt: string;
+  updatedAt: string;
 }
 
 declare interface IAsset {

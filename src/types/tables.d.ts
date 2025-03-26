@@ -14,7 +14,7 @@ declare interface IPaginatedTransactions extends IPaginatedData {
 
 declare interface IAssetData {
   _id: string;
-  updatedAt: Date;
+  createdAt: Date;
   name: string;
   category: string;
   numShares: number;

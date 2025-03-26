@@ -2,11 +2,10 @@
 import Label from './Label';
 import Input from './Input';
 import Select from './Select';
-import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
+import { TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
 import { addTransaction, editTransaction } from '@/app/actions/transactions';
 import { useEffect, useState } from 'react';
-import { hasCategoryGotShares } from '@/utils/misc';
 
 interface IProps {
   assetList: IAssetListData[];
@@ -60,7 +59,7 @@ const TransactionForm = ({
       setSelectedType(transaction.type);
       setSelectedAsset(transaction.asset);
     }
-  }, [transaction?.type, transaction?.asset]);
+  }, [transaction]);
 
   return (
     <form

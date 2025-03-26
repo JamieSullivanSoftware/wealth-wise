@@ -2,7 +2,7 @@ const apiDomain = process.env.NEXT_PUBLIC_API_DOMAIN || null;
 
 export const getTransactions = async (
   limit: number = 5,
-  sortBy: string = 'updatedAt',
+  sortBy: string = 'createdAt',
   order: string = 'desc',
   page: number = 1
 ) => {
@@ -21,7 +21,7 @@ export const getTransactions = async (
 
 export const getAssets = async (
   limit: number = 5,
-  sortBy: string = 'updatedAt',
+  sortBy: string = 'createdAt',
   order: string = 'desc',
   page: number = 1
 ) => {

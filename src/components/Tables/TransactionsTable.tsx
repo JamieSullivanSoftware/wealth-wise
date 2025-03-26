@@ -4,12 +4,7 @@ import { faPencilAlt, faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-import {
-  currencyFormat,
-  getEuropeanYear,
-  getMonthDate,
-  getTime,
-} from '@/utils/string';
+import { getEuropeanYear, getMonthDate, getTime } from '@/utils/string';
 import { getAssetList, getTransactions } from '@/utils/api';
 import Button from '../Common/Button';
 import IconButton from '../Common/IconButton';
@@ -34,7 +29,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
   const { data: session, status } = useSession();
   const isAuthenticated = session && status === 'authenticated';
   const [sort, setSort] = useState<ISort>({
-    by: 'updatedAt',
+    by: 'createdAt',
     order: 'desc',
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
