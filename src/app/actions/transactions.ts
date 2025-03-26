@@ -58,6 +58,7 @@ export const addTransaction = async (formData: FormData) => {
       type: addData.type,
       updatedAssetCost: updatedCost,
       numShares: addData.numShares,
+      isFirst: false,
     }).save();
 
     await Promise.all([updatedAsset, transaction]);
@@ -167,7 +168,6 @@ export const editTransaction = async (formData: FormData, id: string) => {
       amount: transactionFormData.amount,
       type: transactionFormData.type,
       numShares: originalAssetShares + numShares,
-      updatedAssetCost: originalAssetCost + cost,
     };
 
     const updatedAsset = Asset.updateOne(
@@ -175,7 +175,7 @@ export const editTransaction = async (formData: FormData, id: string) => {
       {
         $set: {
           numShares: updateData.numShares,
-          cost: updateData.updatedAssetCost,
+          cost: originalAssetCost + cost,
         },
       }
     );

@@ -246,17 +246,6 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'assetName' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
-                  <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
-                    <Button
-                      text='Cost'
-                      onClick={() => handleSort('updatedAssetCost')}
-                      icon={faSort}
-                      iconAlign='right'
-                      hasBg={false}
-                      iconSize='xs'
-                      classes={`${sort.by === 'updatedAssetCost' ? 'font-bold' : 'font-normal'} py-0 px-0`}
-                    />
-                  </div>
                   <div className='col-span-1' />
                 </div>
 
@@ -266,7 +255,6 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       asset,
                       amount,
                       type,
-                      updatedAssetCost,
                       updatedAt,
                       numShares,
                       isFirst,
@@ -298,9 +286,6 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                           {asset.name}
-                        </div>
-                        <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
-                          {currencyFormat.format(updatedAssetCost)}
                         </div>
                         {!isFirst && (
                           <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>

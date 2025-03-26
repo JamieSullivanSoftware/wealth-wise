@@ -43,7 +43,6 @@ declare interface ITransactionData {
   type: TransactionType;
   updatedAt: Date;
   asset: ITransactionAssetData;
-  updatedAssetCost: number;
   numShares: number;
   isFirst: boolean;
 }

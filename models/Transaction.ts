@@ -16,10 +16,6 @@ const TransactionSchema = new Schema(
       type: Number,
       required: true,
     },
-    updatedAssetCost: {
-      type: Number,
-      required: true,
-    },
     type: {
       type: String,
       required: true,
