@@ -18,6 +18,7 @@ export const GET = async () => {
       {
         $match: {
           user_id: userId,
+          category: { $in: ['Stocks', 'Crypto'] },
         },
       },
       {
