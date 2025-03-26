@@ -120,24 +120,26 @@ const TransactionForm = ({
         />
       </div>
 
-      {/* Type */}
-      <div>
-        <Label
-          htmlFor='type'
-          text='Transaction Type'
-        />
-        <Select
-          name='type'
-          id='type'
-          placeholder='Select type'
-          options={Object.values(TRANSACTION_TYPES).map((type: string) => ({
-            value: type,
-            label: type,
-          }))}
-          value={selectedType}
-          onSelect={handleOnTypeSelect}
-        />
-      </div>
+      {/* Type - Only Show on Add Modal */}
+      {!transaction && (
+        <div>
+          <Label
+            htmlFor='type'
+            text='Transaction Type'
+          />
+          <Select
+            name='type'
+            id='type'
+            placeholder='Select type'
+            options={Object.values(TRANSACTION_TYPES).map((type: string) => ({
+              value: type,
+              label: type,
+            }))}
+            value={selectedType}
+            onSelect={handleOnTypeSelect}
+          />
+        </div>
+      )}
 
       {/* Submit Button */}
       <Button
