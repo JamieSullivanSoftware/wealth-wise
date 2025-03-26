@@ -66,42 +66,61 @@ const TransactionForm = ({
       className='space-y-6'
       onSubmit={handleSubmit}
     >
+      {/* Asset & Type - Only Show on Add Modal */}
+      {!transaction && (
+        <>
+          <div>
+            <Label
+              htmlFor='asset'
+              text='Asset'
+            />
+            <Select
+              name='asset-id'
+              id='asset-id'
+              placeholder='Select asset'
+              options={assetList.map((asset: IAssetListData) => ({
+                value: asset._id,
+                label: asset.name,
+              }))}
+              value={selectedAsset?._id}
+              onSelect={handleOnAssetSelect}
+            />
+          </div>
+          <div>
+            <Label
+              htmlFor='type'
+              text='Transaction Type'
+            />
+            <Select
+              name='type'
+              id='type'
+              placeholder='Select type'
+              options={Object.values(TRANSACTION_TYPES).map((type: string) => ({
+                value: type,
+                label: type,
+              }))}
+              value={selectedType}
+              onSelect={handleOnTypeSelect}
+            />
+          </div>
+        </>
+      )}
+
       {/* Amount */}
       <div>
         <Label
-          htmlFor='amount'
-          text='Amount'
+          htmlFor='price-per-share'
+          text='Price per Share'
         />
         <Input
           type='number'
-          name='amount'
-          id='amount'
-          placeholder='e.g. 150.00'
+          name='price-per-share'
+          id='price-per-share'
+          placeholder='150'
           required
-          defaultValue={transaction?.amount}
+          defaultValue={transaction?.pricePerShare}
         />
       </div>
-
-      {/* Asset - Only Show on Add Modal */}
-      {!transaction && (
-        <div>
-          <Label
-            htmlFor='asset'
-            text='Asset'
-          />
-          <Select
-            name='asset-id'
-            id='asset-id'
-            placeholder='Select asset'
-            options={assetList.map((asset: IAssetListData) => ({
-              value: asset._id,
-              label: asset.name,
-            }))}
-            value={selectedAsset?._id}
-            onSelect={handleOnAssetSelect}
-          />
-        </div>
-      )}
 
       {/* Number of Shares */}
       <div>
@@ -113,32 +132,11 @@ const TransactionForm = ({
           type='number'
           name='num-shares'
           id='num-shares'
-          placeholder='5'
+          placeholder='10'
           required
           defaultValue={transaction?.numShares}
         />
       </div>
-
-      {/* Type - Only Show on Add Modal */}
-      {!transaction && (
-        <div>
-          <Label
-            htmlFor='type'
-            text='Transaction Type'
-          />
-          <Select
-            name='type'
-            id='type'
-            placeholder='Select type'
-            options={Object.values(TRANSACTION_TYPES).map((type: string) => ({
-              value: type,
-              label: type,
-            }))}
-            value={selectedType}
-            onSelect={handleOnTypeSelect}
-          />
-        </div>
-      )}
 
       {/* Submit Button */}
       <Button

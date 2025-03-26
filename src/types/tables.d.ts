@@ -44,6 +44,7 @@ declare interface ITransactionData {
   createdAt: Date;
   asset: ITransactionAssetData;
   numShares: number;
+  pricePerShare: number;
   isFirst: boolean;
 }
 

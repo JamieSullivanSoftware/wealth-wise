@@ -18,50 +18,34 @@ export const addTransaction = async (formData: FormData) => {
 
   const { user } = sessionUser;
 
-  const addData = {
-    amount: parseFloat(formData.get('amount')?.toString() || '0'),
-    type: formData.get('type')?.toString() || '',
-    numShares: parseFloat(formData.get('num-shares')?.toString() || '0'),
-  };
+  const type = formData.get('type')?.toString() || '';
+  const numShares = parseFloat(formData.get('num-shares')?.toString() || '0');
+  const pricePerShare = parseFloat(
+    formData.get('price-per-share')?.toString() || '0'
+  );
+  const amount = isBuyType(type)
+    ? numShares * pricePerShare
+    : -numShares * pricePerShare;
 
   const asset = await Asset.findById(formData.get('asset-id'));
   if (!asset) {
     throw new Error('Asset not found');
   }
 
-  if (addData.amount <= 0) {
-    throw new Error('Amount must be greater than 0');
+  if (pricePerShare <= 0) {
+    throw new Error('Price must be greater than 0');
   }
 
-  const { updatedNumShares, updatedCost } = calculateUpdatedSharesAndCost(
-    asset,
-    addData.amount,
-    addData.numShares,
-    addData.type
-  );
-
   try {
-    const updatedAsset = Asset.updateOne(
-      { _id: asset._id },
-      {
-        $set: {
-          numShares: updatedNumShares,
-          cost: updatedCost,
-        },
-      }
-    );
-
-    const transaction = new Transaction({
+    await new Transaction({
       user_id: user.id,
       asset_id: asset._id,
-      amount: addData.amount,
-      type: addData.type,
-      updatedAssetCost: updatedCost,
-      numShares: addData.numShares,
+      amount,
+      type,
+      numShares,
+      pricePerShare,
       isFirst: false,
     }).save();
-
-    await Promise.all([updatedAsset, transaction]);
   } catch (error) {
     console.log(error);
     return new Response('Transaction not created', { status: 500 });
