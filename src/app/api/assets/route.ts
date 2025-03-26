@@ -50,7 +50,7 @@ export const GET = async (request: NextRequest) => {
               $project: {
                 _id: 1,
                 user_id: 1,
-                updatedAt: 1,
+                createdAt: 1,
                 name: 1,
                 category: 1,
                 numShares: 1,

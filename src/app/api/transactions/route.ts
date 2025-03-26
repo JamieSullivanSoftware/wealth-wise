@@ -54,14 +54,13 @@ export const GET = async (request: NextRequest) => {
               $project: {
                 _id: 1,
                 user_id: 1,
-                updatedAt: 1,
+                createdAt: 1,
                 amount: 1,
                 numShares: 1,
                 type: 1,
                 'asset._id': 1,
                 'asset.name': 1,
                 'asset.category': 1,
-                updatedAssetCost: 1,
                 isFirst: 1,
               },
             },
@@ -70,9 +69,6 @@ export const GET = async (request: NextRequest) => {
                 ...(sortBy === 'assetName' ? { 'asset.name': order } : {}),
                 ...(sortBy === 'assetCategory'
                   ? { 'asset.category': order }
-                  : {}),
-                ...(sortBy === 'updatedAssetCost'
-                  ? { updatedAssetCost: order }
                   : {}),
                 ...(sortBy !== 'assetName' && sortBy !== 'assetCategory'
                   ? { [sortBy]: order }

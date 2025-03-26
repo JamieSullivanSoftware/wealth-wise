@@ -41,7 +41,7 @@ declare interface ITransactionData {
   _id: string;
   amount: number;
   type: TransactionType;
-  updatedAt: Date;
+  createdAt: Date;
   asset: ITransactionAssetData;
   numShares: number;
   isFirst: boolean;
@@ -53,7 +53,7 @@ declare interface ISort {
 }
 
 declare type AssetSortBy =
-  | 'updatedAt'
+  | 'createdAt'
   | 'name'
   | 'category'
   | 'numShares'
@@ -62,9 +62,8 @@ declare type AssetSortBy =
   | 'diffPercentage';
 
 declare type TransactionSortBy =
-  | 'updatedAt'
+  | 'createdAt'
   | 'amount'
   | 'type'
   | 'assetName'
-  | 'assetCategory'
-  | 'updatedAssetCost';
+  | 'assetCategory';

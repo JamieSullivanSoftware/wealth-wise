@@ -205,12 +205,12 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                   <div className='col-span-4 sm:col-span-2 flex items-center'>
                     <Button
                       text='Date'
-                      onClick={() => handleSort('updatedAt')}
+                      onClick={() => handleSort('createdAt')}
                       icon={faSort}
                       iconAlign='right'
                       hasBg={false}
                       iconSize='xs'
-                      classes={`${sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'} py-0 px-0`}
+                      classes={`${sort.by === 'createdAt' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
                   <div className='col-span-6 flex sm:col-span-3 items-center'>
@@ -255,7 +255,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       asset,
                       amount,
                       type,
-                      updatedAt,
+                      createdAt,
                       numShares,
                       isFirst,
                     } = transaction;
@@ -266,7 +266,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm px-2 rounded-md'
                       >
                         <div className='col-span-4 flex flex-wrap items-center sm:col-span-2'>
-                          {getEuropeanYear(new Date(updatedAt))}
+                          {getEuropeanYear(new Date(createdAt))}
                         </div>
                         <div className='col-span-6 flex flex-wrap items-center sm:col-span-3'>
                           <TransactionAmountInfo
@@ -358,8 +358,8 @@ const TransactionsTable = ({ showFullData }: IProps) => {
               paginatedTransactions.transactions.length > 0 ? (
                 paginatedTransactions.transactions.map(
                   (transaction: ITransactionData, i: number) => {
-                    const { asset, amount, updatedAt } = transaction;
-                    const date = new Date(updatedAt);
+                    const { asset, amount, createdAt } = transaction;
+                    const date = new Date(createdAt);
 
                     return (
                       <div

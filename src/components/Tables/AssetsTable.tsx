@@ -31,7 +31,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
   const { data: session, status } = useSession();
   const isAuthenticated = session && status === 'authenticated';
   const [sort, setSort] = useState<ISort>({
-    by: 'updatedAt',
+    by: 'createdAt',
     order: 'desc',
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -175,12 +175,12 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   <div className='col-span-3 sm:col-span-2 flex items-center'>
                     <Button
                       text='Date'
-                      onClick={() => handleSort('updatedAt')}
+                      onClick={() => handleSort('createdAt')}
                       icon={faSort}
                       iconAlign='right'
                       hasBg={false}
                       iconSize='xs'
-                      classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'updatedAt' ? 'font-bold' : 'font-normal'}`}
+                      classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'createdAt' ? 'font-bold' : 'font-normal'}`}
                     />
                   </div>
                   <div className='col-span-6 flex sm:col-span-2 items-center'>
@@ -242,7 +242,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                 </div>
                 {paginatedAssets.assets.map((asset: IAssetData, i: number) => {
                   const {
-                    updatedAt,
+                    createdAt,
                     name,
                     category,
                     cost,
@@ -257,7 +257,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm px-2 rounded-md'
                     >
                       <div className='col-span-3 sm:col-span-2 flex flex-wrap items-center'>
-                        {getEuropeanYear(new Date(updatedAt))}
+                        {getEuropeanYear(new Date(createdAt))}
                       </div>
                       <div className='justify-center col-span-6 flex flex-col flex-wrap gap-2 sm:justify-start sm:col-span-2'>
                         <span className='font-medium'>{name}</span>
