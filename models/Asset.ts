@@ -15,17 +15,9 @@ export const AssetSchema = new Schema(
       type: String,
       required: true,
     },
-    cost: {
+    shareValue: {
       type: Number,
       required: true,
-    },
-    value: {
-      type: Number,
-      required: true,
-    },
-    numShares: {
-      type: Number,
-      required: false,
     },
     detail: {
       type: String,

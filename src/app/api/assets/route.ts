@@ -4,6 +4,7 @@ import { Types, type PipelineStage } from 'mongoose';
 import connectDB from '@/config/database';
 import Asset from '@/models/Asset';
 import { getSessionUser } from '@/utils/getSessionUser';
+import { getTransactionsAmountAndShares } from '@/helpers/routeHelper';
 
 export const GET = async (request: NextRequest) => {
   try {
@@ -34,13 +35,26 @@ export const GET = async (request: NextRequest) => {
                 user_id: userId,
               },
             },
+            ...getTransactionsAmountAndShares(),
+            {
+              $addFields: {
+                marketValue: {
+                  $sum: {
+                    $multiply: [
+                      { $ifNull: ['$shareValue', 0] },
+                      { $ifNull: ['$numShares', 0] },
+                    ],
+                  },
+                },
+              },
+            },
             {
               $addFields: {
                 diffTotal: {
                   $sum: {
                     $subtract: [
-                      { $ifNull: ['$value', 0] },
-                      { $ifNull: ['$cost', 0] },
+                      { $ifNull: ['$marketValue', 0] },
+                      { $ifNull: ['$totalCost', 0] },
                     ],
                   },
                 },
@@ -54,8 +68,10 @@ export const GET = async (request: NextRequest) => {
                 name: 1,
                 category: 1,
                 numShares: 1,
-                value: 1,
-                cost: 1,
+                shareValue: 1,
+                totalCost: 1,
+                diffTotal: 1,
+                marketValue: 1,
                 detail: 1,
                 diffPercentage: {
                   $round: [
@@ -66,13 +82,13 @@ export const GET = async (request: NextRequest) => {
                             if: {
                               $or: [
                                 { $eq: ['$diffTotal', 0] },
-                                { $eq: ['$cost', 0] },
-                                { $not: ['$cost'] },
+                                { $eq: ['$totalCost', 0] },
+                                { $not: ['$totalCost'] },
                               ],
                             },
                             then: 0,
                             else: {
-                              $divide: ['$diffTotal', '$cost'],
+                              $divide: ['$diffTotal', '$totalCost'],
                             },
                           },
                         },

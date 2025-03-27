@@ -17,27 +17,29 @@ export const addAsset = async (formData: FormData) => {
 
   const { user } = sessionUser;
 
-  const assetData = {
+  const data = {
     user_id: user.id,
     name: formData.get('asset-name'),
     category: formData.get('category'),
     numShares: parseFloat(formData.get('num-shares')?.toString() || '0'),
-    cost: parseFloat(formData.get('cost')?.toString() || '0'),
+    pricePerShare: parseFloat(
+      formData.get('price-per-share')?.toString() || '0'
+    ),
     value: parseFloat(formData.get('value')?.toString() || '0'),
     detail: formData.get('detail'),
   };
 
   try {
-    const asset = new Asset(assetData);
+    const asset = new Asset(data);
     const newAsset = await asset.save();
 
     const transaction = {
       user_id: user.id,
       asset_id: newAsset._id,
-      amount: assetData.cost,
+      amount: data.pricePerShare * data.numShares,
       type: TRANSACTION_TYPES.buy,
-      updatedAssetCost: assetData.cost,
-      numShares: assetData.numShares,
+      numShares: data.numShares,
+      pricePerShare: data.pricePerShare,
       isFirst: true,
     };
     await new Transaction(transaction).save();

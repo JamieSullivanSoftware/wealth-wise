@@ -57,7 +57,7 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
         <Input
           name='asset-name'
           id='asset-name'
-          placeholder='e.g. Apple Stock'
+          placeholder='Apple Stock'
           required
           defaultValue={asset?.name}
         />
@@ -102,14 +102,14 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
           )}
           <div>
             <Label
-              htmlFor='cost'
-              text='Cost'
+              htmlFor='price-per-share'
+              text='Price per Share'
             />
             <Input
               type='number'
-              name='cost'
-              id='cost'
-              placeholder='1000'
+              name='price-per-share'
+              id='price-per-share'
+              placeholder='100'
               required
             />
           </div>
@@ -120,13 +120,13 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
       <div>
         <Label
           htmlFor='value'
-          text='Value'
+          text='Current Market Value'
         />
         <Input
           type='number'
           name='value'
           id='value'
-          placeholder='1000'
+          placeholder='100'
           required
           defaultValue={asset?.value}
         />
