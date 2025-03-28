@@ -2,10 +2,10 @@
 import Label from './Label';
 import Input from './Input';
 import Select from './Select';
-import { ACCOUNT_TYPES, CATEGORIES, TRANSACTION_TYPES } from '@/constants';
+import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
-import { addTransaction, editTransaction } from '@/app/actions/transactions';
-import { useEffect, useState } from 'react';
+import { addTransaction } from '@/app/actions/transactions';
+import { ChangeEvent, useEffect, useState } from 'react';
 import {
   isAccount,
   isRealEstateCarOrOther,
@@ -16,34 +16,48 @@ interface IProps {
   assetList: IAssetListData[];
   onTransactionAdded: () => void;
   transaction?: ITransactionTableData;
+  isModalVisible?: boolean;
 }
 
 const TransactionForm = ({
   assetList,
   onTransactionAdded,
   transaction,
+  isModalVisible,
 }: IProps) => {
+  const [formData, setFormData] = useState<ITransactionData>({
+    assetId: '',
+    type: '',
+    amount: 0,
+    pricePerUnit: 0,
+  });
+  const [amountLabel, setAmountLabel] = useState<string>('');
   const [selectedAsset, setSelectedAsset] = useState<IAssetListData | null>(
     null
-  );
-  const [selectedType, setSelectedType] = useState<string>(
-    transaction?.type || ''
   );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
 
     try {
       if (transaction) {
-        await editTransaction(formData, transaction._id);
+        // await editTransaction(formData, transaction._id);
       } else {
         await addTransaction(formData);
       }
-      await onTransactionAdded();
+
+      onTransactionAdded();
     } catch (error) {
       console.error('Failed to submit transaction:', error);
     }
+  };
+
+  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
   };
 
   const handleOnAssetSelect = (assetId: string) => {
@@ -52,11 +66,27 @@ const TransactionForm = ({
     );
     if (asset) {
       setSelectedAsset(asset);
+      setFormData({
+        ...formData,
+        assetId: asset._id,
+      });
     }
   };
 
   const handleOnTypeSelect = (type: string) => {
-    setSelectedType(type);
+    setFormData({
+      ...formData,
+      type,
+    });
+  };
+
+  const resetFormData = () => {
+    setFormData({
+      assetId: '',
+      type: '',
+      amount: 0,
+      pricePerUnit: 0,
+    });
   };
 
   const getTypeOptions = () => {
@@ -74,7 +104,7 @@ const TransactionForm = ({
       );
     }
     if (isAccount(selectedAsset?.category)) {
-      return Object.keys(TRANSACTION_TYPES).filter(
+      return Object.values(TRANSACTION_TYPES).filter(
         (type: string) =>
           type === TRANSACTION_TYPES.deposit ||
           type === TRANSACTION_TYPES.withdraw
@@ -84,11 +114,38 @@ const TransactionForm = ({
   };
 
   useEffect(() => {
-    if (transaction) {
-      setSelectedType(transaction.type);
-      setSelectedAsset(transaction.asset);
+    console.log('isModalVisible', isModalVisible);
+    console.log('transaction', transaction);
+    if (isModalVisible && !transaction) {
+      resetFormData();
     }
-  }, [transaction]);
+    if (transaction) {
+      setSelectedAsset(transaction.asset);
+      setFormData({
+        assetId: transaction.asset._id,
+        type: transaction.type,
+        amount: transaction.amount,
+        pricePerUnit: transaction.pricePerUnit,
+        total: transaction.total,
+      });
+    }
+  }, [transaction, isModalVisible]);
+
+  useEffect(() => {
+    if (isStocksOrCrypto(selectedAsset?.category)) {
+      setAmountLabel(
+        `Number of ${
+          selectedAsset?.category === CATEGORIES.stocks ? 'Shares' : 'Units'
+        }`
+      );
+    }
+    if (isRealEstateCarOrOther(selectedAsset?.category)) {
+      setAmountLabel('Market Value');
+    }
+    if (isAccount(selectedAsset?.category)) {
+      setAmountLabel('Amount');
+    }
+  }, [selectedAsset]);
 
   return (
     <form
@@ -105,18 +162,17 @@ const TransactionForm = ({
             />
             <Select
               name='asset-id'
-              id='asset-id'
+              id='assetId'
               placeholder='Select asset'
               options={assetList.map((asset: IAssetListData) => ({
                 value: asset._id,
                 label: asset.name,
               }))}
-              value={selectedAsset?._id}
+              value={formData.assetId}
               onSelect={handleOnAssetSelect}
             />
           </div>
-          {(isStocksOrCrypto(selectedAsset?.category) ||
-            isAccount(selectedAsset?.category)) && (
+          {selectedAsset?.category && (
             <div>
               <Label
                 htmlFor='type'
@@ -130,7 +186,7 @@ const TransactionForm = ({
                   value: type,
                   label: type,
                 }))}
-                value={selectedType}
+                value={formData.type}
                 onSelect={handleOnTypeSelect}
               />
             </div>
@@ -138,68 +194,39 @@ const TransactionForm = ({
         </>
       )}
 
-      {/* Number of Units/Shares and Price - (Stocks & Crypto) - Can Edit */}
-      {isStocksOrCrypto(selectedAsset?.category) && (
-        <>
-          <div>
-            <Label
-              htmlFor='num-units'
-              text={`Number of ${selectedAsset?.category === CATEGORIES.stocks ? 'Shares' : 'Units'}`}
-            />
-            <Input
-              type='number'
-              name='num-units'
-              id='num-units'
-              placeholder='5'
-              required
-            />
-          </div>
-          <div>
-            <Label
-              htmlFor='price-per-unit'
-              text={`Price per ${selectedAsset?.category === CATEGORIES.stocks ? 'Share' : 'Unit'}`}
-            />
-            <Input
-              type='number'
-              name='price-per-unit'
-              id='price-per-unit'
-              placeholder='100'
-              required
-            />
-          </div>
-        </>
-      )}
-
-      {/* Market Value - Real Estate/Cars/Other - Can Edit */}
-      {isRealEstateCarOrOther(selectedAsset?.category) && (
-        <div>
-          <Label
-            htmlFor='value'
-            text='Latest Market Value'
-          />
-          <Input
-            type='number'
-            name='value'
-            id='value'
-            placeholder='50,000'
-            required
-          />
-        </div>
-      )}
-
-      {/* Account Balance Amount - (Accounts) */}
-      {isAccount(selectedAsset?.category) && (
+      {/* Amount - Can Edit */}
+      {selectedAsset?.category && (
         <div>
           <Label
             htmlFor='amount'
-            text='Amount'
+            text={amountLabel}
           />
           <Input
             type='number'
             name='amount'
             id='amount'
-            placeholder='1000'
+            placeholder='100'
             required
+            value={formData.amount}
+            onChange={handleOnChange}
+          />
+        </div>
+      )}
+
+      {/* Unit Price - (Stocks & Crypto) - Can Edit */}
+      {isStocksOrCrypto(selectedAsset?.category) && (
+        <div>
+          <Label
+            htmlFor='price-per-unit'
+            text={`Price per ${selectedAsset?.category === CATEGORIES.stocks ? 'Share' : 'Unit'}`}
+          />
+          <Input
+            type='number'
+            name='price-per-unit'
+            id='price-per-unit'
+            placeholder='100'
+            required
+            onChange={handleOnChange}
           />
         </div>
       )}

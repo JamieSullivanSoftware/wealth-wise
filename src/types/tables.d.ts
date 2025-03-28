@@ -44,8 +44,9 @@ declare interface ITransactionTableData {
   type: TransactionType;
   createdAt: Date;
   asset: ITransactionAssetData;
-  numShares: number;
-  pricePerShare: number;
+  numUnits: number;
+  pricePerUnit: number;
+  total: number;
   isFirst: boolean;
 }
 

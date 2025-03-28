@@ -2,7 +2,7 @@ import { Schema, model, models } from 'mongoose';
 
 export const AssetSchema = new Schema(
   {
-    user_id: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,

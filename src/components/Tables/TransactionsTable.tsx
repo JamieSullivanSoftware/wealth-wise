@@ -154,6 +154,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
               <TransactionForm
                 assetList={assetList}
                 onTransactionAdded={refetchTransactions}
+                isModalVisible={showAddModal}
               />
             </Modal>
             <Modal
@@ -165,6 +166,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                 assetList={assetList}
                 onTransactionAdded={refetchTransactions}
                 transaction={selectedTransaction}
+                isModalVisible={showEditModal}
               />
             </Modal>
           </>

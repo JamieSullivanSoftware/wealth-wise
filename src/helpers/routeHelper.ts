@@ -173,7 +173,7 @@ export const getTransactionsAmountAndShares = () => [
     $lookup: {
       from: 'transactions',
       localField: '_id',
-      foreignField: 'asset_id',
+      foreignField: 'assetId',
       as: 'transactions',
     },
   },

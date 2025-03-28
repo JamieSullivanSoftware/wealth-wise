@@ -12,13 +12,12 @@ export const GET = async () => {
     const userId =
       sessionUser && sessionUser.userId
         ? new Types.ObjectId(sessionUser.userId)
-        : new Types.ObjectId(process.env.DEFAULT_USER_ID);
+        : new Types.ObjectId(process.env.DEFAULT_userId);
 
     const pipeline: PipelineStage[] = [
       {
         $match: {
-          user_id: userId,
-          category: { $in: ['Stocks', 'Crypto'] },
+          userId: userId,
         },
       },
       {

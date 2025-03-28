@@ -15,12 +15,12 @@ declare enum AccountType {
 }
 
 declare interface ITransactionData {
-  user_id: string;
-  asset_id: IAsset;
-  type: TransactionType;
-  amount: number;
+  userId?: string;
+  assetId?: IAsset | string;
+  type?: TransactionType | string;
+  amount?: number;
   pricePerUnit?: number;
-  total: number;
+  total?: number;
   isFirst?: boolean;
 }
 
@@ -31,7 +31,7 @@ declare interface ITransaction extends ITransactionData {
 }
 
 declare interface IAssetData {
-  user_id?: string;
+  userId?: string;
   name?: string;
   category?: string;
   cost?: number;

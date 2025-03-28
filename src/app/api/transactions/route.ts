@@ -14,7 +14,7 @@ export const GET = async (request: NextRequest) => {
     const userId =
       sessionUser && sessionUser.userId
         ? new Types.ObjectId(sessionUser.userId)
-        : new Types.ObjectId(process.env.DEFAULT_USER_ID);
+        : new Types.ObjectId(process.env.DEFAULT_userId);
 
     // Extract query parameters
     const limit = Number(request.nextUrl.searchParams.get('limit')) || 5;
@@ -31,18 +31,18 @@ export const GET = async (request: NextRequest) => {
           transactions: [
             {
               $match: {
-                user_id: userId,
+                userId: userId,
               },
             },
             {
               $addFields: {
-                asset_id: { $toObjectId: '$asset_id' },
+                assetId: { $toObjectId: '$assetId' },
               },
             },
             {
               $lookup: {
                 from: 'assets',
-                localField: 'asset_id',
+                localField: 'assetId',
                 foreignField: '_id',
                 as: 'asset',
               },
@@ -53,7 +53,7 @@ export const GET = async (request: NextRequest) => {
             {
               $project: {
                 _id: 1,
-                user_id: 1,
+                userId: 1,
                 createdAt: 1,
                 amount: 1,
                 numShares: 1,
@@ -82,7 +82,7 @@ export const GET = async (request: NextRequest) => {
           count: [
             {
               $match: {
-                user_id: userId,
+                userId: userId,
               },
             },
             {

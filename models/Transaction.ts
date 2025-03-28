@@ -1,21 +1,19 @@
-import { TRANSACTION_TYPES } from '@/constants';
 import { Schema, model, models } from 'mongoose';
 
 const TransactionSchema = new Schema(
   {
-    user_id: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    asset_id: {
+    assetId: {
       type: Schema.Types.ObjectId,
       ref: 'Asset',
       required: true,
     },
     type: {
       type: String,
-      enum: Object.values(TRANSACTION_TYPES),
       required: true,
     },
 
@@ -40,6 +38,7 @@ const TransactionSchema = new Schema(
     isFirst: {
       type: Boolean,
       required: false,
+      default: false,
     },
   },
   {

@@ -20,7 +20,7 @@ export const GET = async () => {
     const userId =
       sessionUser && sessionUser.userId
         ? new Types.ObjectId(sessionUser.userId)
-        : new Types.ObjectId(process.env.DEFAULT_USER_ID);
+        : new Types.ObjectId(process.env.DEFAULT_userId);
 
     const pipeline: PipelineStage[] = [
       // Step 1: Filter documents for the base total before start date and all totals after start date
@@ -30,7 +30,7 @@ export const GET = async () => {
             {
               $match: {
                 createdAt: { $lt: startDate },
-                user_id: userId,
+                userId: userId,
               },
             },
             {

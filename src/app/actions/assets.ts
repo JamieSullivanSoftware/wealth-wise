@@ -5,7 +5,6 @@ import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
 import Asset from '@/modelsAsset';
 import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
-import { parse } from 'path';
 
 export const addAsset = async (assetData: IAssetData) => {
   await connectDB();
@@ -19,7 +18,7 @@ export const addAsset = async (assetData: IAssetData) => {
   const { user } = sessionUser;
 
   const data = {
-    user_id: user.id,
+    userId: user.id,
     name: assetData.name || '',
     category: assetData.category || '',
     numUnits: parseFloat(assetData.numUnits?.toString() || '0'),
@@ -34,13 +33,13 @@ export const addAsset = async (assetData: IAssetData) => {
     const newAsset = await asset.save();
 
     let transaction: ITransactionData = {
-      user_id: user.id?.toString() || '',
-      asset_id: newAsset._id?.toString() || '',
+      userId: user.id?.toString() || '',
+      assetId: newAsset._id?.toString() || '',
       type: TRANSACTION_TYPES.deposit as TransactionType,
       isFirst: true,
       amount: data.value,
       pricePerUnit: 0,
-      total: 0,
+      total: data.value,
     };
 
     switch (data.category) {
@@ -95,7 +94,7 @@ export const deleteAsset = async (id: string) => {
     }
 
     const deleteTransactions = await Transaction.deleteMany({
-      asset_id: id,
+      assetId: id,
     });
     const deleteAsset = await Asset.deleteOne({ _id: id });
 
