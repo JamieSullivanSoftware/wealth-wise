@@ -65,8 +65,6 @@ export const TRANSACTION_TYPES = {
   sell: 'SELL',
   deposit: 'DEPOSIT',
   withdraw: 'WITHDRAW',
-  appreciation: 'APPRECIATION',
-  depreciation: 'DEPRECIATION',
 };
 
 export const ACCOUNT_TYPES = {

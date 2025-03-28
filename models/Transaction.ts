@@ -19,7 +19,7 @@ const TransactionSchema = new Schema(
       required: true,
     },
 
-    // Number of shares, deposit amount, or value change
+    // Number of shares/coins, deposit amount, or market value change
     amount: {
       type: Number,
       required: true,
@@ -30,13 +30,13 @@ const TransactionSchema = new Schema(
       required: false,
       default: 0,
     },
-    // Total transaction cost (amount * price)
+    // Total transaction cost
     total: {
       type: Number,
       required: true,
     },
 
-    // First transaction for the asset
+    // First transaction when creating an asset
     isFirst: {
       type: Boolean,
       required: false,

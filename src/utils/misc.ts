@@ -1,10 +1,10 @@
 import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
 
-export const isStocksOrCrypto = (category: string): boolean => {
+export const isStocksOrCrypto = (category: string = ''): boolean => {
   return category === CATEGORIES.crypto || category === CATEGORIES.stocks;
 };
 
-export const isRealEstateCarOrOther = (category: string): boolean => {
+export const isRealEstateCarOrOther = (category: string = ''): boolean => {
   return (
     category === CATEGORIES.realEstate ||
     category === CATEGORIES.cars ||
@@ -12,7 +12,7 @@ export const isRealEstateCarOrOther = (category: string): boolean => {
   );
 };
 
-export const isAccount = (category: string): boolean => {
+export const isAccount = (category: string = ''): boolean => {
   return category === CATEGORIES.accounts;
 };
 

@@ -2,10 +2,15 @@
 import Label from './Label';
 import Input from './Input';
 import Select from './Select';
-import { TRANSACTION_TYPES } from '@/constants';
+import { ACCOUNT_TYPES, CATEGORIES, TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
 import { addTransaction, editTransaction } from '@/app/actions/transactions';
 import { useEffect, useState } from 'react';
+import {
+  isAccount,
+  isRealEstateCarOrOther,
+  isStocksOrCrypto,
+} from '@/utils/misc';
 
 interface IProps {
   assetList: IAssetListData[];
@@ -54,6 +59,23 @@ const TransactionForm = ({
     setSelectedType(type);
   };
 
+  const getTypeOptions = () => {
+    if (isStocksOrCrypto(selectedAsset?.category)) {
+      return Object.values(TRANSACTION_TYPES).filter(
+        (type: string) =>
+          type === TRANSACTION_TYPES.buy || type === TRANSACTION_TYPES.sell
+      );
+    }
+    if (isAccount(selectedAsset?.category)) {
+      return Object.keys(TRANSACTION_TYPES).filter(
+        (type: string) =>
+          type === TRANSACTION_TYPES.deposit ||
+          type === TRANSACTION_TYPES.withdraw
+      );
+    }
+    return [];
+  };
+
   useEffect(() => {
     if (transaction) {
       setSelectedType(transaction.type);
@@ -66,7 +88,7 @@ const TransactionForm = ({
       className='space-y-6'
       onSubmit={handleSubmit}
     >
-      {/* Asset & Type - Only Show on Add Modal */}
+      {/* Asset & Type - Cannot Edit */}
       {!transaction && (
         <>
           <div>
@@ -86,57 +108,94 @@ const TransactionForm = ({
               onSelect={handleOnAssetSelect}
             />
           </div>
+          {(isStocksOrCrypto(selectedAsset?.category) ||
+            isAccount(selectedAsset?.category)) && (
+            <div>
+              <Label
+                htmlFor='type'
+                text='Transaction Type'
+              />
+              <Select
+                name='type'
+                id='type'
+                placeholder='Select type'
+                options={getTypeOptions().map((type: string) => ({
+                  value: type,
+                  label: type,
+                }))}
+                value={selectedType}
+                onSelect={handleOnTypeSelect}
+              />
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Number of Units/Shares and Price - (Stocks & Crypto) - Can Edit */}
+      {isStocksOrCrypto(selectedAsset?.category) && (
+        <>
           <div>
             <Label
-              htmlFor='type'
-              text='Transaction Type'
+              htmlFor='num-units'
+              text={`Number of ${selectedAsset?.category === CATEGORIES.stocks ? 'Shares' : 'Units'}`}
             />
-            <Select
-              name='type'
-              id='type'
-              placeholder='Select type'
-              options={Object.values(TRANSACTION_TYPES).map((type: string) => ({
-                value: type,
-                label: type,
-              }))}
-              value={selectedType}
-              onSelect={handleOnTypeSelect}
+            <Input
+              type='number'
+              name='num-units'
+              id='num-units'
+              placeholder='5'
+              required
+            />
+          </div>
+          <div>
+            <Label
+              htmlFor='price-per-unit'
+              text={`Price per ${selectedAsset?.category === CATEGORIES.stocks ? 'Share' : 'Unit'}`}
+            />
+            <Input
+              type='number'
+              name='price-per-unit'
+              id='price-per-unit'
+              placeholder='100'
+              required
             />
           </div>
         </>
       )}
 
-      {/* Amount */}
-      <div>
-        <Label
-          htmlFor='price-per-share'
-          text='Price per Share'
-        />
-        <Input
-          type='number'
-          name='price-per-share'
-          id='price-per-share'
-          placeholder='150'
-          required
-          defaultValue={transaction?.pricePerShare}
-        />
-      </div>
+      {/* Market Value - Real Estate/Cars/Other - Can Edit */}
+      {isRealEstateCarOrOther(selectedAsset?.category) && (
+        <div>
+          <Label
+            htmlFor='value'
+            text='Latest Market Value'
+          />
+          <Input
+            type='number'
+            name='value'
+            id='value'
+            placeholder='50,000'
+            required
+          />
+        </div>
+      )}
 
-      {/* Number of Shares */}
-      <div>
-        <Label
-          htmlFor='num-shares'
-          text='Number of Shares'
-        />
-        <Input
-          type='number'
-          name='num-shares'
-          id='num-shares'
-          placeholder='10'
-          required
-          defaultValue={transaction?.numShares}
-        />
-      </div>
+      {/* Account Balance Amount - (Accounts) */}
+      {isAccount(selectedAsset?.category) && (
+        <div>
+          <Label
+            htmlFor='amount'
+            text='Amount'
+          />
+          <Input
+            type='number'
+            name='amount'
+            id='amount'
+            placeholder='1000'
+            required
+          />
+        </div>
+      )}
 
       {/* Submit Button */}
       <Button
