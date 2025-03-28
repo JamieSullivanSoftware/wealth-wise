@@ -17,12 +17,13 @@ declare interface IAssetData {
   createdAt: Date;
   name: string;
   category: string;
-  numShares: number;
   cost: number;
   value: number;
-  numShares: number;
-  detail: string;
-  diffPercentage: number;
+  numUnits?: number;
+  avgPricePerUnit?: number;
+  location?: string;
+  accountType?: string;
+  balance?: number;
 }
 
 declare interface IAssetListData {

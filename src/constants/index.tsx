@@ -63,4 +63,15 @@ export const CATEGORIES = {
 export const TRANSACTION_TYPES = {
   buy: 'BUY',
   sell: 'SELL',
+  deposit: 'DEPOSIT',
+  withdraw: 'WITHDRAW',
+  appreciation: 'APPRECIATION',
+  depreciation: 'DEPRECIATION',
+};
+
+export const ACCOUNT_TYPES = {
+  current: 'Current',
+  deposit: 'Deposit',
+  business: 'Business',
+  student: 'Student',
 };

@@ -1,4 +1,4 @@
-import { CATEGORIES } from '@/constants';
+import { ACCOUNT_TYPES, CATEGORIES } from '@/constants';
 import { Schema, model, models } from 'mongoose';
 
 export const AssetSchema = new Schema(
@@ -32,27 +32,28 @@ export const AssetSchema = new Schema(
     },
 
     // Fields for stocks/crypto
-    numShares: {
+    numUnits: {
       type: Number,
       required: false,
       default: 0,
     },
-    avgPricePerShare: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-
-    // Fields for real estate & car
-    depreciation: {
+    avgPricePerUnit: {
       type: Number,
       required: false,
       default: 0,
     },
 
-    // For accounts, "Checking", "Savings"
+    // For real estate
+    location: {
+      type: String,
+      required: false,
+      default: null,
+    },
+
+    // For accounts
     accountType: {
       type: String,
+      enum: Object.values(ACCOUNT_TYPES),
       required: false,
       default: null,
     },
