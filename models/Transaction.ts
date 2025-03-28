@@ -1,3 +1,4 @@
+import { TRANSACTION_TYPES } from '@/constants';
 import { Schema, model, models } from 'mongoose';
 
 const TransactionSchema = new Schema(
@@ -12,22 +13,30 @@ const TransactionSchema = new Schema(
       ref: 'Asset',
       required: true,
     },
+    type: {
+      type: String,
+      enum: Object.values(TRANSACTION_TYPES),
+      required: true,
+    },
+
+    // Number of shares, deposit amount, or value change
     amount: {
       type: Number,
       required: true,
     },
-    type: {
-      type: String,
+    // Price per unit (only for stocks/crypto)
+    pricePerUnit: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    // Total transaction cost (amount * price)
+    total: {
+      type: Number,
       required: true,
     },
-    numShares: {
-      type: Number,
-      required: false,
-    },
-    pricePerShare: {
-      type: Number,
-      required: false,
-    },
+
+    // First transaction for the asset
     isFirst: {
       type: Boolean,
       required: false,

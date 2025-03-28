@@ -1,3 +1,4 @@
+import { CATEGORIES } from '@/constants';
 import { Schema, model, models } from 'mongoose';
 
 export const AssetSchema = new Schema(
@@ -7,21 +8,58 @@ export const AssetSchema = new Schema(
       ref: 'User',
       required: true,
     },
-    category: {
-      type: String,
-      required: true,
-    },
     name: {
       type: String,
       required: true,
     },
-    shareValue: {
-      type: Number,
+    category: {
+      type: String,
+      enum: Object.values(CATEGORIES),
       required: true,
     },
-    detail: {
+
+    // Total cost basis or purchase price
+    cost: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    // Current market/appraised value
+    value: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+
+    // Fields for stocks/crypto
+    numShares: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    avgPricePerShare: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+
+    // Fields for real estate & car
+    depreciation: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+
+    // For accounts, "Checking", "Savings"
+    accountType: {
       type: String,
       required: false,
+      default: null,
+    },
+    balance: {
+      type: Number,
+      required: false,
+      default: 0,
     },
   },
   {
