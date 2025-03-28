@@ -1,4 +1,5 @@
 import clsx from 'clsx/lite';
+import { ChangeEvent } from 'react';
 
 interface IProps {
   type?: string;
@@ -8,6 +9,8 @@ interface IProps {
   placeholder?: string;
   required?: boolean;
   defaultValue?: number | string | undefined;
+  value?: number | string | undefined;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Input = ({
@@ -18,6 +21,8 @@ const Input = ({
   placeholder = 'e.g. Apple Stock',
   required = false,
   defaultValue,
+  value,
+  onChange,
 }: IProps) => {
   const classNames = clsx(
     `bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white ${classes}`
@@ -31,6 +36,8 @@ const Input = ({
       placeholder={placeholder}
       required={required}
       defaultValue={defaultValue}
+      value={value}
+      onChange={onChange}
     />
   );
 };

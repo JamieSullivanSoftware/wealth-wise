@@ -5,7 +5,7 @@ import { TRANSACTION_TYPES } from '@/constants';
 import Asset from '@/models/Asset';
 import Transaction from '@/models/Transaction';
 import { getSessionUser } from '@/utils/getSessionUser';
-import { hasCategoryGotShares, isBuyType } from '@/utils/misc';
+import { isStocksOrCrypto, isBuyType } from '@/utils/misc';
 
 export const addTransaction = async (formData: FormData) => {
   await connectDB();
@@ -176,14 +176,14 @@ export const editTransaction = async (formData: FormData, id: string) => {
 };
 
 const calculateUpdatedSharesAndCost = (
-  asset: IAssetData,
+  asset: IAssetTableData,
   amount: number,
   numShares: number,
   type: string
 ) => {
   let updatedNumShares = 0;
   let updatedCost = 0;
-  if (hasCategoryGotShares(asset.category)) {
+  if (isStocksOrCrypto(asset.category)) {
     if (type === TRANSACTION_TYPES.buy) {
       updatedNumShares = asset.numShares + numShares;
       updatedCost = asset.cost + amount;

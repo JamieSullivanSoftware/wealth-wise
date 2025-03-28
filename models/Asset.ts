@@ -1,4 +1,3 @@
-import { ACCOUNT_TYPES, CATEGORIES } from '@/constants';
 import { Schema, model, models } from 'mongoose';
 
 export const AssetSchema = new Schema(
@@ -14,7 +13,6 @@ export const AssetSchema = new Schema(
     },
     category: {
       type: String,
-      enum: Object.values(CATEGORIES),
       required: true,
     },
 
@@ -31,20 +29,15 @@ export const AssetSchema = new Schema(
       default: 0,
     },
 
-    // Fields for stocks/crypto
+    // For stocks/crypto
     numUnits: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    avgPricePerUnit: {
       type: Number,
       required: false,
       default: 0,
     },
 
     // For real estate
-    location: {
+    address: {
       type: String,
       required: false,
       default: null,
@@ -53,14 +46,8 @@ export const AssetSchema = new Schema(
     // For accounts
     accountType: {
       type: String,
-      enum: Object.values(ACCOUNT_TYPES),
       required: false,
-      default: null,
-    },
-    balance: {
-      type: Number,
-      required: false,
-      default: 0,
+      default: '',
     },
   },
   {

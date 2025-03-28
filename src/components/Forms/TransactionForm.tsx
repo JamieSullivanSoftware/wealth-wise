@@ -15,7 +15,7 @@ import {
 interface IProps {
   assetList: IAssetListData[];
   onTransactionAdded: () => void;
-  transaction?: ITransactionData;
+  transaction?: ITransactionTableData;
 }
 
 const TransactionForm = ({
@@ -64,6 +64,13 @@ const TransactionForm = ({
       return Object.values(TRANSACTION_TYPES).filter(
         (type: string) =>
           type === TRANSACTION_TYPES.buy || type === TRANSACTION_TYPES.sell
+      );
+    }
+    if (isRealEstateCarOrOther(selectedAsset?.category)) {
+      return Object.values(TRANSACTION_TYPES).filter(
+        (type: string) =>
+          type === TRANSACTION_TYPES.appreciation ||
+          type === TRANSACTION_TYPES.depreciation
       );
     }
     if (isAccount(selectedAsset?.category)) {

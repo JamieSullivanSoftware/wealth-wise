@@ -5,14 +5,14 @@ declare interface IPaginatedData {
 }
 
 declare interface IPaginatedAssets extends IPaginatedData {
-  assets: IAssetData[];
+  assets: IAssetTableData[];
 }
 
 declare interface IPaginatedTransactions extends IPaginatedData {
-  transactions: ITransactionData[];
+  transactions: ITransactionTableData[];
 }
 
-declare interface IAssetData {
+declare interface IAssetTableData {
   _id: string;
   createdAt: Date;
   name: string;
@@ -21,9 +21,9 @@ declare interface IAssetData {
   value: number;
   numUnits?: number;
   avgPricePerUnit?: number;
-  location?: string;
+  address?: string;
   accountType?: string;
-  balance?: number;
+  diffPercentage: number;
 }
 
 declare interface IAssetListData {
@@ -38,7 +38,7 @@ declare interface ITransactionAssetData {
   category: string;
 }
 
-declare interface ITransactionData {
+declare interface ITransactionTableData {
   _id: string;
   amount: number;
   type: TransactionType;

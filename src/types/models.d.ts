@@ -1,25 +1,48 @@
-declare type TransactionType = 'Buy' | 'Sell';
+declare enum TransactionType {
+  BUY = 'BUY',
+  SELL = 'SELL',
+  DEPOSIT = 'DEPOSIT',
+  WITHDRAW = 'WITHDRAW',
+  APPRECIATION = 'APPRECIATION',
+  DEPRECIATION = 'DEPRECIATION',
+}
 
-declare interface ITransaction {
-  _id: string;
-  type: TransactionType;
+declare enum AccountType {
+  CURRENT = 'Current',
+  DEPOSIT = 'Deposit',
+  BUSINESS = 'Business',
+  STUDENT = 'Student',
+}
+
+declare interface ITransactionData {
   user_id: string;
   asset_id: IAsset;
+  type: TransactionType;
   amount: number;
-  updatedAssetCost: number;
-  numShares?: number;
+  pricePerUnit?: number;
+  total: number;
+  isFirst?: boolean;
+}
+
+declare interface ITransaction extends ITransactionData {
+  _id: string;
   createdAt: string;
   updatedAt: string;
 }
 
-declare interface IAsset {
+declare interface IAssetData {
+  user_id?: string;
+  name?: string;
+  category?: string;
+  cost?: number;
+  value?: number;
+  numUnits?: number;
+  address?: string;
+  accountType?: AccountType | string;
+}
+
+declare interface IAsset extends IAssetData {
   _id: string;
-  user_id: string;
-  category: string;
-  name: string;
-  cost: number;
-  value: number;
-  numShares?: number;
   createdAt: string;
   updatedAt: string;
 }

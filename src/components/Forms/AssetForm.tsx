@@ -4,7 +4,7 @@ import Select from './Select';
 import { ACCOUNT_TYPES, CATEGORIES } from '@/constants';
 import Button from '../Common/Button';
 import { addAsset, editAsset } from '@/app/actions/assets';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import {
   isAccount,
   isRealEstateCarOrOther,
@@ -13,20 +13,23 @@ import {
 
 interface IProps {
   onAssetAdded: () => void;
-  asset?: IAssetData;
+  asset?: IAssetTableData;
+  isModalVisible?: boolean;
 }
 
-const AssetForm = ({ onAssetAdded, asset }: IProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>(
-    asset?.category || ''
-  );
-  const [selectedAccountType, setSelectedAccountType] = useState<string>(
-    asset?.accountType || ''
-  );
+const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
+  const [formData, setFormData] = useState<IAssetData>({
+    name: '',
+    category: '',
+    numUnits: 0,
+    cost: 0,
+    value: 0,
+    address: '',
+    accountType: '',
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
 
     try {
       if (asset) {
@@ -34,26 +37,65 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
       } else {
         await addAsset(formData);
       }
-      await onAssetAdded();
+
+      onAssetAdded();
     } catch (error) {
       console.error('Failed to submit asset:', error);
     }
   };
 
+  const handleOnChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
+  ) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value,
+    });
+  };
+
   const handleOnSelectCategory = (category: string = '') => {
-    setSelectedCategory(category);
+    setFormData({
+      ...formData,
+      category,
+    });
   };
 
   const handleOnSelectAccountType = (accountType: string = '') => {
-    setSelectedCategory(accountType);
+    setFormData({
+      ...formData,
+      accountType: accountType as AccountType,
+    });
+  };
+
+  const resetFormData = () => {
+    setFormData({
+      name: '',
+      category: '',
+      numUnits: 0,
+      cost: 0,
+      value: 0,
+      address: '',
+      accountType: '',
+    });
   };
 
   useEffect(() => {
-    if (asset) {
-      handleOnSelectCategory(asset.category);
-      handleOnSelectAccountType(asset.accountType);
+    if (isModalVisible && !asset) {
+      resetFormData();
     }
-  }, [asset]);
+    if (asset) {
+      setFormData({
+        name: asset?.name,
+        category: asset?.category,
+        numUnits: asset?.numUnits,
+        cost: asset?.cost,
+        value: asset?.value,
+        address: asset?.address,
+        accountType: asset?.accountType as AccountType,
+      });
+    }
+  }, [asset, isModalVisible]);
 
   return (
     <form
@@ -63,15 +105,16 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
       {/* Asset Name */}
       <div>
         <Label
-          htmlFor='asset-name'
+          htmlFor='name'
           text='Asset Name'
         />
         <Input
-          name='asset-name'
-          id='asset-name'
+          name='name'
+          id='name'
           placeholder='Apple Stock'
           required
-          defaultValue={asset?.name}
+          value={formData.name}
+          onChange={handleOnChange}
         />
       </div>
 
@@ -89,45 +132,49 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
             value: category,
             label: category,
           }))}
-          value={selectedCategory}
+          value={formData.category}
           onSelect={handleOnSelectCategory}
         />
       </div>
 
       {/* Number of Units/Shares and Price - (Stocks & Crypto) */}
-      {isStocksOrCrypto(selectedCategory) && (
+      {isStocksOrCrypto(formData.category) && (
         <>
           <div>
             <Label
               htmlFor='num-units'
-              text={`Number of ${selectedCategory === CATEGORIES.stocks ? 'Shares' : 'Units'}`}
+              text={`Number of ${formData.category === CATEGORIES.stocks ? 'Shares' : 'Units'}`}
             />
             <Input
               type='number'
               name='num-units'
-              id='num-units'
+              id='numUnits'
               placeholder='5'
               required
+              value={formData.numUnits}
+              onChange={handleOnChange}
             />
           </div>
           <div>
             <Label
-              htmlFor='price-per-unit'
-              text={`Price per ${selectedCategory === CATEGORIES.stocks ? 'Share' : 'Unit'}`}
+              htmlFor='cost'
+              text={`Price per ${formData.category === CATEGORIES.stocks ? 'Share' : 'Unit'}`}
             />
             <Input
               type='number'
-              name='price-per-unit'
-              id='price-per-unit'
+              name='cost'
+              id='cost'
               placeholder='100'
               required
+              value={formData.cost}
+              onChange={handleOnChange}
             />
           </div>
         </>
       )}
 
       {/* Purchase Price - Real Estate/Cars/Other */}
-      {isRealEstateCarOrOther(selectedCategory) && (
+      {isRealEstateCarOrOther(formData.category) && (
         <>
           <div>
             <Label
@@ -140,12 +187,14 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
               id='cost'
               placeholder='50,000'
               required
+              value={formData.cost}
+              onChange={handleOnChange}
             />
           </div>
           <div>
             <Label
               htmlFor='value'
-              text='Latest Market Value'
+              text='Market Value'
             />
             <Input
               type='number'
@@ -153,9 +202,11 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
               id='value'
               placeholder='50,000'
               required
+              value={formData.value}
+              onChange={handleOnChange}
             />
           </div>
-          {selectedCategory === CATEGORIES.realEstate && (
+          {formData.category === CATEGORIES.realEstate && (
             <div>
               <Label
                 htmlFor='address'
@@ -168,6 +219,8 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
                 rows={3}
                 className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white'
                 placeholder='Address of the property...'
+                value={formData.address}
+                onChange={handleOnChange}
               />
             </div>
           )}
@@ -175,7 +228,7 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
       )}
 
       {/* Account and Balance - (Accounts) */}
-      {isAccount(selectedCategory) && (
+      {isAccount(formData.category) && (
         <>
           <div>
             <Label
@@ -184,27 +237,29 @@ const AssetForm = ({ onAssetAdded, asset }: IProps) => {
             />
             <Select
               name='account-type'
-              id='account-type'
+              id='accountType'
               placeholder='Select account type'
               options={Object.values(ACCOUNT_TYPES).map((type: string) => ({
                 value: type,
                 label: type,
               }))}
-              value={selectedAccountType}
+              value={formData.accountType}
               onSelect={handleOnSelectAccountType}
             />
           </div>
           <div>
             <Label
-              htmlFor='account-balance'
+              htmlFor='value'
               text='Account Balance'
             />
             <Input
               type='number'
-              name='account-balance'
-              id='account-balance'
+              name='value'
+              id='value'
               placeholder='1000'
               required
+              value={formData.value}
+              onChange={handleOnChange}
             />
           </div>
         </>

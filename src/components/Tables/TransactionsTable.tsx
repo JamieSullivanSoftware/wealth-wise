@@ -18,7 +18,7 @@ import TransactionForm from '../Forms/TransactionForm';
 import TablesContainer from '../Containers/TablesContainer';
 import { deleteTransaction } from '@/app/actions/transactions';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
-import { hasCategoryGotShares } from '@/utils/misc';
+import { isStocksOrCrypto } from '@/utils/misc';
 
 interface IProps {
   showFullData?: boolean;
@@ -42,7 +42,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     useState<IPaginatedTransactions | null>(null);
   const [assetList, setAssetList] = useState<IAssetListData[]>([]);
   const [selectedTransaction, setSelectedTransaction] = useState<
-    ITransactionData | undefined
+    ITransactionTableData | undefined
   >(undefined);
 
   const showHeaderButtons =
@@ -246,7 +246,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                 </div>
 
                 {paginatedTransactions.transactions.map(
-                  (transaction: ITransactionData, i: number) => {
+                  (transaction: ITransactionTableData, i: number) => {
                     const {
                       asset,
                       amount,
@@ -283,7 +283,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                           {asset.name}
                         </div>
-                        {!isFirst && hasCategoryGotShares(asset.category) && (
+                        {!isFirst && isStocksOrCrypto(asset.category) && (
                           <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
                             <IconButton
                               onClick={() => {
@@ -353,7 +353,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
               {paginatedTransactions &&
               paginatedTransactions.transactions.length > 0 ? (
                 paginatedTransactions.transactions.map(
-                  (transaction: ITransactionData, i: number) => {
+                  (transaction: ITransactionTableData, i: number) => {
                     const { asset, amount, createdAt } = transaction;
                     const date = new Date(createdAt);
 

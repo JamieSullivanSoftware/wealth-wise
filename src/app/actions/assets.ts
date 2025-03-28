@@ -1,12 +1,13 @@
 'use server';
 
 import connectDB from '@/configdatabase';
-import { TRANSACTION_TYPES } from '@/constants';
+import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
 import Asset from '@/modelsAsset';
 import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
+import { parse } from 'path';
 
-export const addAsset = async (formData: FormData) => {
+export const addAsset = async (assetData: IAssetData) => {
   await connectDB();
 
   const sessionUser = await getSessionUser();
@@ -19,29 +20,58 @@ export const addAsset = async (formData: FormData) => {
 
   const data = {
     user_id: user.id,
-    name: formData.get('asset-name'),
-    category: formData.get('category'),
-    numShares: parseFloat(formData.get('num-shares')?.toString() || '0'),
-    pricePerShare: parseFloat(
-      formData.get('price-per-share')?.toString() || '0'
-    ),
-    value: parseFloat(formData.get('value')?.toString() || '0'),
-    detail: formData.get('detail'),
+    name: assetData.name || '',
+    category: assetData.category || '',
+    numUnits: parseFloat(assetData.numUnits?.toString() || '0'),
+    cost: parseFloat(assetData.cost?.toString() || '0'),
+    value: parseFloat(assetData.value?.toString() || '0'),
+    address: assetData.address || '',
+    accountType: assetData.accountType || '',
   };
 
   try {
     const asset = new Asset(data);
     const newAsset = await asset.save();
 
-    const transaction = {
-      user_id: user.id,
-      asset_id: newAsset._id,
-      amount: data.pricePerShare * data.numShares,
-      type: TRANSACTION_TYPES.buy,
-      numShares: data.numShares,
-      pricePerShare: data.pricePerShare,
+    let transaction: ITransactionData = {
+      user_id: user.id?.toString() || '',
+      asset_id: newAsset._id?.toString() || '',
+      type: TRANSACTION_TYPES.deposit as TransactionType,
       isFirst: true,
+      amount: data.value,
+      pricePerUnit: 0,
+      total: 0,
     };
+
+    switch (data.category) {
+      case CATEGORIES.cars:
+      case CATEGORIES.realEstate:
+      case CATEGORIES.other:
+        const isAppreciation = data.value > data.cost;
+        const type = isAppreciation
+          ? TRANSACTION_TYPES.appreciation
+          : TRANSACTION_TYPES.depreciation;
+        transaction = {
+          ...transaction,
+          type: type as TransactionType,
+          amount: data.value - data.cost,
+          total: data.cost,
+        };
+        break;
+      case CATEGORIES.crypto:
+      case CATEGORIES.stocks:
+        transaction = {
+          ...transaction,
+          type: TRANSACTION_TYPES.buy as TransactionType,
+          amount: data.numUnits,
+          pricePerUnit: data.cost,
+          total: data.numUnits * data.cost,
+        };
+        break;
+      default:
+        break;
+    }
+
     await new Transaction(transaction).save();
   } catch (error) {
     console.log(error);
@@ -76,7 +106,7 @@ export const deleteAsset = async (id: string) => {
   }
 };
 
-export const editAsset = async (formData: FormData, id: string) => {
+export const editAsset = async (formData: IAssetData, id: string) => {
   await connectDB();
 
   const sessionUser = await getSessionUser();
@@ -85,17 +115,17 @@ export const editAsset = async (formData: FormData, id: string) => {
     throw new Error('You must be logged in to edit an asset');
   }
 
-  const assetData = {
-    name: formData.get('asset-name'),
-    category: formData.get('category'),
-    value: parseFloat(formData.get('value')?.toString() || '0'),
-    detail: formData.get('detail'),
-  };
+  // const assetData = {
+  //   name: formData.get('asset-name'),
+  //   category: formData.get('category'),
+  //   value: parseFloat(formData.get('value')?.toString() || '0'),
+  //   detail: formData.get('detail'),
+  // };
 
-  try {
-    await Asset.updateOne({ _id: id }, { $set: assetData });
-  } catch (error) {
-    console.log(error);
-    return new Response('Asset not updated', { status: 500 });
-  }
+  // try {
+  //   await Asset.updateOne({ _id: id }, { $set: assetData });
+  // } catch (error) {
+  //   console.log(error);
+  //   return new Response('Asset not updated', { status: 500 });
+  // }
 };

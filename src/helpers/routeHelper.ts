@@ -179,10 +179,10 @@ export const getTransactionsAmountAndShares = () => [
   },
   {
     $addFields: {
-      totalCost: {
+      totalTransactionAmount: {
         $sum: '$transactions.amount',
       },
-      numShares: {
+      remainingShares: {
         $sum: '$transactions.numShares',
       },
     },

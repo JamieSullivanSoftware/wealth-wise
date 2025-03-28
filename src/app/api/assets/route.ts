@@ -5,6 +5,7 @@ import connectDB from '@/config/database';
 import Asset from '@/models/Asset';
 import { getSessionUser } from '@/utils/getSessionUser';
 import { getTransactionsAmountAndShares } from '@/helpers/routeHelper';
+import { CATEGORIES } from '@/constants';
 
 export const GET = async (request: NextRequest) => {
   try {
@@ -36,26 +37,64 @@ export const GET = async (request: NextRequest) => {
               },
             },
             ...getTransactionsAmountAndShares(),
+            // {
+            //   $addFields: {
+            //     marketValue: {
+            //       $sum: {
+            //         $multiply: [
+            //           { $ifNull: ['$value', 0] },
+            //           { $ifNull: ['$numShares', 0] },
+            //         ],
+            //       },
+            //     },
+            //   },
+            // },
+            // {
+            //   $addFields: {
+            //     diffTotal: {
+            //       $sum: {
+            //         $subtract: [
+            //           { $ifNull: ['$marketValue', 0] },
+            //           { $ifNull: ['$totalCost', 0] },
+            //         ],
+            //       },
+            //     },
+            //   },
+            // },
+            // Calculate Market Value Based on Asset Type
             {
               $addFields: {
                 marketValue: {
-                  $sum: {
-                    $multiply: [
-                      { $ifNull: ['$shareValue', 0] },
-                      { $ifNull: ['$numShares', 0] },
-                    ],
+                  $cond: {
+                    if: {
+                      $in: [
+                        '$category',
+                        [CATEGORIES.stocks, CATEGORIES.crypto],
+                      ],
+                    },
+                    then: { $multiply: ['$remainingShares', '$currentPrice'] },
+                    else: '$currentPrice',
                   },
                 },
-              },
-            },
-            {
-              $addFields: {
-                diffTotal: {
-                  $sum: {
-                    $subtract: [
-                      { $ifNull: ['$marketValue', 0] },
-                      { $ifNull: ['$totalCost', 0] },
-                    ],
+                unrealisedGainLoss: {
+                  $cond: {
+                    if: {
+                      $in: [
+                        '$category',
+                        [CATEGORIES.stocks, CATEGORIES.crypto],
+                      ],
+                    },
+                    then: {
+                      $subtract: [
+                        {
+                          $multiply: ['$remainingShares', '$currentPrice'],
+                        },
+                        '$totalTransactionAmount',
+                      ],
+                    },
+                    else: {
+                      $subtract: ['$currentPrice', '$purchasePrice'], // Appreciation/Depreciation
+                    },
                   },
                 },
               },
@@ -67,37 +106,43 @@ export const GET = async (request: NextRequest) => {
                 createdAt: 1,
                 name: 1,
                 category: 1,
-                numShares: 1,
-                shareValue: 1,
-                totalCost: 1,
-                diffTotal: 1,
+                remainingShares: 1,
+                totalTransactionAmount: 1,
+                unrealisedGainLoss: 1,
+                currentPrice: 1,
                 marketValue: 1,
                 detail: 1,
                 diffPercentage: {
-                  $round: [
-                    {
-                      $multiply: [
-                        {
-                          $cond: {
-                            if: {
-                              $or: [
-                                { $eq: ['$diffTotal', 0] },
-                                { $eq: ['$totalCost', 0] },
-                                { $not: ['$totalCost'] },
-                              ],
-                            },
-                            then: 0,
-                            else: {
-                              $divide: ['$diffTotal', '$totalCost'],
-                            },
-                          },
-                        },
-                        100,
-                      ],
-                    },
-                    2,
-                  ],
+                  $sum: 0,
                 },
+                // diffPercentage: {
+                //   $round: [
+                //     {
+                //       $multiply: [
+                //         {
+                //           $cond: {
+                //             if: {
+                //               $or: [
+                //                 { $eq: ['$unrealisedGainLoss', 0] },
+                //                 { $eq: ['$totalTransactionAmount', 0] },
+                //                 { $not: ['$totalTransactionAmount'] },
+                //               ],
+                //             },
+                //             then: 0,
+                //             else: {
+                //               $divide: [
+                //                 '$unrealisedGainLoss',
+                //                 '$totalTransactionAmount',
+                //               ],
+                //             },
+                //           },
+                //         },
+                //         100,
+                //       ],
+                //     },
+                //     2,
+                //   ],
+                // },
               },
             },
             {

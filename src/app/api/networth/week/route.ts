@@ -3,6 +3,7 @@ import { Types, type PipelineStage } from 'mongoose';
 import {
   formatCategories,
   generateCumulatedNetworth,
+  getTransactionsAmountAndShares,
 } from '@/helpers/routeHelper';
 import Asset from '@/models/Asset';
 import connectDB from '@/configdatabase';
@@ -34,6 +35,7 @@ export const GET = async () => {
                 user_id: userId,
               },
             },
+            ...getTransactionsAmountAndShares(),
             {
               $group: {
                 _id: null,
@@ -41,7 +43,7 @@ export const GET = async () => {
                   $sum: {
                     $subtract: [
                       { $ifNull: ['$value', 0] },
-                      { $ifNull: ['$cost', 0] },
+                      { $ifNull: ['$totalTransAmount', 0] },
                     ],
                   },
                 },
@@ -57,12 +59,14 @@ export const GET = async () => {
                 },
               },
             },
+            ...getTransactionsAmountAndShares(),
             {
               $group: {
                 _id: '$category',
+                numShares: { $sum: '$numShares' },
                 total: {
                   $sum: {
-                    $subtract: ['$value', '$cost'],
+                    $subtract: ['$value', '$totalTransAmount'],
                   },
                 },
               },
@@ -78,6 +82,7 @@ export const GET = async () => {
                 },
               },
             },
+            ...getTransactionsAmountAndShares(),
             {
               $group: {
                 _id: {
@@ -90,7 +95,7 @@ export const GET = async () => {
                   $sum: {
                     $subtract: [
                       { $ifNull: ['$value', 0] },
-                      { $ifNull: ['$cost', 0] },
+                      { $ifNull: ['$totalTransAmount', 0] },
                     ],
                   },
                 },
@@ -112,72 +117,72 @@ export const GET = async () => {
       },
 
       // Step 2: Simplify the filtered data
-      {
-        $project: {
-          baseNetworth: { $arrayElemAt: ['$baseNetworth.total', 0] },
-          existingData: '$afterStartDateTotals',
-          categories: '$categories',
-        },
-      },
+      // {
+      //   $project: {
+      //     baseNetworth: { $arrayElemAt: ['$baseNetworth.total', 0] },
+      //     existingData: '$afterStartDateTotals',
+      //     categories: '$categories',
+      //   },
+      // },
 
       // Step 3: Create an array of dates after the start date
-      {
-        $addFields: {
-          dateArray: {
-            $map: {
-              input: {
-                $range: [
-                  {
-                    $toInt: {
-                      $divide: [
-                        {
-                          $toLong: {
-                            $dateSubtract: {
-                              startDate: today,
-                              unit: 'day',
-                              amount: 6,
-                            },
-                          },
-                        },
-                        1000,
-                      ],
-                    },
-                  },
-                  {
-                    $toInt: {
-                      $divide: [
-                        {
-                          $toLong: {
-                            $dateAdd: {
-                              startDate: today,
-                              unit: 'day',
-                              amount: 1,
-                            },
-                          },
-                        },
-                        1000,
-                      ],
-                    },
-                  },
-                  86400,
-                ],
-              },
-              as: 'date',
-              in: {
-                $dateToString: {
-                  format: '%Y-%m-%d',
-                  date: {
-                    $toDate: {
-                      $multiply: ['$$date', 1000],
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-      ...generateCumulatedNetworth('dateArray', 'existingData', 'baseNetworth'),
+      // {
+      //   $addFields: {
+      //     dateArray: {
+      //       $map: {
+      //         input: {
+      //           $range: [
+      //             {
+      //               $toInt: {
+      //                 $divide: [
+      //                   {
+      //                     $toLong: {
+      //                       $dateSubtract: {
+      //                         startDate: today,
+      //                         unit: 'day',
+      //                         amount: 6,
+      //                       },
+      //                     },
+      //                   },
+      //                   1000,
+      //                 ],
+      //               },
+      //             },
+      //             {
+      //               $toInt: {
+      //                 $divide: [
+      //                   {
+      //                     $toLong: {
+      //                       $dateAdd: {
+      //                         startDate: today,
+      //                         unit: 'day',
+      //                         amount: 1,
+      //                       },
+      //                     },
+      //                   },
+      //                   1000,
+      //                 ],
+      //               },
+      //             },
+      //             86400,
+      //           ],
+      //         },
+      //         as: 'date',
+      //         in: {
+      //           $dateToString: {
+      //             format: '%Y-%m-%d',
+      //             date: {
+      //               $toDate: {
+      //                 $multiply: ['$$date', 1000],
+      //               },
+      //             },
+      //           },
+      //         },
+      //       },
+      //     },
+      //   },
+      // },
+      // ...generateCumulatedNetworth('dateArray', 'existingData', 'baseNetworth'),
     ];
 
     const data = await Asset.aggregate(pipeline).exec();

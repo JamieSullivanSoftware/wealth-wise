@@ -42,9 +42,9 @@ const AssetsTable = ({ showFullData }: IProps) => {
   const [limit, setLimit] = useState<number>(5);
   const [paginatedAssets, setPaginatedAssets] =
     useState<IPaginatedAssets | null>(null);
-  const [selectedAsset, setSelectedAsset] = useState<IAssetData | undefined>(
-    undefined
-  );
+  const [selectedAsset, setSelectedAsset] = useState<
+    IAssetTableData | undefined
+  >(undefined);
 
   const showHeaderButtons =
     showFullData &&
@@ -119,7 +119,10 @@ const AssetsTable = ({ showFullData }: IProps) => {
         onClose={() => setShowAddModal(false)}
         heading='Add Asset'
       >
-        <AssetForm onAssetAdded={refetchAssets} />
+        <AssetForm
+          onAssetAdded={refetchAssets}
+          isModalVisible={showAddModal}
+        />
       </Modal>
       <Modal
         show={showEditModal}
@@ -129,6 +132,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
         <AssetForm
           onAssetAdded={refetchAssets}
           asset={selectedAsset}
+          isModalVisible={showEditModal}
         />
       </Modal>
       <Modal
@@ -240,71 +244,72 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   </div>
                   <div className='col-span-1' />
                 </div>
-                {paginatedAssets.assets.map((asset: IAssetData, i: number) => {
-                  const {
-                    createdAt,
-                    name,
-                    category,
-                    cost,
-                    value,
-                    diffPercentage,
-                    detail,
-                    numShares,
-                  } = asset;
-                  return (
-                    <div
-                      key={i}
-                      className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm px-2 rounded-md'
-                    >
-                      <div className='col-span-3 sm:col-span-2 flex flex-wrap items-center'>
-                        {getEuropeanYear(new Date(createdAt))}
+                {paginatedAssets.assets.map(
+                  (asset: IAssetTableData, i: number) => {
+                    const {
+                      createdAt,
+                      name,
+                      category,
+                      cost,
+                      value,
+                      diffPercentage,
+                      numUnits,
+                    } = asset;
+                    return (
+                      <div
+                        key={i}
+                        className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm px-2 rounded-md'
+                      >
+                        <div className='col-span-3 sm:col-span-2 flex flex-wrap items-center'>
+                          {getEuropeanYear(new Date(createdAt))}
+                        </div>
+                        <div className='justify-center col-span-6 flex flex-col flex-wrap gap-2 sm:justify-start sm:col-span-2'>
+                          <span className='font-medium'>{name}</span>
+                          <span className='font-light'>
+                            {category === CATEGORIES.stocks ||
+                            category === CATEGORIES.crypto
+                              ? `${numUnits} Share${numUnits === 1 ? '' : 's'}`
+                              : 'nada'}
+                          </span>
+                        </div>
+                        <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-1'>
+                          {category}
+                        </div>
+                        <div className='col-span-3 flex flex-wrap justify-end items-center sm:col-span-2'>
+                          <AssetsChange diffPercentage={diffPercentage} />
+                        </div>
+                        <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:justify-end sm:col-span-2'>
+                          {currencyFormat.format(cost)}
+                        </div>
+                        <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
+                          {currencyFormat.format(value)}
+                        </div>
+                        <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
+                          <IconButton
+                            onClick={() => {
+                              setSelectedAsset(asset);
+                              setShowEditModal(true);
+                            }}
+                            icon={faPencilAlt}
+                            iconSize='sm'
+                            iconColor='#197f4c'
+                            classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
+                          />
+                          <IconButton
+                            onClick={() => {
+                              setSelectedAsset(asset);
+                              setShowDeleteModal(true);
+                            }}
+                            icon={faTrashAlt}
+                            iconSize='sm'
+                            iconColor='#e52020'
+                            classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
+                          />
+                        </div>
                       </div>
-                      <div className='justify-center col-span-6 flex flex-col flex-wrap gap-2 sm:justify-start sm:col-span-2'>
-                        <span className='font-medium'>{name}</span>
-                        <span className='font-light'>
-                          {category === CATEGORIES.stocks ||
-                          category === CATEGORIES.crypto
-                            ? `${numShares} Share${numShares === 1 ? '' : 's'}`
-                            : detail}
-                        </span>
-                      </div>
-                      <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-1'>
-                        {category}
-                      </div>
-                      <div className='col-span-3 flex flex-wrap justify-end items-center sm:col-span-2'>
-                        <AssetsChange diffPercentage={diffPercentage} />
-                      </div>
-                      <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:justify-end sm:col-span-2'>
-                        {currencyFormat.format(cost)}
-                      </div>
-                      <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
-                        {currencyFormat.format(value)}
-                      </div>
-                      <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
-                        <IconButton
-                          onClick={() => {
-                            setSelectedAsset(asset);
-                            setShowEditModal(true);
-                          }}
-                          icon={faPencilAlt}
-                          iconSize='sm'
-                          iconColor='#197f4c'
-                          classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
-                        />
-                        <IconButton
-                          onClick={() => {
-                            setSelectedAsset(asset);
-                            setShowDeleteModal(true);
-                          }}
-                          icon={faTrashAlt}
-                          iconSize='sm'
-                          iconColor='#e52020'
-                          classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  }
+                )}
               </div>
               <Paginator
                 totalCount={paginatedAssets.totalCount}
@@ -351,31 +356,33 @@ const AssetsTable = ({ showFullData }: IProps) => {
                 </div>
               )}
               {paginatedAssets && paginatedAssets.assets?.length > 0 ? (
-                paginatedAssets.assets.map((asset: IAssetData, i: number) => (
-                  <div
-                    key={i}
-                    className='grid grid-cols-12 py-4 text-xs text-black dark:text-white xsm:text-sm'
-                  >
-                    <div className='col-span-3 flex flex-col gap-2 flex-wrap'>
-                      <span className='font-medium'>{asset.name}</span>
-                      <span className='font-light overflow-hidden whitespace-nowrap text-ellipsis 2xsm:inline-block hidden 2lg:w-[180px] md:w-[200px] xsm:w-[140px] 2xsm:w-[90px]'>
-                        {asset.category === CATEGORIES.stocks ||
-                        asset.category === CATEGORIES.crypto
-                          ? `${asset.numShares} Share${asset.numShares > 1 ? 's' : ''}`
-                          : `${asset.detail}`}
-                      </span>
+                paginatedAssets.assets.map(
+                  (asset: IAssetTableData, i: number) => (
+                    <div
+                      key={i}
+                      className='grid grid-cols-12 py-4 text-xs text-black dark:text-white xsm:text-sm'
+                    >
+                      <div className='col-span-3 flex flex-col gap-2 flex-wrap'>
+                        <span className='font-medium'>{asset.name}</span>
+                        <span className='font-light overflow-hidden whitespace-nowrap text-ellipsis 2xsm:inline-block hidden 2lg:w-[180px] md:w-[200px] xsm:w-[140px] 2xsm:w-[90px]'>
+                          {asset.category === CATEGORIES.stocks ||
+                          asset.category === CATEGORIES.crypto
+                            ? `${asset.numUnits} Share${asset.numUnits && asset.numUnits > 1 ? 's' : ''}`
+                            : `nada`}
+                        </span>
+                      </div>
+                      <div className='col-span-3 flex flex-wrap justify-center 2lg:justify-end items-center'>
+                        <AssetsChange diffPercentage={asset.diffPercentage} />
+                      </div>
+                      <div className='col-span-3 flex flex-wrap justify-center items-center 2lg:justify-end'>
+                        {currencyFormat.format(asset.cost)}
+                      </div>
+                      <div className='col-span-3 flex flex-wrap justify-end items-center'>
+                        {currencyFormat.format(asset.value)}
+                      </div>
                     </div>
-                    <div className='col-span-3 flex flex-wrap justify-center 2lg:justify-end items-center'>
-                      <AssetsChange diffPercentage={asset.diffPercentage} />
-                    </div>
-                    <div className='col-span-3 flex flex-wrap justify-center items-center 2lg:justify-end'>
-                      {currencyFormat.format(asset.cost)}
-                    </div>
-                    <div className='col-span-3 flex flex-wrap justify-end items-center'>
-                      {currencyFormat.format(asset.value)}
-                    </div>
-                  </div>
-                ))
+                  )
+                )
               ) : (
                 <div className='flex flex-col justify-center min-h-[500px]'>
                   <NoResults
