@@ -12,7 +12,7 @@ export const GET = async () => {
     const userId =
       sessionUser && sessionUser.userId
         ? new Types.ObjectId(sessionUser.userId)
-        : new Types.ObjectId(process.env.DEFAULT_userId);
+        : new Types.ObjectId(process.env.DEFAULT_USER_ID);
 
     const pipeline: PipelineStage[] = [
       {

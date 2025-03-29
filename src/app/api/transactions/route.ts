@@ -14,7 +14,7 @@ export const GET = async (request: NextRequest) => {
     const userId =
       sessionUser && sessionUser.userId
         ? new Types.ObjectId(sessionUser.userId)
-        : new Types.ObjectId(process.env.DEFAULT_userId);
+        : new Types.ObjectId(process.env.DEFAULT_USER_ID);
 
     // Extract query parameters
     const limit = Number(request.nextUrl.searchParams.get('limit')) || 5;
