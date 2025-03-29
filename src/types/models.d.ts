@@ -3,8 +3,6 @@ declare enum TransactionType {
   SELL = 'SELL',
   DEPOSIT = 'DEPOSIT',
   WITHDRAW = 'WITHDRAW',
-  APPRECIATION = 'APPRECIATION',
-  DEPRECIATION = 'DEPRECIATION',
 }
 
 declare enum AccountType {
@@ -19,8 +17,8 @@ declare interface ITransactionData {
   assetId?: IAsset | string;
   type?: TransactionType | string;
   amount?: number;
+  numUnits?: number;
   pricePerUnit?: number;
-  total?: number;
   isFirst?: boolean;
 }
 
@@ -36,7 +34,9 @@ declare interface IAssetData {
   category?: string;
   cost?: number;
   value?: number;
+  marketValue?: number;
   numUnits?: number;
+  avgPricePerUnit?: number;
   address?: string;
   accountType?: AccountType | string;
 }

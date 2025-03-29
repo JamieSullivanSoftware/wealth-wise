@@ -54,12 +54,10 @@ export const addTransaction = async (transactionData: ITransactionData) => {
         transaction.total = -transaction.amount * transaction.pricePerUnit;
         break;
       case TRANSACTION_TYPES.deposit:
-      case TRANSACTION_TYPES.appreciation:
         assetValue += transaction.amount;
         transaction.total = transaction.amount;
         break;
       case TRANSACTION_TYPES.withdraw:
-      case TRANSACTION_TYPES.depreciation:
         assetValue -= transaction.amount;
         transaction.total = -transaction.amount;
         break;

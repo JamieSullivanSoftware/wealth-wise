@@ -21,9 +21,9 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
   const [formData, setFormData] = useState<IAssetData>({
     name: '',
     category: '',
-    numUnits: 0,
-    cost: 0,
-    value: 0,
+    cost: undefined,
+    value: undefined,
+    numUnits: undefined,
     address: '',
     accountType: '',
   });
@@ -72,9 +72,9 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
     setFormData({
       name: '',
       category: '',
-      numUnits: 0,
-      cost: 0,
-      value: 0,
+      cost: undefined,
+      value: undefined,
+      numUnits: undefined,
       address: '',
       accountType: '',
     });
@@ -88,9 +88,9 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       setFormData({
         name: asset?.name,
         category: asset?.category,
-        numUnits: asset?.numUnits,
         cost: asset?.cost,
         value: asset?.value,
+        numUnits: asset?.numUnits,
         address: asset?.address,
         accountType: asset?.accountType as AccountType,
       });
@@ -137,13 +137,13 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
         />
       </div>
 
-      {/* Number of Units/Shares and Price - (Stocks & Crypto) */}
+      {/* Number of Units and Price - (Stocks & Crypto) */}
       {isStocksOrCrypto(formData.category) && (
         <>
           <div>
             <Label
               htmlFor='num-units'
-              text={`Number of ${formData.category === CATEGORIES.stocks ? 'Shares' : 'Units'}`}
+              text={`Number of ${formData.category === CATEGORIES.stocks ? 'Shares' : 'Coins'}`}
             />
             <Input
               type='number'
@@ -158,7 +158,7 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
           <div>
             <Label
               htmlFor='cost'
-              text={`Price per ${formData.category === CATEGORIES.stocks ? 'Share' : 'Unit'}`}
+              text={`Price per ${formData.category === CATEGORIES.stocks ? 'Share' : 'Coin'}`}
             />
             <Input
               type='number'
@@ -227,7 +227,7 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
         </>
       )}
 
-      {/* Account and Balance - (Accounts) */}
+      {/* Account Type - (Accounts) */}
       {isAccount(formData.category) && (
         <>
           <div>

@@ -12,26 +12,28 @@ const TransactionSchema = new Schema(
       ref: 'Asset',
       required: true,
     },
-    type: {
-      type: String,
-      required: true,
-    },
-
-    // Number of shares/coins, deposit amount, or market value change
     amount: {
       type: Number,
       required: true,
     },
-    // Price per unit (only for stocks/crypto)
-    pricePerUnit: {
+
+    type: {
+      type: String,
+      required: false,
+      default: '',
+    },
+    // Only for stocks/crypto
+    // Number of units
+    numUnits: {
       type: Number,
       required: false,
       default: 0,
     },
-    // Total transaction cost
-    total: {
+    // Price per unit
+    pricePerUnit: {
       type: Number,
-      required: true,
+      required: false,
+      default: 0,
     },
 
     // First transaction when creating an asset

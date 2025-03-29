@@ -28,8 +28,9 @@ const TransactionForm = ({
   const [formData, setFormData] = useState<ITransactionData>({
     assetId: '',
     type: '',
-    amount: 0,
-    pricePerUnit: 0,
+    amount: undefined,
+    numUnits: undefined,
+    pricePerUnit: undefined,
   });
   const [amountLabel, setAmountLabel] = useState<string>('');
   const [selectedAsset, setSelectedAsset] = useState<IAssetListData | null>(
@@ -81,11 +82,13 @@ const TransactionForm = ({
   };
 
   const resetFormData = () => {
+    setSelectedAsset(null);
     setFormData({
       assetId: '',
       type: '',
-      amount: 0,
-      pricePerUnit: 0,
+      amount: undefined,
+      numUnits: undefined,
+      pricePerUnit: undefined,
     });
   };
 
@@ -94,13 +97,6 @@ const TransactionForm = ({
       return Object.values(TRANSACTION_TYPES).filter(
         (type: string) =>
           type === TRANSACTION_TYPES.buy || type === TRANSACTION_TYPES.sell
-      );
-    }
-    if (isRealEstateCarOrOther(selectedAsset?.category)) {
-      return Object.values(TRANSACTION_TYPES).filter(
-        (type: string) =>
-          type === TRANSACTION_TYPES.appreciation ||
-          type === TRANSACTION_TYPES.depreciation
       );
     }
     if (isAccount(selectedAsset?.category)) {
@@ -114,20 +110,19 @@ const TransactionForm = ({
   };
 
   useEffect(() => {
-    console.log('isModalVisible', isModalVisible);
-    console.log('transaction', transaction);
-    if (isModalVisible && !transaction) {
-      resetFormData();
-    }
-    if (transaction) {
-      setSelectedAsset(transaction.asset);
-      setFormData({
-        assetId: transaction.asset._id,
-        type: transaction.type,
-        amount: transaction.amount,
-        pricePerUnit: transaction.pricePerUnit,
-        total: transaction.total,
-      });
+    if (isModalVisible) {
+      if (transaction) {
+        setSelectedAsset(transaction.asset);
+        setFormData({
+          assetId: transaction.asset._id,
+          type: transaction.type,
+          amount: transaction.amount,
+          numUnits: transaction.numUnits,
+          pricePerUnit: transaction.pricePerUnit,
+        });
+      } else {
+        resetFormData();
+      }
     }
   }, [transaction, isModalVisible]);
 
@@ -138,9 +133,6 @@ const TransactionForm = ({
           selectedAsset?.category === CATEGORIES.stocks ? 'Shares' : 'Units'
         }`
       );
-    }
-    if (isRealEstateCarOrOther(selectedAsset?.category)) {
-      setAmountLabel('Market Value');
     }
     if (isAccount(selectedAsset?.category)) {
       setAmountLabel('Amount');
@@ -164,10 +156,15 @@ const TransactionForm = ({
               name='asset-id'
               id='assetId'
               placeholder='Select asset'
-              options={assetList.map((asset: IAssetListData) => ({
-                value: asset._id,
-                label: asset.name,
-              }))}
+              options={assetList
+                .filter(
+                  (asset: IAssetListData) =>
+                    !isRealEstateCarOrOther(asset.category)
+                )
+                .map((asset: IAssetListData) => ({
+                  value: asset._id,
+                  label: asset.name,
+                }))}
               value={formData.assetId}
               onSelect={handleOnAssetSelect}
             />
@@ -226,6 +223,7 @@ const TransactionForm = ({
             id='price-per-unit'
             placeholder='100'
             required
+            value={formData.pricePerUnit}
             onChange={handleOnChange}
           />
         </div>

@@ -22,8 +22,14 @@ export const AssetSchema = new Schema(
       required: true,
       default: 0,
     },
-    // Current market/appraised value
+    // Total value
     value: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    // Current market value
+    marketValue: {
       type: Number,
       required: true,
       default: 0,
@@ -31,6 +37,12 @@ export const AssetSchema = new Schema(
 
     // For stocks/crypto
     numUnits: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    // Average price per unit
+    avgPricePerUnit: {
       type: Number,
       required: false,
       default: 0,
