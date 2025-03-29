@@ -1,16 +1,6 @@
-declare enum TransactionType {
-  BUY = 'BUY',
-  SELL = 'SELL',
-  DEPOSIT = 'DEPOSIT',
-  WITHDRAW = 'WITHDRAW',
-}
+declare type TransactionType = 'BUY' | 'SELL' | 'DEPOSIT' | 'WITHDRAW';
 
-declare enum AccountType {
-  CURRENT = 'Current',
-  DEPOSIT = 'Deposit',
-  BUSINESS = 'Business',
-  STUDENT = 'Student',
-}
+declare type AccountType = 'Current' | 'Deposit' | 'Business' | 'Student';
 
 declare interface ITransactionData {
   userId?: string;

@@ -254,7 +254,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       amount,
                       type,
                       createdAt,
-                      numShares,
+                      numUnits,
                       isFirst,
                     } = transaction;
 
@@ -269,6 +269,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         <div className='col-span-6 flex flex-wrap items-center sm:col-span-3'>
                           <TransactionAmountInfo
                             amount={amount}
+                            type={type}
                             isFullTable
                           />
                         </div>
@@ -276,9 +277,9 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                           <span className='font-medium text-sm'>
                             {type.toUpperCase()}
                           </span>
-                          {numShares && (
+                          {numUnits && (
                             <span className='text-xs text-gray-3 dark:text-white'>
-                              {`${numShares} ${numShares === 1 ? `Share` : 'Shares'}`}
+                              {`${numUnits} ${numUnits === 1 ? `Share` : 'Shares'}`}
                             </span>
                           )}
                         </div>
