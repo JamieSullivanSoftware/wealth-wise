@@ -22,6 +22,7 @@ import AssetForm from '../Forms/AssetForm';
 import TablesContainer from '../Containers/TablesContainer';
 import { deleteAsset } from '@/app/actions/assets';
 import IconButton from '../Common/IconButton';
+import { isStocksOrCrypto } from '@/utils/misc';
 
 interface IProps {
   showFullData?: boolean;
@@ -89,6 +90,33 @@ const AssetsTable = ({ showFullData }: IProps) => {
       await deleteAsset(selectedAsset._id);
       await refetchAssets();
     }
+  };
+
+  const getDetailsString = (asset: IAssetTableData) => {
+    let details = '';
+
+    switch (asset.category) {
+      case CATEGORIES.accounts:
+        details = `${asset.accountType} Account`;
+        break;
+      case CATEGORIES.crypto:
+        details = `${asset.numUnits} Coin${asset.numUnits && asset.numUnits > 1 ? 's' : ''}`;
+        break;
+      case CATEGORIES.stocks:
+        details = `${asset.numUnits} Share${asset.numUnits && asset.numUnits > 1 ? 's' : ''}`;
+        break;
+      case CATEGORIES.realEstate:
+        details = asset.address || '';
+        break;
+      case CATEGORIES.cars:
+      case CATEGORIES.other:
+        details = asset.details || '';
+        break;
+      default:
+        break;
+    }
+
+    return details;
   };
 
   useEffect(() => {
@@ -178,7 +206,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                 <div className='grid grid-cols-12 mb-2 text-xs font-medium text-black dark:text-white xsm:text-xs'>
                   <div className='col-span-3 sm:col-span-2 flex items-center'>
                     <Button
-                      text='Date'
+                      text='Created'
                       onClick={() => handleSort('createdAt')}
                       icon={faSort}
                       iconAlign='right'
@@ -211,18 +239,18 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   </div>
                   <div className='col-span-3 flex justify-end items-center sm:col-span-2'>
                     <Button
-                      text='Change'
-                      onClick={() => handleSort('diffPercentage')}
+                      text='Gains/Loss'
+                      onClick={() => handleSort('gainsLossPercentage')}
                       icon={faSort}
                       iconAlign='right'
                       hasBg={false}
                       iconSize='xs'
-                      classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'diffPercentage' ? 'font-bold' : 'font-normal'}`}
+                      classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'gainsLossPercentage' ? 'font-bold' : 'font-normal'}`}
                     />
                   </div>
                   <div className='hidden col-span-3 sm:flex justify-center items-center sm:justify-end sm:col-span-2'>
                     <Button
-                      text='Cost'
+                      text='Total Cost'
                       onClick={() => handleSort('cost')}
                       icon={faSort}
                       iconAlign='right'
@@ -233,7 +261,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   </div>
                   <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
                     <Button
-                      text='Value'
+                      text='Market Value'
                       onClick={() => handleSort('value')}
                       icon={faSort}
                       iconAlign='right'
@@ -251,9 +279,10 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       name,
                       category,
                       cost,
+                      totalCostBasis,
                       value,
-                      diffPercentage,
-                      numUnits,
+                      marketValue,
+                      gainsLossPercentage,
                     } = asset;
                     return (
                       <div
@@ -266,23 +295,26 @@ const AssetsTable = ({ showFullData }: IProps) => {
                         <div className='justify-center col-span-6 flex flex-col flex-wrap gap-2 sm:justify-start sm:col-span-2'>
                           <span className='font-medium'>{name}</span>
                           <span className='font-light'>
-                            {category === CATEGORIES.stocks ||
-                            category === CATEGORIES.crypto
-                              ? `${numUnits} Share${numUnits === 1 ? '' : 's'}`
-                              : 'nada'}
+                            {getDetailsString(asset)}
                           </span>
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-1'>
                           {category}
                         </div>
                         <div className='col-span-3 flex flex-wrap justify-end items-center sm:col-span-2'>
-                          <AssetsChange diffPercentage={diffPercentage} />
+                          <AssetsChange
+                            gainsLossPercentage={gainsLossPercentage}
+                          />
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:justify-end sm:col-span-2'>
-                          {currencyFormat.format(cost)}
+                          {isStocksOrCrypto(category) && totalCostBasis
+                            ? currencyFormat.format(totalCostBasis)
+                            : currencyFormat.format(cost)}
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
-                          {currencyFormat.format(value)}
+                          {isStocksOrCrypto(category) && marketValue
+                            ? currencyFormat.format(marketValue)
+                            : currencyFormat.format(value)}
                         </div>
                         <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
                           <IconButton
@@ -372,7 +404,9 @@ const AssetsTable = ({ showFullData }: IProps) => {
                         </span>
                       </div>
                       <div className='col-span-3 flex flex-wrap justify-center 2lg:justify-end items-center'>
-                        <AssetsChange diffPercentage={asset.diffPercentage} />
+                        <AssetsChange
+                          gainsLossPercentage={asset.gainsLossPercentage}
+                        />
                       </div>
                       <div className='col-span-3 flex flex-wrap justify-center items-center 2lg:justify-end'>
                         {currencyFormat.format(asset.cost)}

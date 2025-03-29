@@ -19,11 +19,14 @@ declare interface IAssetTableData {
   category: string;
   cost: number;
   value: number;
+  marketValue?: number;
   numUnits?: number;
   avgPricePerUnit?: number;
   address?: string;
   accountType?: string;
-  diffPercentage: number;
+  details?: string;
+  gainsLossPercentage: number;
+  totalCostBasis?: number;
 }
 
 declare interface IAssetListData {
@@ -62,7 +65,7 @@ declare type AssetSortBy =
   | 'numShares'
   | 'cost'
   | 'value'
-  | 'diffPercentage';
+  | 'gainsLossPercentage';
 
 declare type TransactionSortBy =
   | 'createdAt'

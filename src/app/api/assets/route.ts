@@ -60,6 +60,8 @@ export const GET = async (request: NextRequest) => {
                 avgPricePerUnit: 1,
                 address: 1,
                 accountType: 1,
+                totalCostBasis: 1,
+                details: 1,
                 gainsLossPercentage: {
                   $round: [
                     {

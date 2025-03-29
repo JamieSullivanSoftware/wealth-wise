@@ -61,6 +61,13 @@ export const AssetSchema = new Schema(
       required: false,
       default: '',
     },
+
+    // For other
+    details: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   {
     timestamps: true,
