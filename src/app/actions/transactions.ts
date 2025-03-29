@@ -5,7 +5,8 @@ import { TRANSACTION_TYPES } from '@/constants';
 import Asset from '@/models/Asset';
 import Transaction from '@/models/Transaction';
 import { getSessionUser } from '@/utils/getSessionUser';
-import { isStocksOrCrypto, isBuyType } from '@/utils/misc';
+import { isStocksOrCrypto } from '@/utils/misc';
+import { PipelineStage } from 'mongoose';
 
 export const addTransaction = async (transactionData: ITransactionData) => {
   await connectDB();
@@ -18,51 +19,92 @@ export const addTransaction = async (transactionData: ITransactionData) => {
 
   const { user } = sessionUser;
 
+  const asset = await Asset.findById(transactionData.assetId);
+  if (!asset) {
+    throw new Error('Asset not found');
+  }
+
   let transaction = {
     userId: user.id || '',
     assetId: transactionData.assetId || '',
     type: transactionData.type || '',
     amount: parseFloat(transactionData.amount?.toString() || '0'),
+    numUnits: parseFloat(transactionData.numUnits?.toString() || '0'),
     pricePerUnit: parseFloat(transactionData.pricePerUnit?.toString() || '0'),
-    total: 0,
   };
 
-  const asset = await Asset.findById(transaction.assetId);
-  if (!asset) {
-    throw new Error('Asset not found');
+  if (!transactionData.pricePerUnit && transaction.amount <= 0) {
+    throw new Error('Amount must be greater than 0');
   }
-  let assetCost = asset.cost;
-  let assetValue = asset.value;
-  let assetNumUnits = asset.numUnits;
-
-  if (transactionData.pricePerUnit && transactionData.pricePerUnit <= 0) {
+  if (transactionData.pricePerUnit && transaction.pricePerUnit <= 0) {
     throw new Error('Price must be greater than 0');
   }
 
   try {
-    switch (transaction.type) {
-      case TRANSACTION_TYPES.buy:
-        assetCost += transaction.amount * transaction.pricePerUnit;
-        assetValue += transaction.amount * transaction.pricePerUnit;
-        assetNumUnits += transaction.amount;
-        transaction.total = transaction.amount * transaction.pricePerUnit;
-        break;
-      case TRANSACTION_TYPES.sell:
-        assetCost -= transaction.amount * transaction.pricePerUnit;
-        assetValue -= transaction.amount * transaction.pricePerUnit;
-        assetNumUnits -= transaction.amount;
-        transaction.total = -transaction.amount * transaction.pricePerUnit;
-        break;
-      case TRANSACTION_TYPES.deposit:
-        assetValue += transaction.amount;
-        transaction.total = transaction.amount;
-        break;
-      case TRANSACTION_TYPES.withdraw:
-        assetValue -= transaction.amount;
-        transaction.total = -transaction.amount;
-        break;
-      default:
-        break;
+    if (isStocksOrCrypto(asset.category)) {
+      // Stock or crypto transactions
+      const pipeline: PipelineStage[] = [
+        {
+          $match: {
+            assetId: asset._id,
+            type: TRANSACTION_TYPES.buy,
+          },
+        },
+        {
+          $group: {
+            _id: '$assetId',
+            amount: {
+              $sum: '$amount',
+            },
+          },
+        },
+        {
+          $project: {
+            _id: '',
+            amount: 1,
+          },
+        },
+      ];
+
+      const unitAmount = transaction.numUnits * transaction.pricePerUnit;
+      const buyTransactions = await Transaction.aggregate(pipeline).exec();
+      let totalCostBasis = buyTransactions[0].amount;
+
+      switch (transaction.type) {
+        case TRANSACTION_TYPES.buy:
+          totalCostBasis += unitAmount;
+          asset.numUnits += transaction.numUnits;
+          asset.cost += unitAmount;
+          asset.marketValue = transaction.pricePerUnit;
+          asset.value = asset.numUnits * asset.marketValue;
+          asset.avgPricePerUnit = totalCostBasis / asset.numUnits;
+          transaction.amount = unitAmount;
+          break;
+        case TRANSACTION_TYPES.sell:
+          asset.numUnits -= transaction.numUnits;
+          asset.cost -= unitAmount;
+          asset.marketValue = transaction.pricePerUnit;
+          asset.value = asset.numUnits * asset.marketValue;
+          asset.avgPricePerUnit = totalCostBasis / asset.numUnits;
+          transaction.amount = unitAmount;
+          break;
+        default:
+          break;
+      }
+    } else {
+      // Account transactions
+      switch (transaction.type) {
+        case TRANSACTION_TYPES.deposit:
+          asset.value += transaction.amount;
+          transaction.amount = transaction.amount;
+          break;
+        case TRANSACTION_TYPES.withdraw:
+          asset.value -= transaction.amount;
+          transaction.amount = transaction.amount;
+          break;
+        default:
+          break;
+      }
     }
 
     const newTransaction = await new Transaction(transaction).save();
@@ -70,13 +112,14 @@ export const addTransaction = async (transactionData: ITransactionData) => {
       { _id: asset._id },
       {
         $set: {
-          numUnits: assetNumUnits,
-          value: assetValue,
-          cost: assetCost,
+          numUnits: asset.numUnits,
+          value: asset.value,
+          cost: asset.cost,
+          marketValue: asset.marketValue,
+          avgPricePerUnit: asset.avgPricePerUnit,
         },
       }
     );
-
     await Promise.all([updateAsset, newTransaction]);
   } catch (error) {
     console.log(error);

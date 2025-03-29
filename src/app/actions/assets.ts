@@ -5,7 +5,7 @@ import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
 import Asset from '@/modelsAsset';
 import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
-import { isStocksOrCrypto } from '@/utils/misc';
+import { isAccount, isStocksOrCrypto } from '@/utils/misc';
 
 export const addAsset = async (assetData: IAssetData) => {
   await connectDB();
@@ -24,7 +24,9 @@ export const addAsset = async (assetData: IAssetData) => {
     category: assetData.category || '',
     cost: parseFloat(assetData.cost?.toString() || '0'),
     value: parseFloat(assetData.value?.toString() || '0'),
-    marketValue: parseFloat(assetData.value?.toString() || '0'),
+    marketValue: isAccount(assetData.category)
+      ? 0
+      : parseFloat(assetData.value?.toString() || '0'),
     numUnits: parseFloat(assetData.numUnits?.toString() || '0'),
     avgPricePerUnit: 0,
     address: assetData.address || '',

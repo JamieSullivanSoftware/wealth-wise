@@ -32,7 +32,6 @@ const TransactionForm = ({
     numUnits: undefined,
     pricePerUnit: undefined,
   });
-  const [amountLabel, setAmountLabel] = useState<string>('');
   const [selectedAsset, setSelectedAsset] = useState<IAssetListData | null>(
     null
   );
@@ -126,19 +125,6 @@ const TransactionForm = ({
     }
   }, [transaction, isModalVisible]);
 
-  useEffect(() => {
-    if (isStocksOrCrypto(selectedAsset?.category)) {
-      setAmountLabel(
-        `Number of ${
-          selectedAsset?.category === CATEGORIES.stocks ? 'Shares' : 'Units'
-        }`
-      );
-    }
-    if (isAccount(selectedAsset?.category)) {
-      setAmountLabel('Amount');
-    }
-  }, [selectedAsset]);
-
   return (
     <form
       className='space-y-6'
@@ -192,17 +178,17 @@ const TransactionForm = ({
       )}
 
       {/* Amount - Can Edit */}
-      {selectedAsset?.category && (
+      {isAccount(selectedAsset?.category) && (
         <div>
           <Label
             htmlFor='amount'
-            text={amountLabel}
+            text='Amount'
           />
           <Input
             type='number'
             name='amount'
             id='amount'
-            placeholder='100'
+            placeholder='1000'
             required
             value={formData.amount}
             onChange={handleOnChange}
@@ -210,23 +196,44 @@ const TransactionForm = ({
         </div>
       )}
 
-      {/* Unit Price - (Stocks & Crypto) - Can Edit */}
+      {/* Unit Num/Price - (Stocks & Crypto) - Can Edit */}
       {isStocksOrCrypto(selectedAsset?.category) && (
-        <div>
-          <Label
-            htmlFor='price-per-unit'
-            text={`Price per ${selectedAsset?.category === CATEGORIES.stocks ? 'Share' : 'Unit'}`}
-          />
-          <Input
-            type='number'
-            name='price-per-unit'
-            id='price-per-unit'
-            placeholder='100'
-            required
-            value={formData.pricePerUnit}
-            onChange={handleOnChange}
-          />
-        </div>
+        <>
+          <div>
+            <Label
+              htmlFor='numUnits'
+              text={`Number of ${
+                selectedAsset?.category === CATEGORIES.stocks
+                  ? 'Shares'
+                  : 'Coins'
+              }`}
+            />
+            <Input
+              type='number'
+              name='numUnits'
+              id='numUnits'
+              placeholder='5'
+              required
+              value={formData.numUnits}
+              onChange={handleOnChange}
+            />
+          </div>
+          <div>
+            <Label
+              htmlFor='price-per-unit'
+              text={`Price per ${selectedAsset?.category === CATEGORIES.stocks ? 'Share' : 'Unit'}`}
+            />
+            <Input
+              type='number'
+              name='price-per-unit'
+              id='pricePerUnit'
+              placeholder='100'
+              required
+              value={formData.pricePerUnit}
+              onChange={handleOnChange}
+            />
+          </div>
+        </>
       )}
 
       {/* Submit Button */}
