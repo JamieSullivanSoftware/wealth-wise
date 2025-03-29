@@ -22,6 +22,7 @@ const TransactionSchema = new Schema(
       required: false,
       default: '',
     },
+
     // Only for stocks/crypto
     // Number of units
     numUnits: {
@@ -31,6 +32,12 @@ const TransactionSchema = new Schema(
     },
     // Price per unit
     pricePerUnit: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    // Price per unit
+    totalCostBasis: {
       type: Number,
       required: false,
       default: 0,

@@ -49,15 +49,18 @@ export const GET = async (request: NextRequest) => {
             {
               $project: {
                 _id: 1,
-                user_id: 1,
                 createdAt: 1,
+                userId: 1,
                 name: 1,
                 category: 1,
-                numShares: 1,
-                value: 1,
                 cost: 1,
-                detail: 1,
-                diffPercentage: {
+                value: 1,
+                marketValue: 1,
+                numUnits: 1,
+                avgPricePerUnit: 1,
+                address: 1,
+                accountType: 1,
+                gainsLossPercentage: {
                   $round: [
                     {
                       $multiply: [
