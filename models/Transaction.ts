@@ -36,12 +36,6 @@ const TransactionSchema = new Schema(
       required: false,
       default: 0,
     },
-    // Price per unit
-    totalCostBasis: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
 
     // First transaction when creating an asset
     isFirst: {

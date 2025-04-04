@@ -47,6 +47,12 @@ export const AssetSchema = new Schema(
       required: false,
       default: 0,
     },
+    // Total of BUY transactions
+    totalCostBasis: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
 
     // For real estate
     address: {

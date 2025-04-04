@@ -6,7 +6,6 @@ import Asset from '@/models/Asset';
 import Transaction from '@/models/Transaction';
 import { getSessionUser } from '@/utils/getSessionUser';
 import { isStocksOrCrypto } from '@/utils/misc';
-import { PipelineStage } from 'mongoose';
 
 export const addTransaction = async (transactionData: ITransactionData) => {
   await connectDB();
@@ -24,7 +23,7 @@ export const addTransaction = async (transactionData: ITransactionData) => {
     throw new Error('Asset not found');
   }
 
-  let transaction = {
+  const transaction = {
     userId: user.id || '',
     assetId: transactionData.assetId || '',
     type: transactionData.type || '',
@@ -42,42 +41,16 @@ export const addTransaction = async (transactionData: ITransactionData) => {
 
   try {
     if (isStocksOrCrypto(asset.category)) {
-      // Stock or crypto transactions
-      const pipeline: PipelineStage[] = [
-        {
-          $match: {
-            assetId: asset._id,
-            type: TRANSACTION_TYPES.buy,
-          },
-        },
-        {
-          $group: {
-            _id: '$assetId',
-            amount: {
-              $sum: '$amount',
-            },
-          },
-        },
-        {
-          $project: {
-            _id: '',
-            amount: 1,
-          },
-        },
-      ];
-
       const unitAmount = transaction.numUnits * transaction.pricePerUnit;
-      const buyTransactions = await Transaction.aggregate(pipeline).exec();
-      let totalCostBasis = buyTransactions[0].amount;
 
       switch (transaction.type) {
         case TRANSACTION_TYPES.buy:
-          totalCostBasis += unitAmount;
+          asset.totalCostBasis += unitAmount;
           asset.numUnits += transaction.numUnits;
           asset.cost += unitAmount;
           asset.marketValue = transaction.pricePerUnit;
           asset.value = asset.numUnits * asset.marketValue;
-          asset.avgPricePerUnit = totalCostBasis / asset.numUnits;
+          asset.avgPricePerUnit = asset.totalCostBasis / asset.numUnits;
           transaction.amount = unitAmount;
           break;
         case TRANSACTION_TYPES.sell:
@@ -85,7 +58,7 @@ export const addTransaction = async (transactionData: ITransactionData) => {
           asset.cost -= unitAmount;
           asset.marketValue = transaction.pricePerUnit;
           asset.value = asset.numUnits * asset.marketValue;
-          asset.avgPricePerUnit = totalCostBasis / asset.numUnits;
+          asset.avgPricePerUnit = asset.totalCostBasis / asset.numUnits;
           transaction.amount = unitAmount;
           break;
         default:
@@ -117,6 +90,7 @@ export const addTransaction = async (transactionData: ITransactionData) => {
           cost: asset.cost,
           marketValue: asset.marketValue,
           avgPricePerUnit: asset.avgPricePerUnit,
+          totalCostBasis: asset.totalCostBasis,
         },
       }
     );
