@@ -21,6 +21,11 @@ export const GET = async () => {
         },
       },
       {
+        $sort: {
+          name: 1 as 1 | -1,
+        },
+      },
+      {
         $project: {
           _id: 1,
           name: 1,

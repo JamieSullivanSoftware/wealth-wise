@@ -3,6 +3,7 @@ declare type TransactionType = 'BUY' | 'SELL' | 'DEPOSIT' | 'WITHDRAW';
 declare type AccountType = 'Current' | 'Deposit' | 'Business' | 'Student';
 
 declare interface ITransactionData {
+  _id: string;
   userId?: string;
   assetId?: IAsset | string;
   type?: TransactionType | string;
@@ -13,7 +14,6 @@ declare interface ITransactionData {
 }
 
 declare interface ITransaction extends ITransactionData {
-  _id: string;
   createdAt: string;
   updatedAt: string;
 }

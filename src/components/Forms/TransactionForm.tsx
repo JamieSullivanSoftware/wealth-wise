@@ -25,7 +25,8 @@ const TransactionForm = ({
   transaction,
   isModalVisible,
 }: IProps) => {
-  const [formData, setFormData] = useState<ITransactionData>({
+  const [transactionData, setTransactionData] = useState<ITransactionData>({
+    _id: '',
     assetId: '',
     type: '',
     amount: undefined,
@@ -40,12 +41,7 @@ const TransactionForm = ({
     e.preventDefault();
 
     try {
-      if (transaction) {
-        // await editTransaction(formData, transaction._id);
-      } else {
-        await addTransaction(formData);
-      }
-
+      await addTransaction(transactionData);
       onTransactionAdded();
     } catch (error) {
       console.error('Failed to submit transaction:', error);
@@ -54,8 +50,8 @@ const TransactionForm = ({
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
-    setFormData({
-      ...formData,
+    setTransactionData({
+      ...transactionData,
       [id]: value,
     });
   };
@@ -66,23 +62,24 @@ const TransactionForm = ({
     );
     if (asset) {
       setSelectedAsset(asset);
-      setFormData({
-        ...formData,
+      setTransactionData({
+        ...transactionData,
         assetId: asset._id,
       });
     }
   };
 
   const handleOnTypeSelect = (type: string) => {
-    setFormData({
-      ...formData,
+    setTransactionData({
+      ...transactionData,
       type,
     });
   };
 
   const resetFormData = () => {
     setSelectedAsset(null);
-    setFormData({
+    setTransactionData({
+      _id: '',
       assetId: '',
       type: '',
       amount: undefined,
@@ -110,74 +107,59 @@ const TransactionForm = ({
 
   useEffect(() => {
     if (isModalVisible) {
-      if (transaction) {
-        setSelectedAsset(transaction.asset);
-        setFormData({
-          assetId: transaction.asset._id,
-          type: transaction.type,
-          amount: transaction.amount,
-          numUnits: transaction.numUnits,
-          pricePerUnit: transaction.pricePerUnit,
-        });
-      } else {
-        resetFormData();
-      }
+      resetFormData();
     }
-  }, [transaction, isModalVisible]);
+  }, [isModalVisible]);
 
   return (
     <form
       className='space-y-6'
       onSubmit={handleSubmit}
     >
-      {/* Asset & Type - Cannot Edit */}
-      {!transaction && (
-        <>
-          <div>
-            <Label
-              htmlFor='asset'
-              text='Asset'
-            />
-            <Select
-              name='asset-id'
-              id='assetId'
-              placeholder='Select asset'
-              options={assetList
-                .filter(
-                  (asset: IAssetListData) =>
-                    !isRealEstateCarOrOther(asset.category)
-                )
-                .map((asset: IAssetListData) => ({
-                  value: asset._id,
-                  label: asset.name,
-                }))}
-              value={formData.assetId}
-              onSelect={handleOnAssetSelect}
-            />
-          </div>
-          {selectedAsset?.category && (
-            <div>
-              <Label
-                htmlFor='type'
-                text='Transaction Type'
-              />
-              <Select
-                name='type'
-                id='type'
-                placeholder='Select type'
-                options={getTypeOptions().map((type: string) => ({
-                  value: type,
-                  label: type,
-                }))}
-                value={formData.type}
-                onSelect={handleOnTypeSelect}
-              />
-            </div>
-          )}
-        </>
+      {/* Asset & Type */}
+
+      <div>
+        <Label
+          htmlFor='asset'
+          text='Asset'
+        />
+        <Select
+          name='asset-id'
+          id='assetId'
+          placeholder='Select asset'
+          options={assetList
+            .filter(
+              (asset: IAssetListData) => !isRealEstateCarOrOther(asset.category)
+            )
+            .map((asset: IAssetListData) => ({
+              value: asset._id,
+              label: asset.name,
+            }))}
+          value={transactionData.assetId}
+          onSelect={handleOnAssetSelect}
+        />
+      </div>
+      {selectedAsset?.category && (
+        <div>
+          <Label
+            htmlFor='type'
+            text='Transaction Type'
+          />
+          <Select
+            name='type'
+            id='type'
+            placeholder='Select type'
+            options={getTypeOptions().map((type: string) => ({
+              value: type,
+              label: type,
+            }))}
+            value={transactionData.type}
+            onSelect={handleOnTypeSelect}
+          />
+        </div>
       )}
 
-      {/* Amount - Can Edit */}
+      {/* Amount */}
       {isAccount(selectedAsset?.category) && (
         <div>
           <Label
@@ -190,13 +172,13 @@ const TransactionForm = ({
             id='amount'
             placeholder='1000'
             required
-            value={formData.amount}
+            value={transactionData.amount}
             onChange={handleOnChange}
           />
         </div>
       )}
 
-      {/* Unit Num/Price - (Stocks & Crypto) - Can Edit */}
+      {/* Unit Num/Price - (Stocks & Crypto) */}
       {isStocksOrCrypto(selectedAsset?.category) && (
         <>
           <div>
@@ -214,7 +196,7 @@ const TransactionForm = ({
               id='numUnits'
               placeholder='5'
               required
-              value={formData.numUnits}
+              value={transactionData.numUnits}
               onChange={handleOnChange}
             />
           </div>
@@ -229,7 +211,7 @@ const TransactionForm = ({
               id='pricePerUnit'
               placeholder='100'
               required
-              value={formData.pricePerUnit}
+              value={transactionData.pricePerUnit}
               onChange={handleOnChange}
             />
           </div>
