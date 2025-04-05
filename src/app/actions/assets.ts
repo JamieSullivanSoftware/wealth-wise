@@ -1,11 +1,11 @@
 'use server';
 
 import connectDB from '@/configdatabase';
-import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
+import { TRANSACTION_TYPES } from '@/constants';
 import Asset from '@/modelsAsset';
 import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
-import { isAccount, isStocksOrCrypto } from '@/utils/misc';
+import { isRealEstateCarOrOther, isStocksOrCrypto } from '@/utils/misc';
 
 export const addAsset = async (assetData: IAssetData) => {
   await connectDB();
@@ -23,27 +23,28 @@ export const addAsset = async (assetData: IAssetData) => {
     name: assetData.name || '',
     category: assetData.category || '',
     cost: parseFloat(assetData.cost?.toString() || '0'),
-    value: parseFloat(assetData.value?.toString() || '0'),
-    marketValue: isAccount(assetData.category)
-      ? 0
+    value: isRealEstateCarOrOther(assetData.category)
+      ? parseFloat(assetData.marketValue?.toString() || '0')
       : parseFloat(assetData.value?.toString() || '0'),
+    marketValue: parseFloat(assetData.marketValue?.toString() || '0'),
     numUnits: parseFloat(assetData.numUnits?.toString() || '0'),
     avgPricePerUnit: 0,
     address: assetData.address || '',
     accountType: assetData.accountType || '',
+    details: assetData.details || '',
   };
 
   try {
     let asset = new Asset(data);
 
-    // Transaction only added for stocks and crypto
+    // First transaction only added for stocks and crypto
     if (isStocksOrCrypto(data.category)) {
       const amount = data.numUnits * data.cost;
       data = {
         ...data,
         cost: amount,
         value: amount,
-        marketValue: data.cost, // Market value is the current cost of the 1 unit
+        marketValue: data.cost, // Market value is the current value of 1 unit
         avgPricePerUnit: amount / data.numUnits, // Avg price per unit
       };
 
@@ -97,26 +98,42 @@ export const deleteAsset = async (id: string) => {
   }
 };
 
-export const editAsset = async (formData: IAssetData, id: string) => {
-  await connectDB();
-
+export const editAsset = async (assetData: IAssetData) => {
   const sessionUser = await getSessionUser();
 
   if (!sessionUser) {
     throw new Error('You must be logged in to edit an asset');
   }
 
-  // const assetData = {
-  //   name: formData.get('asset-name'),
-  //   category: formData.get('category'),
-  //   value: parseFloat(formData.get('value')?.toString() || '0'),
-  //   detail: formData.get('detail'),
-  // };
+  const { user } = sessionUser;
 
-  // try {
-  //   await Asset.updateOne({ _id: id }, { $set: assetData });
-  // } catch (error) {
-  //   console.log(error);
-  //   return new Response('Asset not updated', { status: 500 });
-  // }
+  const data = {
+    userId: user.id,
+    name: assetData.name || '',
+    category: assetData.category || '',
+    cost: parseFloat(assetData.cost?.toString() || '0'),
+    value: parseFloat(assetData.value?.toString() || '0'),
+    marketValue: parseFloat(assetData.marketValue?.toString() || '0'),
+    numUnits: parseFloat(assetData.numUnits?.toString() || '0'),
+    avgPricePerUnit: 0,
+    totalCostBasis: 0,
+    address: assetData.address || '',
+    accountType: assetData.accountType || '',
+    details: assetData.details || '',
+  };
+
+  try {
+    if (isStocksOrCrypto(data.category)) {
+      data.value = data.marketValue * data.numUnits;
+    }
+
+    if (isRealEstateCarOrOther(data.category)) {
+      data.value = data.marketValue;
+    }
+
+    await Asset.updateOne({ _id: assetData._id }, { $set: data });
+  } catch (error) {
+    console.log(error);
+    return new Response('Asset not updated', { status: 500 });
+  }
 };

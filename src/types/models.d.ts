@@ -19,6 +19,7 @@ declare interface ITransaction extends ITransactionData {
 }
 
 declare interface IAssetData {
+  _id: string;
   userId?: string;
   name?: string;
   category?: string;
@@ -28,11 +29,11 @@ declare interface IAssetData {
   numUnits?: number;
   avgPricePerUnit?: number;
   address?: string;
+  details?: string;
   accountType?: AccountType | string;
 }
 
 declare interface IAsset extends IAssetData {
-  _id: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -18,7 +18,8 @@ interface IProps {
 }
 
 const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
-  const [formData, setFormData] = useState<IAssetData>({
+  const [assetData, setAssetData] = useState<IAssetData>({
+    _id: '',
     name: '',
     category: '',
     cost: undefined,
@@ -26,6 +27,8 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
     numUnits: undefined,
     address: '',
     accountType: '',
+    details: '',
+    marketValue: undefined,
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -33,9 +36,9 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
 
     try {
       if (asset) {
-        await editAsset(formData, asset._id);
+        await editAsset(assetData);
       } else {
-        await addAsset(formData);
+        await addAsset(assetData);
       }
 
       onAssetAdded();
@@ -48,28 +51,29 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
-    setFormData({
-      ...formData,
+    setAssetData({
+      ...assetData,
       [id]: value,
     });
   };
 
   const handleOnSelectCategory = (category: string = '') => {
-    setFormData({
-      ...formData,
+    setAssetData({
+      ...assetData,
       category,
     });
   };
 
   const handleOnSelectAccountType = (accountType: string = '') => {
-    setFormData({
-      ...formData,
+    setAssetData({
+      ...assetData,
       accountType: accountType as AccountType,
     });
   };
 
   const resetFormData = () => {
-    setFormData({
+    setAssetData({
+      _id: '',
       name: '',
       category: '',
       cost: undefined,
@@ -77,6 +81,8 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       numUnits: undefined,
       address: '',
       accountType: '',
+      details: '',
+      marketValue: undefined,
     });
   };
 
@@ -85,7 +91,8 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       resetFormData();
     }
     if (asset) {
-      setFormData({
+      setAssetData({
+        _id: asset?._id,
         name: asset?.name,
         category: asset?.category,
         cost: asset?.cost,
@@ -93,6 +100,8 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
         numUnits: asset?.numUnits,
         address: asset?.address,
         accountType: asset?.accountType as AccountType,
+        marketValue: asset?.marketValue,
+        details: asset?.details,
       });
     }
   }, [asset, isModalVisible]);
@@ -106,67 +115,72 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       <div>
         <Label
           htmlFor='name'
-          text='Asset Name'
+          text='Name'
         />
         <Input
           name='name'
           id='name'
-          placeholder='Apple Stock'
+          placeholder='Asset name'
+          maxLength={50}
           required
-          value={formData.name}
+          value={assetData.name}
           onChange={handleOnChange}
         />
       </div>
 
-      {/* Category */}
-      <div>
-        <Label
-          htmlFor='category'
-          text='Category'
-        />
-        <Select
-          name='category'
-          id='category'
-          placeholder='Select a category'
-          options={Object.values(CATEGORIES).map((category: string) => ({
-            value: category,
-            label: category,
-          }))}
-          value={formData.category}
-          onSelect={handleOnSelectCategory}
-        />
-      </div>
+      {/* Category - Not Editable */}
+      {!asset && (
+        <div>
+          <Label
+            htmlFor='category'
+            text='Category'
+          />
+          <Select
+            name='category'
+            id='category'
+            placeholder='Select a category'
+            options={Object.values(CATEGORIES).map((category: string) => ({
+              value: category,
+              label: category,
+            }))}
+            value={assetData.category}
+            onSelect={handleOnSelectCategory}
+          />
+        </div>
+      )}
 
       {/* Number of Units and Price - (Stocks & Crypto) */}
-      {isStocksOrCrypto(formData.category) && (
+      {isStocksOrCrypto(assetData.category) && (
         <>
+          {!asset && (
+            <div>
+              <Label
+                htmlFor='num-units'
+                text={`Number of ${assetData.category === CATEGORIES.stocks ? 'Shares' : 'Coins'}`}
+              />
+              <Input
+                type='number'
+                name='num-units'
+                id='numUnits'
+                placeholder='5'
+                required
+                value={assetData.numUnits}
+                onChange={handleOnChange}
+              />
+            </div>
+          )}
           <div>
             <Label
-              htmlFor='num-units'
-              text={`Number of ${formData.category === CATEGORIES.stocks ? 'Shares' : 'Coins'}`}
+              htmlFor='pricePerUnit'
+              text={`Price per ${assetData.category === CATEGORIES.stocks ? 'Share' : 'Coin'}`}
             />
             <Input
               type='number'
-              name='num-units'
-              id='numUnits'
-              placeholder='5'
-              required
-              value={formData.numUnits}
-              onChange={handleOnChange}
-            />
-          </div>
-          <div>
-            <Label
-              htmlFor='cost'
-              text={`Price per ${formData.category === CATEGORIES.stocks ? 'Share' : 'Coin'}`}
-            />
-            <Input
-              type='number'
-              name='cost'
-              id='cost'
+              name='pricePerUnit'
+              id='marketValue'
               placeholder='100'
               required
-              value={formData.cost}
+              value={assetData.marketValue}
               onChange={handleOnChange}
             />
           </div>
@@ -174,7 +188,7 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       )}
 
       {/* Purchase Price - Real Estate/Cars/Other */}
-      {isRealEstateCarOrOther(formData.category) && (
+      {isRealEstateCarOrOther(assetData.category) && (
         <>
           <div>
             <Label
@@ -187,26 +201,26 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
               id='cost'
               placeholder='50,000'
               required
-              value={formData.cost}
+              value={assetData.cost}
               onChange={handleOnChange}
             />
           </div>
           <div>
             <Label
-              htmlFor='value'
+              htmlFor='marketValue'
               text='Market Value'
             />
             <Input
               type='number'
-              name='value'
-              id='value'
+              name='marketValue'
+              id='marketValue'
               placeholder='50,000'
               required
-              value={formData.value}
+              value={assetData.marketValue}
               onChange={handleOnChange}
             />
           </div>
-          {formData.category === CATEGORIES.realEstate && (
+          {assetData.category === CATEGORIES.realEstate && (
             <div>
               <Label
                 htmlFor='address'
@@ -219,7 +233,30 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
                 rows={3}
                 className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white'
                 placeholder='Address of the property...'
-                value={formData.address}
+                value={assetData.address}
+                onChange={handleOnChange}
+              />
+            </div>
+          )}
+          {(assetData.category === CATEGORIES.cars ||
+            assetData.category === CATEGORIES.other) && (
+            <div>
+              <Label
+                htmlFor='details'
+                text='Details'
+              />
+              <textarea
+                name='details'
+                id='details'
+                maxLength={100}
+                rows={3}
+                className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white'
+                placeholder={
+                  assetData.category === CATEGORIES.cars
+                    ? 'Car details...'
+                    : 'Other details...'
+                }
+                value={assetData.details}
                 onChange={handleOnChange}
               />
             </div>
@@ -228,7 +265,7 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       )}
 
       {/* Account Type - (Accounts) */}
-      {isAccount(formData.category) && (
+      {isAccount(assetData.category) && (
         <>
           <div>
             <Label
@@ -243,25 +280,27 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
                 value: type,
                 label: type,
               }))}
-              value={formData.accountType}
+              value={assetData.accountType}
               onSelect={handleOnSelectAccountType}
             />
           </div>
-          <div>
-            <Label
-              htmlFor='value'
-              text='Account Balance'
-            />
-            <Input
-              type='number'
-              name='value'
-              id='value'
-              placeholder='1000'
-              required
-              value={formData.value}
-              onChange={handleOnChange}
-            />
-          </div>
+          {!asset && (
+            <div>
+              <Label
+                htmlFor='value'
+                text='Account Balance'
+              />
+              <Input
+                type='number'
+                name='value'
+                id='value'
+                placeholder='1000'
+                required
+                value={assetData.value}
+                onChange={handleOnChange}
+              />
+            </div>
+          )}
         </>
       )}
 

@@ -10,6 +10,7 @@ interface IProps {
   required?: boolean;
   defaultValue?: number | string | undefined;
   value?: number | string | undefined;
+  maxLength?: number | undefined;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -22,6 +23,7 @@ const Input = ({
   required = false,
   defaultValue,
   value,
+  maxLength,
   onChange,
 }: IProps) => {
   const classNames = clsx(
@@ -37,6 +39,7 @@ const Input = ({
       required={required}
       defaultValue={defaultValue}
       value={value}
+      max={maxLength}
       onChange={onChange}
     />
   );

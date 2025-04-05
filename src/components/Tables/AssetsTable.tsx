@@ -250,7 +250,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   </div>
                   <div className='hidden col-span-3 sm:flex justify-center items-center sm:justify-end sm:col-span-2'>
                     <Button
-                      text='Total Cost'
+                      text='Cost'
                       onClick={() => handleSort('cost')}
                       icon={faSort}
                       iconAlign='right'
@@ -261,7 +261,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   </div>
                   <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
                     <Button
-                      text='Market Value'
+                      text='Value'
                       onClick={() => handleSort('value')}
                       icon={faSort}
                       iconAlign='right'
@@ -307,14 +307,10 @@ const AssetsTable = ({ showFullData }: IProps) => {
                           />
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:justify-end sm:col-span-2'>
-                          {isStocksOrCrypto(category) && totalCostBasis
-                            ? currencyFormat.format(totalCostBasis)
-                            : currencyFormat.format(cost)}
+                          {currencyFormat.format(cost)}
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
-                          {isStocksOrCrypto(category) && marketValue
-                            ? currencyFormat.format(marketValue)
-                            : currencyFormat.format(value)}
+                          {currencyFormat.format(value)}
                         </div>
                         <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
                           <IconButton
