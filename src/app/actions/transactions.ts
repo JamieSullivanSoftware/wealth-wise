@@ -66,15 +66,11 @@ export const addTransaction = async (transactionData: ITransactionData) => {
       }
     } else {
       // Account transactions
-      switch (transaction.type) {
-        case TRANSACTION_TYPES.deposit:
-          asset.value += transaction.amount;
-          break;
-        case TRANSACTION_TYPES.withdraw:
-          asset.value -= transaction.amount;
-          break;
-        default:
-          break;
+      if (transaction.type === TRANSACTION_TYPES.deposit) {
+        asset.value += transaction.amount;
+      }
+      if (transaction.type === TRANSACTION_TYPES.withdraw) {
+        asset.value -= transaction.amount;
       }
     }
 
@@ -99,41 +95,75 @@ export const addTransaction = async (transactionData: ITransactionData) => {
   }
 };
 
-export const deleteTransaction = async (id: string) => {
-  // await connectDB();
-  // const sessionUser = await getSessionUser();
-  // if (!sessionUser) {
-  //   throw new Error('You must be logged in to delete a transaction');
-  // }
-  // try {
-  //   const transaction = await Transaction.findById(id);
-  //   if (!transaction) {
-  //     throw new Error('Transaction not found');
-  //   }
-  //   const asset = await Asset.findById(transaction.assetId);
-  //   if (!asset) {
-  //     throw new Error('Asset not found');
-  //   }
-  //   const { amount, type, numShares } = transaction;
-  //   const { updatedNumShares, updatedCost } = calculateUpdatedSharesAndCost(
-  //     asset,
-  //     amount,
-  //     numShares,
-  //     type
-  //   );
-  //   const updateAsset = Asset.updateOne(
-  //     { _id: asset._id },
-  //     {
-  //       $set: {
-  //         numShares: updatedNumShares,
-  //         cost: updatedCost,
-  //       },
-  //     }
-  //   );
-  //   const deleteTransaction = Transaction.deleteOne({ _id: id });
-  //   await Promise.all([updateAsset, deleteTransaction]);
-  // } catch (error) {
-  //   console.log(error);
-  //   return new Response('Transaction not deleted', { status: 500 });
-  // }
+export const deleteTransaction = async (transaction: ITransactionTableData) => {
+  await connectDB();
+
+  const sessionUser = await getSessionUser();
+
+  if (!sessionUser) {
+    throw new Error('You must be logged in to delete a transaction');
+  }
+
+  try {
+    const asset = await Asset.findById(transaction.asset._id);
+    if (!asset) {
+      throw new Error('Asset for transaction not found');
+    }
+
+    if (isStocksOrCrypto(asset.category)) {
+      const unitAmount = transaction.numUnits * transaction.pricePerUnit;
+
+      switch (transaction.type) {
+        case TRANSACTION_TYPES.buy:
+          asset.totalCostBasis -= unitAmount;
+          asset.numUnits -= transaction.numUnits;
+          asset.cost -= unitAmount;
+          asset.marketValue = transaction.pricePerUnit;
+          asset.value = asset.numUnits * asset.marketValue;
+          asset.avgPricePerUnit = asset.totalCostBasis / asset.numUnits;
+          transaction.amount = unitAmount;
+          break;
+        case TRANSACTION_TYPES.sell:
+          asset.numUnits += transaction.numUnits;
+          asset.cost += unitAmount;
+          asset.marketValue = transaction.pricePerUnit;
+          asset.value = asset.numUnits * asset.marketValue;
+          asset.avgPricePerUnit = asset.totalCostBasis / asset.numUnits;
+          transaction.amount = unitAmount;
+          break;
+        default:
+          break;
+      }
+    } else {
+      // Account transactions
+      if (transaction.type === TRANSACTION_TYPES.deposit) {
+        asset.value -= transaction.amount;
+      }
+      if (transaction.type === TRANSACTION_TYPES.withdraw) {
+        asset.value += transaction.amount;
+      }
+    }
+
+    const updateAsset = Asset.updateOne(
+      { _id: asset._id },
+      {
+        $set: {
+          numUnits: asset.numUnits,
+          value: asset.value,
+          cost: asset.cost,
+          marketValue: asset.marketValue,
+          avgPricePerUnit: asset.avgPricePerUnit,
+          totalCostBasis: asset.totalCostBasis,
+        },
+      }
+    );
+    const deleteTransaction = Transaction.deleteOne({
+      _id: transaction._id,
+    });
+
+    await Promise.all([updateAsset, deleteTransaction]);
+  } catch (error) {
+    console.log(error);
+    return new Response('Transaction not deleted', { status: 500 });
+  }
 };

@@ -115,8 +115,6 @@ export const editAsset = async (assetData: IAssetData) => {
     value: parseFloat(assetData.value?.toString() || '0'),
     marketValue: parseFloat(assetData.marketValue?.toString() || '0'),
     numUnits: parseFloat(assetData.numUnits?.toString() || '0'),
-    avgPricePerUnit: 0,
-    totalCostBasis: 0,
     address: assetData.address || '',
     accountType: assetData.accountType || '',
     details: assetData.details || '',

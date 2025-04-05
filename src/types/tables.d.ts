@@ -43,14 +43,13 @@ declare interface ITransactionAssetData {
 
 declare interface ITransactionTableData {
   _id: string;
+  asset: ITransactionAssetData;
   amount: number;
   type: TransactionType;
-  createdAt: Date;
-  asset: ITransactionAssetData;
   numUnits: number;
   pricePerUnit: number;
-  total: number;
   isFirst: boolean;
+  createdAt: Date;
 }
 
 declare interface ISort {

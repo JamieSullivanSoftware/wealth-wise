@@ -77,7 +77,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
 
   const handleOnDelete = async () => {
     if (selectedTransaction) {
-      await deleteTransaction(selectedTransaction._id);
+      await deleteTransaction(selectedTransaction);
       await refetchTransactions();
     }
   };
