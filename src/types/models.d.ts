@@ -5,7 +5,7 @@ declare type AccountType = 'Current' | 'Deposit' | 'Business' | 'Student';
 declare interface ITransactionData {
   _id: string;
   userId?: string;
-  assetId?: IAsset | string;
+  assetId?: string;
   type?: TransactionType | string;
   amount?: number;
   numUnits?: number;
