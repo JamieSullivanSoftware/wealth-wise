@@ -14,18 +14,6 @@ const UserSchema = new Schema(
     image: {
       type: String,
     },
-    assets: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Asset',
-      },
-    ],
-    transactions: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'Transaction',
-      },
-    ],
   },
   {
     timestamps: true,

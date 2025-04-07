@@ -27,6 +27,7 @@ const config: Config = {
         'black-2': '#010101',
         body: '#64748B',
         primary: '#3E76E0',
+        'primary-dark': '#315EB5',
         secondary: '#80CAEE',
         whiten: '#F1F5F9',
         whiter: '#F5F7FD',

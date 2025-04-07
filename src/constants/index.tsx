@@ -59,3 +59,17 @@ export const CATEGORIES = {
   realEstate: 'Real Estate',
   stocks: 'Stocks',
 };
+
+export const TRANSACTION_TYPES = {
+  buy: 'BUY',
+  sell: 'SELL',
+  deposit: 'DEPOSIT',
+  withdraw: 'WITHDRAW',
+};
+
+export const ACCOUNT_TYPES = {
+  current: 'Current',
+  deposit: 'Deposit',
+  business: 'Business',
+  student: 'Student',
+};

@@ -1,10 +1,12 @@
-import type { PipelineStage } from 'mongoose';
+import { Types, type PipelineStage } from 'mongoose';
 
 import {
   formatCategories,
   generateCumulatedNetworth,
 } from '@/helpers/routeHelper';
 import Asset from '@/models/Asset';
+import connectDB from '@/configdatabase';
+import { getSessionUser } from '@/utils/getSessionUser';
 
 export const GET = async () => {
   const today = new Date();
@@ -12,6 +14,14 @@ export const GET = async () => {
   startDate.setUTCDate(startDate.getUTCDate() - 28);
 
   try {
+    await connectDB();
+
+    const sessionUser = await getSessionUser();
+    const userId =
+      sessionUser && sessionUser.userId
+        ? new Types.ObjectId(sessionUser.userId)
+        : new Types.ObjectId(process.env.DEFAULT_USER_ID);
+
     const pipeline: PipelineStage[] = [
       // Step 1: Filter documents for the base total before sta rt date and all totals after start date
       {
@@ -20,6 +30,7 @@ export const GET = async () => {
             {
               $match: {
                 createdAt: { $lt: startDate },
+                userId: userId,
               },
             },
             {

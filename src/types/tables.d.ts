@@ -5,39 +5,51 @@ declare interface IPaginatedData {
 }
 
 declare interface IPaginatedAssets extends IPaginatedData {
-  assets: IAssetData[];
+  assets: IAssetTableData[];
 }
 
 declare interface IPaginatedTransactions extends IPaginatedData {
-  transactions: ITransactionData[];
+  transactions: ITransactionTableData[];
 }
 
-declare interface IAssetData {
+declare interface IAssetTableData {
   _id: string;
-  updatedAt: Date;
+  createdAt: Date;
   name: string;
   category: string;
-  numShares: number;
   cost: number;
   value: number;
-  numShares: number;
-  detail: string;
-  diffPercentage: number;
+  marketValue?: number;
+  numUnits?: number;
+  avgPricePerUnit?: number;
+  address?: string;
+  accountType?: string;
+  details?: string;
+  gainsLossPercentage: number;
+  totalCostBasis?: number;
 }
 
-declare interface ITransationAssetData {
+declare interface IAssetListData {
   _id: string;
   name: string;
   category: string;
 }
 
-declare interface ITransactionData {
+declare interface ITransactionAssetData {
   _id: string;
+  name: string;
+  category: string;
+}
+
+declare interface ITransactionTableData {
+  _id: string;
+  asset: ITransactionAssetData;
   amount: number;
   type: TransactionType;
-  updatedAt: Date;
-  asset: ITransationAssetData;
-  assetTotal: number;
+  numUnits: number;
+  pricePerUnit: number;
+  isFirst: boolean;
+  createdAt: Date;
 }
 
 declare interface ISort {
@@ -46,18 +58,17 @@ declare interface ISort {
 }
 
 declare type AssetSortBy =
-  | 'updatedAt'
+  | 'createdAt'
   | 'name'
   | 'category'
   | 'numShares'
   | 'cost'
   | 'value'
-  | 'diffPercentage';
+  | 'gainsLossPercentage';
 
 declare type TransactionSortBy =
-  | 'updatedAt'
+  | 'createdAt'
   | 'amount'
   | 'type'
   | 'assetName'
-  | 'assetCategory'
-  | 'assetTotal';
+  | 'assetCategory';
