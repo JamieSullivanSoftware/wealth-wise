@@ -332,7 +332,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
               paginatedTransactions.transactions.length > 0 ? (
                 paginatedTransactions.transactions.map(
                   (transaction: ITransactionTableData, i: number) => {
-                    const { asset, amount, createdAt } = transaction;
+                    const { asset, amount, createdAt, type } = transaction;
                     const date = new Date(createdAt);
 
                     return (
@@ -342,6 +342,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       >
                         <TransactionAmountInfo
                           amount={amount}
+                          type={type}
                           assetName={asset.name}
                         />
                         <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
