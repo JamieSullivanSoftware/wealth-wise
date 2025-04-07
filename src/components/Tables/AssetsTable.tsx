@@ -22,7 +22,6 @@ import AssetForm from '../Forms/AssetForm';
 import TablesContainer from '../Containers/TablesContainer';
 import { deleteAsset } from '@/app/actions/assets';
 import IconButton from '../Common/IconButton';
-import { isStocksOrCrypto } from '@/utils/misc';
 
 interface IProps {
   showFullData?: boolean;
@@ -279,9 +278,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       name,
                       category,
                       cost,
-                      totalCostBasis,
                       value,
-                      marketValue,
                       gainsLossPercentage,
                     } = asset;
                     return (
