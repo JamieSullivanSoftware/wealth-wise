@@ -2,7 +2,7 @@ const apiDomain = process.env.NEXT_PUBLIC_API_DOMAIN || null;
 
 export const getTransactions = async (
   limit: number = 5,
-  sortBy: string = 'updatedAt',
+  sortBy: string = 'createdAt',
   order: string = 'desc',
   page: number = 1
 ) => {
@@ -21,7 +21,7 @@ export const getTransactions = async (
 
 export const getAssets = async (
   limit: number = 5,
-  sortBy: string = 'updatedAt',
+  sortBy: string = 'createdAt',
   order: string = 'desc',
   page: number = 1
 ) => {
@@ -36,6 +36,17 @@ export const getAssets = async (
   );
   const data = await res.json();
   return data;
+};
+
+export const getAssetList = async () => {
+  if (!apiDomain) {
+    return [];
+  }
+  const res = await fetch(`${apiDomain}/assets/list`, {
+    cache: 'no-store',
+  });
+  const data = await res.json();
+  return data.assetList;
 };
 
 export const getNetWorth = async (filter: DateFilter) => {

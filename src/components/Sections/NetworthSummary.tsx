@@ -19,13 +19,13 @@ const NetworthSummary = ({
   totalNetworth,
 }: IProps) => {
   const getIcon = (total: number) => {
-    if (total === 0) {
-      return faMinus;
+    if (total < 0) {
+      return faArrowDown;
     }
     if (total > 0) {
       return faArrowUp;
     }
-    return faArrowDown;
+    return faMinus;
   };
 
   return (

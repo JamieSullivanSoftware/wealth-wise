@@ -163,6 +163,7 @@ export const formatCategories = () => [
       _id: 0,
       name: '$_id',
       total: { $round: ['$total', 2] },
+      numShares: 1,
     },
   },
 ];

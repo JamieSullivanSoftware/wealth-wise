@@ -5,23 +5,30 @@ import AmountIcon from './AmountIcon';
 
 interface IProps {
   amount: number;
+  type: TransactionType;
   assetName?: string;
   isFullTable?: boolean;
 }
 
-const TransactionAmountInfo = ({ amount, assetName, isFullTable }: IProps) => {
+const TransactionAmountInfo = ({
+  amount,
+  type,
+  assetName,
+  isFullTable,
+}: IProps) => {
+  const isPositive = type === 'BUY' || type === 'DEPOSIT';
+  const isNegative = type === 'SELL' || type === 'WITHDRAW';
+
   const iconClassNames = clsx(
     'rounded-md flex items-center justify-center text-xl border border-stroke bg-gray-1 dark:border-0',
-    amount > 0 && 'text-mid-green dark:bg-dark-green dark:text-light-green',
-    amount < 0 && 'text-mid-red dark:bg-dark-red dark:text-light-red',
-    amount === 0 && 'text-black dark:bg-gray-2',
+    isPositive && 'text-mid-green dark:bg-dark-green dark:text-light-green',
+    isNegative && 'text-mid-red dark:bg-dark-red dark:text-light-red',
     isFullTable ? 'h-10 min-w-10' : 'h-10 min-w-10 2lg:h-12 2lg:min-w-12'
   );
   const fontClassNames = clsx(
     'font-medium',
-    amount > 0 && 'text-mid-green dark:text-light-green',
-    amount < 0 && 'text-mid-red dark:text-light-red',
-    amount === 0 && 'text-black dark:text-white'
+    isPositive && 'text-mid-green dark:text-light-green',
+    isNegative && 'text-mid-red dark:text-light-red'
   );
 
   return (
@@ -32,11 +39,15 @@ const TransactionAmountInfo = ({ amount, assetName, isFullTable }: IProps) => {
         {
           <div className={iconClassNames}>
             <span className='hidden xsm:flex 2lg:hidden'>
-              <AmountIcon amount={amount} />
+              <AmountIcon
+                isPositive={isPositive}
+                isNegative={isNegative}
+              />
             </span>
             <span className='flex xsm:hidden 2lg:flex'>
               <AmountIcon
-                amount={amount}
+                isPositive={isPositive}
+                isNegative={isNegative}
                 iconSize={isFullTable ? 'sm' : 'lg'}
               />
             </span>
