@@ -1,25 +1,39 @@
-declare type TransactionType = 'Buy' | 'Sell';
+declare type TransactionType = 'BUY' | 'SELL' | 'DEPOSIT' | 'WITHDRAW';
 
-declare interface ITransaction {
+declare type AccountType = 'Current' | 'Deposit' | 'Business' | 'Student';
+
+declare interface ITransactionData {
   _id: string;
-  type: TransactionType;
-  user_id: string;
-  asset_id: IAsset;
-  amount: number;
-  updatedAssetCost: number;
-  numShares?: number;
+  userId?: string;
+  assetId?: string;
+  type?: TransactionType | string;
+  amount?: number;
+  numUnits?: number;
+  pricePerUnit?: number;
+  isFirst?: boolean;
+}
+
+declare interface ITransaction extends ITransactionData {
   createdAt: string;
   updatedAt: string;
 }
 
-declare interface IAsset {
+declare interface IAssetData {
   _id: string;
-  user_id: string;
-  category: string;
-  name: string;
-  cost: number;
-  value: number;
-  numShares?: number;
+  userId?: string;
+  name?: string;
+  category?: string;
+  cost?: number;
+  value?: number;
+  marketValue?: number;
+  numUnits?: number;
+  avgPricePerUnit?: number;
+  address?: string;
+  details?: string;
+  accountType?: AccountType | string;
+}
+
+declare interface IAsset extends IAssetData {
   createdAt: string;
   updatedAt: string;
 }

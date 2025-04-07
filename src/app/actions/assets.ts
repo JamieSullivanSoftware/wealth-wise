@@ -5,8 +5,9 @@ import { TRANSACTION_TYPES } from '@/constants';
 import Asset from '@/modelsAsset';
 import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
+import { isRealEstateCarOrOther, isStocksOrCrypto } from '@/utils/misc';
 
-export const addAsset = async (formData: FormData) => {
+export const addAsset = async (assetData: IAssetData) => {
   await connectDB();
 
   const sessionUser = await getSessionUser();
@@ -17,30 +18,53 @@ export const addAsset = async (formData: FormData) => {
 
   const { user } = sessionUser;
 
-  const assetData = {
-    user_id: user.id,
-    name: formData.get('asset-name'),
-    category: formData.get('category'),
-    numShares: parseFloat(formData.get('num-shares')?.toString() || '0'),
-    cost: parseFloat(formData.get('cost')?.toString() || '0'),
-    value: parseFloat(formData.get('value')?.toString() || '0'),
-    detail: formData.get('detail'),
+  let data = {
+    userId: user.id,
+    name: assetData.name || '',
+    category: assetData.category || '',
+    cost: parseFloat(assetData.cost?.toString() || '0'),
+    value: isRealEstateCarOrOther(assetData.category)
+      ? parseFloat(assetData.marketValue?.toString() || '0')
+      : parseFloat(assetData.value?.toString() || '0'),
+    marketValue: parseFloat(assetData.marketValue?.toString() || '0'),
+    numUnits: parseFloat(assetData.numUnits?.toString() || '0'),
+    avgPricePerUnit: 0,
+    address: assetData.address || '',
+    accountType: assetData.accountType || '',
+    details: assetData.details || '',
   };
 
   try {
-    const asset = new Asset(assetData);
-    const newAsset = await asset.save();
+    let asset = new Asset(data);
 
-    const transaction = {
-      user_id: user.id,
-      asset_id: newAsset._id,
-      amount: assetData.cost,
-      type: TRANSACTION_TYPES.buy,
-      updatedAssetCost: assetData.cost,
-      numShares: assetData.numShares,
-      isFirst: true,
-    };
-    await new Transaction(transaction).save();
+    // First transaction only added for stocks and crypto
+    if (isStocksOrCrypto(data.category)) {
+      const amount = data.numUnits * data.cost;
+      data = {
+        ...data,
+        cost: amount,
+        value: amount,
+        marketValue: data.cost, // Market value is the current value of 1 unit
+        avgPricePerUnit: amount / data.numUnits, // Avg price per unit
+      };
+
+      asset = new Asset(data);
+      const newAsset = await asset.save();
+      const transaction = {
+        userId: user.id?.toString() || '',
+        assetId: newAsset._id?.toString() || '',
+        type: TRANSACTION_TYPES.buy as TransactionType,
+        amount,
+        numUnits: data.numUnits,
+        pricePerUnit: data.cost,
+        isFirst: true,
+      };
+
+      await new Transaction(transaction).save();
+      return;
+    }
+
+    await asset.save();
   } catch (error) {
     console.log(error);
     return new Response('Asset not saved', { status: 500 });
@@ -63,7 +87,7 @@ export const deleteAsset = async (id: string) => {
     }
 
     const deleteTransactions = await Transaction.deleteMany({
-      asset_id: id,
+      assetId: id,
     });
     const deleteAsset = await Asset.deleteOne({ _id: id });
 
@@ -74,24 +98,38 @@ export const deleteAsset = async (id: string) => {
   }
 };
 
-export const editAsset = async (formData: FormData, id: string) => {
-  await connectDB();
-
+export const editAsset = async (assetData: IAssetData) => {
   const sessionUser = await getSessionUser();
 
   if (!sessionUser) {
     throw new Error('You must be logged in to edit an asset');
   }
 
-  const assetData = {
-    name: formData.get('asset-name'),
-    category: formData.get('category'),
-    value: parseFloat(formData.get('value')?.toString() || '0'),
-    detail: formData.get('detail'),
+  const { user } = sessionUser;
+
+  const data = {
+    userId: user.id,
+    name: assetData.name || '',
+    category: assetData.category || '',
+    cost: parseFloat(assetData.cost?.toString() || '0'),
+    value: parseFloat(assetData.value?.toString() || '0'),
+    marketValue: parseFloat(assetData.marketValue?.toString() || '0'),
+    numUnits: parseFloat(assetData.numUnits?.toString() || '0'),
+    address: assetData.address || '',
+    accountType: assetData.accountType || '',
+    details: assetData.details || '',
   };
 
   try {
-    await Asset.updateOne({ _id: id }, { $set: assetData });
+    if (isStocksOrCrypto(data.category)) {
+      data.value = data.marketValue * data.numUnits;
+    }
+
+    if (isRealEstateCarOrOther(data.category)) {
+      data.value = data.marketValue;
+    }
+
+    await Asset.updateOne({ _id: assetData._id }, { $set: data });
   } catch (error) {
     console.log(error);
     return new Response('Asset not updated', { status: 500 });

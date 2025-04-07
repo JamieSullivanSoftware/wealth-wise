@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { faPencilAlt, faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
@@ -18,7 +18,6 @@ import TransactionForm from '../Forms/TransactionForm';
 import TablesContainer from '../Containers/TablesContainer';
 import { deleteTransaction } from '@/app/actions/transactions';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
-import { hasCategoryGotShares } from '@/utils/misc';
 
 interface IProps {
   showFullData?: boolean;
@@ -34,7 +33,6 @@ const TransactionsTable = ({ showFullData }: IProps) => {
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
-  const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
@@ -42,7 +40,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     useState<IPaginatedTransactions | null>(null);
   const [assetList, setAssetList] = useState<IAssetListData[]>([]);
   const [selectedTransaction, setSelectedTransaction] = useState<
-    ITransactionData | undefined
+    ITransactionTableData | undefined
   >(undefined);
 
   const showHeaderButtons =
@@ -78,7 +76,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
 
   const handleOnDelete = async () => {
     if (selectedTransaction) {
-      await deleteTransaction(selectedTransaction._id);
+      await deleteTransaction(selectedTransaction);
       await refetchTransactions();
     }
   };
@@ -92,7 +90,6 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     );
     setPaginatedTransactions(transactions);
     setShowAddModal(false);
-    setShowEditModal(false);
     setShowDeleteModal(false);
   };
 
@@ -154,17 +151,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
               <TransactionForm
                 assetList={assetList}
                 onTransactionAdded={refetchTransactions}
-              />
-            </Modal>
-            <Modal
-              show={showEditModal}
-              onClose={() => setShowEditModal(false)}
-              heading='Edit Transaction'
-            >
-              <TransactionForm
-                assetList={assetList}
-                onTransactionAdded={refetchTransactions}
-                transaction={selectedTransaction}
+                isModalVisible={showAddModal}
               />
             </Modal>
           </>
@@ -246,13 +233,13 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                 </div>
 
                 {paginatedTransactions.transactions.map(
-                  (transaction: ITransactionData, i: number) => {
+                  (transaction: ITransactionTableData, i: number) => {
                     const {
                       asset,
                       amount,
                       type,
                       createdAt,
-                      numShares,
+                      numUnits,
                       isFirst,
                     } = transaction;
 
@@ -267,6 +254,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         <div className='col-span-6 flex flex-wrap items-center sm:col-span-3'>
                           <TransactionAmountInfo
                             amount={amount}
+                            type={type}
                             isFullTable
                           />
                         </div>
@@ -274,27 +262,17 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                           <span className='font-medium text-sm'>
                             {type.toUpperCase()}
                           </span>
-                          {numShares && (
+                          {numUnits && (
                             <span className='text-xs text-gray-3 dark:text-white'>
-                              {`${numShares} ${numShares === 1 ? `Share` : 'Shares'}`}
+                              {`${numUnits} ${numUnits === 1 ? `Share` : 'Shares'}`}
                             </span>
                           )}
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                           {asset.name}
                         </div>
-                        {!isFirst && hasCategoryGotShares(asset.category) && (
+                        {!isFirst && (
                           <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
-                            <IconButton
-                              onClick={() => {
-                                setSelectedTransaction(transaction);
-                                setShowEditModal(true);
-                              }}
-                              icon={faPencilAlt}
-                              iconSize='sm'
-                              iconColor='#197f4c'
-                              classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
-                            />
                             <IconButton
                               onClick={() => {
                                 setSelectedTransaction(transaction);
@@ -353,8 +331,8 @@ const TransactionsTable = ({ showFullData }: IProps) => {
               {paginatedTransactions &&
               paginatedTransactions.transactions.length > 0 ? (
                 paginatedTransactions.transactions.map(
-                  (transaction: ITransactionData, i: number) => {
-                    const { asset, amount, createdAt } = transaction;
+                  (transaction: ITransactionTableData, i: number) => {
+                    const { asset, amount, createdAt, type } = transaction;
                     const date = new Date(createdAt);
 
                     return (
@@ -364,6 +342,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       >
                         <TransactionAmountInfo
                           amount={amount}
+                          type={type}
                           assetName={asset.name}
                         />
                         <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>

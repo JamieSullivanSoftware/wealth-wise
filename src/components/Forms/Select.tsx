@@ -6,7 +6,7 @@ interface IProps {
   placeholder: string;
   options: { value: string; label: string }[];
   required?: boolean;
-  value?: number | string | undefined;
+  value?: string | number | undefined;
   onSelect?: (value: string) => void;
 }
 

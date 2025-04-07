@@ -40,7 +40,7 @@ export const GET = async () => {
           afterStartDateTotals: [
             {
               $match: {
-                user_id: userId,
+                userId: userId,
               },
             },
             {

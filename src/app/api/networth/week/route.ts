@@ -31,7 +31,7 @@ export const GET = async () => {
             {
               $match: {
                 createdAt: { $lt: startDate },
-                user_id: userId,
+                userId: userId,
               },
             },
             {
