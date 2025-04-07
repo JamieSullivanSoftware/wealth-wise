@@ -193,8 +193,8 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                 <TableHeader title='Transactions' />
               </div>
               <div>
-                <div className='grid grid-cols-12 gap-2 px-2 mb-2 text-xs font-medium text-black dark:text-white xsm:text-sm'>
-                  <div className='col-span-4 sm:col-span-2 flex items-center'>
+                <div className='grid grid-cols-12 gap-2 px-2 mb-2 font-medium text-black dark:text-white text-sm'>
+                  <div className='hidden col-span-2 xsm:flex items-center'>
                     <Button
                       text='Date'
                       onClick={() => handleSort('createdAt')}
@@ -205,7 +205,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'createdAt' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
-                  <div className='col-span-6 flex sm:col-span-3 items-center'>
+                  <div className='flex items-center col-span-4 sm:col-span-3'>
                     <Button
                       text='Amount'
                       onClick={() => handleSort('amount')}
@@ -216,18 +216,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'amount' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
-                  <div className='hidden col-span-3 sm:flex items-center sm:col-span-3'>
-                    <Button
-                      text='Asset Name'
-                      onClick={() => handleSort('assetName')}
-                      icon={faSort}
-                      iconAlign='right'
-                      hasBg={false}
-                      iconSize='xs'
-                      classes={`${sort.by === 'assetName' ? 'font-bold' : 'font-normal'} py-0 px-0`}
-                    />
-                  </div>
-                  <div className='col-span-2 flex sm:col-span-1 justify-center items-center'>
+                  <div className='flex sm:hidden justify-center items-center col-span-2 xsm:col-span-1'>
                     <Button
                       text='Type'
                       onClick={() => handleSort('type')}
@@ -238,7 +227,29 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'type' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
-                  <div className='col-span-2 flex sm:col-span-2 justify-end items-center'>
+                  <div className='flex items-center col-span-4 sm:col-span-3 justify-end sm:justify-start'>
+                    <Button
+                      text='Asset'
+                      onClick={() => handleSort('assetName')}
+                      icon={faSort}
+                      iconAlign='right'
+                      hasBg={false}
+                      iconSize='xs'
+                      classes={`${sort.by === 'assetName' ? 'font-bold' : 'font-normal'} py-0 px-0`}
+                    />
+                  </div>
+                  <div className='hidden sm:flex justify-center items-center col-span-1'>
+                    <Button
+                      text='Type'
+                      onClick={() => handleSort('type')}
+                      icon={faSort}
+                      iconAlign='right'
+                      hasBg={false}
+                      iconSize='xs'
+                      classes={`${sort.by === 'type' ? 'font-bold' : 'font-normal'} py-0 px-0`}
+                    />
+                  </div>
+                  <div className='hidden sm:flex sm:col-span-2 justify-end items-center'>
                     <Button
                       text='Quantity'
                       onClick={() => handleSort('type')}
@@ -269,20 +280,23 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         key={i}
                         className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm gap-2 px-2 rounded-md'
                       >
-                        <div className='col-span-4 flex flex-wrap items-center sm:col-span-2'>
+                        <div className='col-span-2 hidden xsm:flex flex-wrap items-center'>
                           {getEuropeanYear(new Date(createdAt))}
                         </div>
-                        <div className='col-span-6 flex flex-wrap items-center sm:col-span-3'>
+                        <div className='flex flex-wrap items-center col-span-4 sm:col-span-3'>
                           <TransactionAmountInfo
                             amount={amount}
                             type={type}
                             isFullTable
                           />
                         </div>
-                        <div className='hidden col-span-3 sm:flex flex-wrap items-center sm:col-span-3'>
+                        <div className='col-span-2 flex flex-wrap justify-center items-center sm:hidden xsm:col-span-1'>
+                          <span className='text-sm'>{type.toUpperCase()}</span>
+                        </div>
+                        <div className='col-span-4 sm:col-span-3 flex flex-wrap items-center justify-end sm:justify-start text-end'>
                           {asset.name}
                         </div>
-                        <div className='col-span-2 flex flex-wrap justify-center items-center gap-1 sm:col-span-1'>
+                        <div className='hidden sm:flex flex-wrap justify-center items-center sm:col-span-1'>
                           <span className='text-sm'>{type.toUpperCase()}</span>
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
@@ -296,7 +310,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         </div>
 
                         {!isFirst && (
-                          <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
+                          <div className='col-span-2 xsm:col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
                             <IconButton
                               onClick={() => {
                                 setSelectedTransaction(transaction);
