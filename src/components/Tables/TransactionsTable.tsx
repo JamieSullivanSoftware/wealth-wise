@@ -31,7 +31,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     by: 'createdAt',
     order: 'desc',
   });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
@@ -77,41 +77,27 @@ const TransactionsTable = ({ showFullData }: IProps) => {
   const handleOnDelete = async () => {
     if (selectedTransaction) {
       await deleteTransaction(selectedTransaction);
-      await refetchTransactions();
+      await fetchTransactions();
     }
   };
 
-  const refetchTransactions = async () => {
-    const transactions = await getTransactions(
-      limit,
-      sort.by,
-      sort.order,
-      page
-    );
+  const fetchTransactions = async () => {
+    setIsLoading(true);
+    const transactionsData = getTransactions(limit, sort.by, sort.order, page);
+    const assetListData = getAssetList();
+    const [transactions, assetsList] = await Promise.all([
+      transactionsData,
+      assetListData,
+    ]);
     setPaginatedTransactions(transactions);
+    setAssetList(assetsList);
+    setIsLoading(false);
     setShowAddModal(false);
     setShowDeleteModal(false);
   };
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      setIsLoading(true);
-      const transactionsData = getTransactions(
-        limit,
-        sort.by,
-        sort.order,
-        page
-      );
-      const assetListData = getAssetList();
-      const [transactions, assetsList] = await Promise.all([
-        transactionsData,
-        assetListData,
-      ]);
-      setPaginatedTransactions(transactions);
-      setAssetList(assetsList);
-    };
-
-    fetchTransactions().finally(() => setIsLoading(false));
+    fetchTransactions();
   }, [sort.by, sort.order, page, limit]);
 
   if (isLoading) {
@@ -150,7 +136,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
             >
               <TransactionForm
                 assetList={assetList}
-                onTransactionAdded={refetchTransactions}
+                onTransactionAdded={fetchTransactions}
                 isModalVisible={showAddModal}
               />
             </Modal>

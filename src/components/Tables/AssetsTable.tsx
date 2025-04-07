@@ -34,7 +34,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
     by: 'createdAt',
     order: 'desc',
   });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -76,18 +76,10 @@ const AssetsTable = ({ showFullData }: IProps) => {
     setLimit(numLimit);
   };
 
-  const refetchAssets = async () => {
-    const assets = await getAssets(limit, sort.by, sort.order, page);
-    setPaginatedAssets(assets);
-    setShowAddModal(false);
-    setShowDeleteModal(false);
-    setShowEditModal(false);
-  };
-
   const handleOnDelete = async () => {
     if (selectedAsset) {
       await deleteAsset(selectedAsset._id);
-      await refetchAssets();
+      await fetchAssets();
     }
   };
 
@@ -118,14 +110,18 @@ const AssetsTable = ({ showFullData }: IProps) => {
     return details;
   };
 
-  useEffect(() => {
-    const fetchAssets = async () => {
-      setIsLoading(true);
-      const assets = await getAssets(limit, sort.by, sort.order, page);
-      setPaginatedAssets(assets);
-    };
+  const fetchAssets = async () => {
+    setIsLoading(true);
+    const assets = await getAssets(limit, sort.by, sort.order, page);
+    setPaginatedAssets(assets);
+    setIsLoading(false);
+    setShowAddModal(false);
+    setShowDeleteModal(false);
+    setShowEditModal(false);
+  };
 
-    fetchAssets().finally(() => setIsLoading(false));
+  useEffect(() => {
+    fetchAssets();
   }, [sort.by, sort.order, page, limit]);
 
   if (isLoading) {
@@ -147,7 +143,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
         heading='Add Asset'
       >
         <AssetForm
-          onAssetAdded={refetchAssets}
+          onAssetAdded={fetchAssets}
           isModalVisible={showAddModal}
         />
       </Modal>
@@ -157,7 +153,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
         heading='Edit Asset'
       >
         <AssetForm
-          onAssetAdded={refetchAssets}
+          onAssetAdded={fetchAssets}
           asset={selectedAsset}
           isModalVisible={showEditModal}
         />
