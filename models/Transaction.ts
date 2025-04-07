@@ -2,12 +2,12 @@ import { Schema, model, models } from 'mongoose';
 
 const TransactionSchema = new Schema(
   {
-    user_id: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
       required: true,
     },
-    asset_id: {
+    assetId: {
       type: Schema.Types.ObjectId,
       ref: 'Asset',
       required: true,
@@ -16,17 +16,32 @@ const TransactionSchema = new Schema(
       type: Number,
       required: true,
     },
+
     type: {
       type: String,
-      required: true,
+      required: false,
+      default: '',
     },
-    numShares: {
+
+    // Only for stocks/crypto
+    // Number of units
+    numUnits: {
       type: Number,
       required: false,
+      default: 0,
     },
+    // Price per unit
+    pricePerUnit: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+
+    // First transaction when creating an asset
     isFirst: {
       type: Boolean,
       required: false,
+      default: false,
     },
   },
   {

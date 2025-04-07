@@ -31,18 +31,18 @@ export const GET = async (request: NextRequest) => {
           transactions: [
             {
               $match: {
-                user_id: userId,
+                userId: userId,
               },
             },
             {
               $addFields: {
-                asset_id: { $toObjectId: '$asset_id' },
+                assetId: { $toObjectId: '$assetId' },
               },
             },
             {
               $lookup: {
                 from: 'assets',
-                localField: 'asset_id',
+                localField: 'assetId',
                 foreignField: '_id',
                 as: 'asset',
               },
@@ -53,14 +53,16 @@ export const GET = async (request: NextRequest) => {
             {
               $project: {
                 _id: 1,
-                user_id: 1,
                 createdAt: 1,
-                amount: 1,
-                numShares: 1,
-                type: 1,
+                userId: 1,
                 'asset._id': 1,
                 'asset.name': 1,
                 'asset.category': 1,
+                amount: 1,
+                type: 1,
+                numUnits: 1,
+                pricePerUnit: 1,
+                totalCostBasis: 1,
                 isFirst: 1,
               },
             },
@@ -82,7 +84,7 @@ export const GET = async (request: NextRequest) => {
           count: [
             {
               $match: {
-                user_id: userId,
+                userId: userId,
               },
             },
             {

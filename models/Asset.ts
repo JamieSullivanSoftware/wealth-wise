@@ -2,34 +2,77 @@ import { Schema, model, models } from 'mongoose';
 
 export const AssetSchema = new Schema(
   {
-    user_id: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
-    },
-    category: {
-      type: String,
       required: true,
     },
     name: {
       type: String,
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+    },
+
+    // Total cost basis or purchase price
     cost: {
       type: Number,
       required: true,
+      default: 0,
     },
+    // Total value
     value: {
       type: Number,
       required: true,
+      default: 0,
     },
-    numShares: {
+    // Current market value
+    marketValue: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+
+    // For stocks/crypto
+    numUnits: {
       type: Number,
       required: false,
+      default: 0,
     },
-    detail: {
+    // Average price per unit
+    avgPricePerUnit: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    // Total of BUY transactions
+    totalCostBasis: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+
+    // For real estate
+    address: {
       type: String,
       required: false,
+      default: null,
+    },
+
+    // For accounts
+    accountType: {
+      type: String,
+      required: false,
+      default: '',
+    },
+
+    // For other
+    details: {
+      type: String,
+      required: false,
+      default: '',
     },
   },
   {

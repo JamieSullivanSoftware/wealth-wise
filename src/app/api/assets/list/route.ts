@@ -17,8 +17,12 @@ export const GET = async () => {
     const pipeline: PipelineStage[] = [
       {
         $match: {
-          user_id: userId,
-          category: { $in: ['Stocks', 'Crypto'] },
+          userId: userId,
+        },
+      },
+      {
+        $sort: {
+          name: 1 as 1 | -1,
         },
       },
       {
