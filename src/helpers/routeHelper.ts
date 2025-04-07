@@ -167,24 +167,3 @@ export const formatCategories = () => [
     },
   },
 ];
-
-export const getTransactionsAmountAndShares = () => [
-  {
-    $lookup: {
-      from: 'transactions',
-      localField: '_id',
-      foreignField: 'assetId',
-      as: 'transactions',
-    },
-  },
-  {
-    $addFields: {
-      totalTransactionAmount: {
-        $sum: '$transactions.amount',
-      },
-      remainingShares: {
-        $sum: '$transactions.numShares',
-      },
-    },
-  },
-];

@@ -19,14 +19,11 @@ declare interface IAssetTableData {
   category: string;
   cost: number;
   value: number;
-  marketValue?: number;
   numUnits?: number;
-  avgPricePerUnit?: number;
   address?: string;
   accountType?: string;
   details?: string;
   gainsLossPercentage: number;
-  totalCostBasis?: number;
 }
 
 declare interface IAssetListData {

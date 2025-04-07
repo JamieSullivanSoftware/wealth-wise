@@ -18,7 +18,6 @@ import TransactionForm from '../Forms/TransactionForm';
 import TablesContainer from '../Containers/TablesContainer';
 import { deleteTransaction } from '@/app/actions/transactions';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
-import { isRealEstateCarOrOther } from '@/utils/misc';
 
 interface IProps {
   showFullData?: boolean;
@@ -272,21 +271,20 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                           {asset.name}
                         </div>
-                        {!isFirst &&
-                          !isRealEstateCarOrOther(asset.category) && (
-                            <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
-                              <IconButton
-                                onClick={() => {
-                                  setSelectedTransaction(transaction);
-                                  setShowDeleteModal(true);
-                                }}
-                                icon={faTrashAlt}
-                                iconSize='sm'
-                                iconColor='#e52020'
-                                classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
-                              />
-                            </div>
-                          )}
+                        {!isFirst && (
+                          <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
+                            <IconButton
+                              onClick={() => {
+                                setSelectedTransaction(transaction);
+                                setShowDeleteModal(true);
+                              }}
+                              icon={faTrashAlt}
+                              iconSize='sm'
+                              iconColor='#e52020'
+                              classes='enabled:hover:opacity-50 enabled:dark:hover:opacity-75'
+                            />
+                          </div>
+                        )}
                       </div>
                     );
                   }
