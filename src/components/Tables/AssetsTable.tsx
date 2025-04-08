@@ -83,7 +83,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
     }
   };
 
-  const getDetailsString = (asset: IAssetTableData) => {
+  const getDetailsString = (asset: IAssetTableData): string => {
     let details = '';
 
     switch (asset.category) {
@@ -107,7 +107,11 @@ const AssetsTable = ({ showFullData }: IProps) => {
         break;
     }
 
-    return details;
+    return details.length > 40 ? truncateDetails(details) : details;
+  };
+
+  const truncateDetails = (details: string) => {
+    return `${details.substring(0, 40)}...`;
   };
 
   const fetchAssets = async () => {
@@ -198,8 +202,8 @@ const AssetsTable = ({ showFullData }: IProps) => {
             <>
               <TableHeader title='Assets' />
               <div>
-                <div className='grid grid-cols-12 mb-2 text-xs font-medium text-black dark:text-white xsm:text-xs'>
-                  <div className='col-span-3 sm:col-span-2 flex items-center'>
+                <div className='grid grid-cols-12 gap-2 mb-2 text-xs font-medium text-black dark:text-white xsm:text-xs'>
+                  <div className='col-span-3 sm:col-span-2 hidden xsm:flex items-center'>
                     <Button
                       text='Created'
                       onClick={() => handleSort('createdAt')}
@@ -210,7 +214,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'createdAt' ? 'font-bold' : 'font-normal'}`}
                     />
                   </div>
-                  <div className='col-span-6 flex sm:col-span-2 items-center'>
+                  <div className='flex items-center col-span-6 sm:col-span-2 xsm:col-span-5'>
                     <Button
                       text='Name'
                       onClick={() => handleSort('name')}
@@ -232,7 +236,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'category' ? 'font-bold' : 'font-normal'}`}
                     />
                   </div>
-                  <div className='col-span-3 flex justify-end items-center sm:col-span-2'>
+                  <div className='flex justify-start sm:justify-end items-center col-span-4 sm:col-span-2 xsm:col-span-3'>
                     <Button
                       text='Gains/Loss'
                       onClick={() => handleSort('gainsLossPercentage')}
@@ -265,7 +269,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                       classes={`py-0 px-0 text-sm xsm:text-base ${sort.by === 'value' ? 'font-bold' : 'font-normal'}`}
                     />
                   </div>
-                  <div className='col-span-1' />
+                  <div className='col-span-2 xsm:col-span-1 ' />
                 </div>
                 {paginatedAssets.assets.map(
                   (asset: IAssetTableData, i: number) => {
@@ -280,21 +284,23 @@ const AssetsTable = ({ showFullData }: IProps) => {
                     return (
                       <div
                         key={i}
-                        className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm px-2 rounded-md'
+                        className='grid grid-cols-12 gap-2 py-3 text-xs text-black dark:text-white xsm:text-sm px-2 rounded-md'
                       >
-                        <div className='col-span-3 sm:col-span-2 flex flex-wrap items-center'>
+                        <div className='col-span-3 sm:col-span-2 hidden xsm:flex  flex-wrap items-center'>
                           {getEuropeanYear(new Date(createdAt))}
                         </div>
-                        <div className='justify-center col-span-6 flex flex-col flex-wrap gap-2 sm:justify-start sm:col-span-2'>
+                        <div className='justify-center flex flex-col flex-wrap gap-2 col-span-6 sm:col-span-2 xsm:col-span-5'>
                           <span className='font-medium'>{name}</span>
-                          <span className='font-light'>
-                            {getDetailsString(asset)}
-                          </span>
+                          {getDetailsString(asset) && (
+                            <span className='font-light'>
+                              {getDetailsString(asset)}
+                            </span>
+                          )}
                         </div>
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-center items-center sm:col-span-1'>
                           {category}
                         </div>
-                        <div className='col-span-3 flex flex-wrap justify-end items-center sm:col-span-2'>
+                        <div className='flex flex-wrap justify-start sm:justify-end items-center col-span-4 sm:col-span-2 xsm:col-span-3'>
                           <AssetsChange
                             gainsLossPercentage={gainsLossPercentage}
                           />
@@ -305,7 +311,7 @@ const AssetsTable = ({ showFullData }: IProps) => {
                         <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
                           {currencyFormat.format(value)}
                         </div>
-                        <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
+                        <div className='col-span-2 xsm:col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
                           <IconButton
                             onClick={() => {
                               setSelectedAsset(asset);
