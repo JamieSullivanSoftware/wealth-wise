@@ -365,7 +365,24 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                   : undefined
               }
             />
-            <div className='mt-8 2lg:mt-0'>
+            <div className='mt-4 2lg:mt-0'>
+              {paginatedTransactions &&
+                paginatedTransactions.transactions.length > 0 && (
+                  <div className='grid grid-cols-12 text-xs font-medium text-black dark:text-white xsm:text-sm items-center 2lg:hidden'>
+                    <div className='col-span-4 xsm:col-span-3 flex items-center'>
+                      Amount
+                    </div>
+                    <div className='col-span-4 xsm:col-span-3 2lg:col-span-6 flex justify-center items-center'>
+                      Asset
+                    </div>
+                    <div className='col-span-3 hidden xsm:flex justify-center items-center 2lg:hidden'>
+                      Type
+                    </div>
+                    <div className='col-span-4 xsm:col-span-3 flex justify-end items-center'>
+                      Date
+                    </div>
+                  </div>
+                )}
               {paginatedTransactions &&
               paginatedTransactions.transactions.length > 0 ? (
                 paginatedTransactions.transactions.map(
@@ -375,24 +392,26 @@ const TransactionsTable = ({ showFullData }: IProps) => {
 
                     return (
                       <div
-                        className='grid grid-cols-12 pb-9 text-xs text-black dark:text-white xsm:text-sm'
+                        className='grid grid-cols-12 pt-4 pb-9 text-xs text-black dark:text-white xsm:text-sm items-center gap-2'
                         key={i}
                       >
-                        <TransactionAmountInfo
-                          amount={amount}
-                          type={type}
-                          assetName={asset.name}
-                        />
-                        <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
+                        <div className='col-span-4 xsm:col-span-3 2lg:col-span-9 flex gap-4'>
+                          <TransactionAmountInfo
+                            amount={amount}
+                            type={type}
+                            assetName={asset.name}
+                          />
+                        </div>
+                        <div className='col-span-4 xsm:col-span-3 2lg:col-span-4 justify-center items-center flex 2lg:hidden text-center'>
                           {asset?.name}
                         </div>
                         <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
-                          {asset?.category}
+                          {type}
                         </div>
                         <div className='hidden gap-1 col-span-3 justify-end items-center xsm:flex 2lg:hidden'>
                           {getEuropeanYear(date)}
                         </div>
-                        <div className='gap-1 col-span-2 flex flex-col justify-center items-end xsm:hidden 2lg:flex'>
+                        <div className='gap-1 col-span-4 xsm:col-span-3 2lg:col-span-3 flex flex-col justify-center items-end xsm:hidden 2lg:flex 2lg:justify-end'>
                           <p>{getMonthDate(date)}</p>
                           <p>{getTime(date)}</p>
                         </div>

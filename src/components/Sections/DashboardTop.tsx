@@ -13,7 +13,7 @@ const DashboardTopSection = () => {
   const [networth, setNetworth] = useState<INetworth | null>(null);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [totalNetworth, setTotalNetworth] = useState<number>(0);
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<DashboardTab>('Chart');
   const [activeFilter, setActiveFilter] = useState<DateFilter>('week');
 

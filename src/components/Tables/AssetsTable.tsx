@@ -367,17 +367,19 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   : undefined
               }
             />
-            <div className='mt-8 2lg:mt-0'>
+            <div className='mt-4 2lg:mt-0'>
               {paginatedAssets && paginatedAssets.assets.length > 0 && (
-                <div className='grid grid-cols-12 text-xs font-medium text-black dark:text-white xsm:text-sm'>
-                  <div className='col-span-3 flex items-center'>Name</div>
-                  <div className='col-span-3 flex justify-center 2lg:justify-end items-center'>
+                <div className='grid grid-cols-12 text-xs font-medium text-black dark:text-white xsm:text-sm 2lg:hidden'>
+                  <div className='col-span-6 xsm:col-span-3 flex items-center'>
+                    Name
+                  </div>
+                  <div className='col-span-6 xsm:col-span-3 flex justify-end items-center xsm:justify-center'>
                     Change
                   </div>
-                  <div className='col-span-3 flex justify-center items-center 2lg:justify-end'>
+                  <div className='col-span-3 hidden xsm:flex justify-center items-center 2lg:justify-end'>
                     Cost
                   </div>
-                  <div className='col-span-3 flex justify-end items-center'>
+                  <div className='hidden col-span-3 xsm:flex justify-end items-center'>
                     Value
                   </div>
                 </div>
@@ -387,26 +389,23 @@ const AssetsTable = ({ showFullData }: IProps) => {
                   (asset: IAssetTableData, i: number) => (
                     <div
                       key={i}
-                      className='grid grid-cols-12 py-4 text-xs text-black dark:text-white xsm:text-sm'
+                      className='grid grid-cols-12 py-4 text-xs text-black dark:text-white xsm:text-sm mb-0 2lg:mb-5'
                     >
-                      <div className='col-span-3 flex flex-col gap-2 flex-wrap'>
+                      <div className='col-span-6 xsm:col-span-3 flex flex-col gap-2 flex-wrap justify-center'>
                         <span className='font-medium'>{asset.name}</span>
-                        <span className='font-light overflow-hidden whitespace-nowrap text-ellipsis 2xsm:inline-block hidden 2lg:w-[180px] md:w-[200px] xsm:w-[140px] 2xsm:w-[90px]'>
-                          {asset.category === CATEGORIES.stocks ||
-                          asset.category === CATEGORIES.crypto
-                            ? `${asset.numUnits} Share${asset.numUnits && asset.numUnits > 1 ? 's' : ''}`
-                            : `nada`}
+                        <span className='font-light'>
+                          {getDetailsString(asset)}
                         </span>
                       </div>
-                      <div className='col-span-3 flex flex-wrap justify-center 2lg:justify-end items-center'>
+                      <div className='col-span-6 xsm:col-span-3 flex flex-wrap justify-end items-center xsm:justify-center'>
                         <AssetsChange
                           gainsLossPercentage={asset.gainsLossPercentage}
                         />
                       </div>
-                      <div className='col-span-3 flex flex-wrap justify-center items-center 2lg:justify-end'>
+                      <div className='col-span-3 hidden xsm:flex flex-wrap justify-center items-center 2lg:justify-end'>
                         {currencyFormat.format(asset.cost)}
                       </div>
-                      <div className='col-span-3 flex flex-wrap justify-end items-center'>
+                      <div className='hidden col-span-3 xsm:flex flex-wrap justify-end items-center'>
                         {currencyFormat.format(asset.value)}
                       </div>
                     </div>

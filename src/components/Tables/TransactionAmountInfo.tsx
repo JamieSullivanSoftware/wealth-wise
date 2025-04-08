@@ -32,9 +32,7 @@ const TransactionAmountInfo = ({
 
   return (
     <>
-      <div
-        className={`hidden sm:flex items-center 2lg:col-span-3 2lg:justify-start ${isFullTable ? 'mr-4' : ''}`}
-      >
+      <div className='hidden sm:flex items-center 2lg:col-span-3 2lg:justify-start'>
         <div className={iconClassNames}>
           <span className='hidden xsm:flex 2lg:hidden'>
             <AmountIcon
@@ -51,7 +49,7 @@ const TransactionAmountInfo = ({
           </span>
         </div>
       </div>
-      <div className='gap-1 text-xs col-span-7 2xsm:col-span-8 xsm:col-start-2 xsm:col-span-2 flex flex-col xsm:flex-row justify-center xsm:text-sm xsm:items-center xsm:justify-start 2lg:col-span-6 2lg:flex-col 2lg:items-start'>
+      <div className='gap-1 text-xs col-span-7 2xsm:col-span-8 sm:col-start-2 xsm:col-span-2 flex flex-col xsm:flex-row justify-center xsm:text-sm xsm:items-center xsm:justify-start 2lg:col-span-6 2lg:flex-col 2lg:items-start'>
         <span className={fontClassNames}>{currencyFormat.format(amount)}</span>
         {assetName && (
           <span className='flex xsm:hidden col-span-3 2lg:flex'>
