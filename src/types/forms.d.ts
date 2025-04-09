@@ -2,7 +2,7 @@ declare type TransactionType = 'BUY' | 'SELL' | 'DEPOSIT' | 'WITHDRAW';
 
 declare type AccountType = 'Current' | 'Deposit' | 'Business' | 'Student';
 
-declare interface ITransactionData {
+declare interface ITransactionFormData {
   _id: string;
   userId?: string;
   assetId?: string;
@@ -13,12 +13,7 @@ declare interface ITransactionData {
   isFirst?: boolean;
 }
 
-declare interface ITransaction extends ITransactionData {
-  createdAt: string;
-  updatedAt: string;
-}
-
-declare interface IAssetData {
+declare interface IAssetFormData {
   _id: string;
   userId?: string;
   name?: string;
@@ -31,9 +26,4 @@ declare interface IAssetData {
   address?: string;
   details?: string;
   accountType?: AccountType | string;
-}
-
-declare interface IAsset extends IAssetData {
-  createdAt: string;
-  updatedAt: string;
 }

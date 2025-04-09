@@ -25,7 +25,7 @@ const TransactionForm = ({
   transaction,
   isModalVisible,
 }: IProps) => {
-  const [transactionData, setTransactionData] = useState<ITransactionData>({
+  const [transactionData, setTransactionData] = useState<ITransactionFormData>({
     _id: '',
     assetId: '',
     type: '',

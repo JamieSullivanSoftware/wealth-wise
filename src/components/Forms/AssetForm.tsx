@@ -18,7 +18,7 @@ interface IProps {
 }
 
 const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
-  const [assetData, setAssetData] = useState<IAssetData>({
+  const [assetData, setAssetData] = useState<IAssetFormData>({
     _id: '',
     name: '',
     category: '',
