@@ -61,6 +61,13 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
     setAssetData({
       ...assetData,
       category,
+      cost: '',
+      value: '',
+      numUnits: '',
+      address: '',
+      accountType: '',
+      details: '',
+      marketValue: '',
     });
   };
 

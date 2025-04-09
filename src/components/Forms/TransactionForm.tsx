@@ -65,6 +65,10 @@ const TransactionForm = ({
       setTransactionData({
         ...transactionData,
         assetId: asset._id,
+        type: '',
+        amount: '',
+        numUnits: '',
+        pricePerUnit: '',
       });
     }
   };
