@@ -7,7 +7,7 @@ import Transaction from '@/modelsTransaction';
 import { getSessionUser } from '@/utils/getSessionUser';
 import { isRealEstateCarOrOther, isStocksOrCrypto } from '@/utils/misc';
 
-export const addAsset = async (assetData: IAssetData) => {
+export const addAsset = async (assetData: IAssetFormData) => {
   await connectDB();
 
   const sessionUser = await getSessionUser();
@@ -98,7 +98,7 @@ export const deleteAsset = async (id: string) => {
   }
 };
 
-export const editAsset = async (assetData: IAssetData) => {
+export const editAsset = async (assetData: IAssetFormData) => {
   const sessionUser = await getSessionUser();
 
   if (!sessionUser) {

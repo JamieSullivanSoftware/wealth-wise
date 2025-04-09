@@ -26,6 +26,11 @@ export const GET = async () => {
         $facet: {
           categories: [
             {
+              $match: {
+                userId: userId,
+              },
+            },
+            {
               $group: {
                 _id: '$category',
                 total: {

@@ -4,7 +4,12 @@ import { faPlus, faSort } from '@fortawesome/free-solid-svg-icons';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-import { getEuropeanYear, getMonthDate, getTime } from '@/utils/string';
+import {
+  currencyFormat,
+  getEuropeanYear,
+  getMonthDate,
+  getTime,
+} from '@/utils/string';
 import { getAssetList, getTransactions } from '@/utils/api';
 import Button from '../Common/Button';
 import IconButton from '../Common/IconButton';
@@ -18,12 +23,17 @@ import TransactionForm from '../Forms/TransactionForm';
 import TablesContainer from '../Containers/TablesContainer';
 import { deleteTransaction } from '@/app/actions/transactions';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
+import { CATEGORIES } from '@/constants';
 
 interface IProps {
   showFullData?: boolean;
+  setShouldRefetchNetworth?: (loading: boolean) => void;
 }
 
-const TransactionsTable = ({ showFullData }: IProps) => {
+const TransactionsTable = ({
+  showFullData,
+  setShouldRefetchNetworth,
+}: IProps) => {
   const router = useRouter();
   const { data: session, status } = useSession();
   const isAuthenticated = session && status === 'authenticated';
@@ -77,41 +87,47 @@ const TransactionsTable = ({ showFullData }: IProps) => {
   const handleOnDelete = async () => {
     if (selectedTransaction) {
       await deleteTransaction(selectedTransaction);
-      await refetchTransactions();
+      await fetchTransactions();
     }
   };
 
-  const refetchTransactions = async () => {
-    const transactions = await getTransactions(
-      limit,
-      sort.by,
-      sort.order,
-      page
-    );
+  const getQuantityString = (
+    amount: number,
+    numUnits: number,
+    category: string
+  ) => {
+    switch (category) {
+      case CATEGORIES.stocks:
+        return `${numUnits} Share${numUnits === 1 ? '' : 's'}`;
+      case CATEGORIES.crypto:
+        return `${numUnits} Coin${numUnits === 1 ? '' : 's'}`;
+      case CATEGORIES.accounts:
+        return currencyFormat.format(amount);
+      default:
+        return '';
+    }
+  };
+
+  const fetchTransactions = async () => {
+    setIsLoading(true);
+    const transactionsData = getTransactions(limit, sort.by, sort.order, page);
+    const assetListData = getAssetList();
+    const [transactions, assetsList] = await Promise.all([
+      transactionsData,
+      assetListData,
+    ]);
     setPaginatedTransactions(transactions);
+    setAssetList(assetsList);
+    setIsLoading(false);
     setShowAddModal(false);
     setShowDeleteModal(false);
+    if (!showFullData && setShouldRefetchNetworth) {
+      setShouldRefetchNetworth(true);
+    }
   };
 
   useEffect(() => {
-    const fetchTransactions = async () => {
-      setIsLoading(true);
-      const transactionsData = getTransactions(
-        limit,
-        sort.by,
-        sort.order,
-        page
-      );
-      const assetListData = getAssetList();
-      const [transactions, assetsList] = await Promise.all([
-        transactionsData,
-        assetListData,
-      ]);
-      setPaginatedTransactions(transactions);
-      setAssetList(assetsList);
-    };
-
-    fetchTransactions().finally(() => setIsLoading(false));
+    fetchTransactions();
   }, [sort.by, sort.order, page, limit]);
 
   if (isLoading) {
@@ -150,7 +166,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
             >
               <TransactionForm
                 assetList={assetList}
-                onTransactionAdded={refetchTransactions}
+                onTransactionAdded={fetchTransactions}
                 isModalVisible={showAddModal}
               />
             </Modal>
@@ -184,8 +200,8 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                 <TableHeader title='Transactions' />
               </div>
               <div>
-                <div className='grid grid-cols-12 px-2 mb-2 text-xs font-medium text-black dark:text-white xsm:text-sm'>
-                  <div className='col-span-4 sm:col-span-2 flex items-center'>
+                <div className='grid grid-cols-12 gap-2 px-2 mb-2 font-medium text-black dark:text-white text-sm'>
+                  <div className='hidden col-span-2 xsm:flex items-center'>
                     <Button
                       text='Date'
                       onClick={() => handleSort('createdAt')}
@@ -196,7 +212,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'createdAt' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
-                  <div className='col-span-6 flex sm:col-span-3 items-center'>
+                  <div className='flex items-center col-span-4 sm:col-span-3'>
                     <Button
                       text='Amount'
                       onClick={() => handleSort('amount')}
@@ -207,9 +223,9 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'amount' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
-                  <div className='col-span-2 flex sm:col-span-2 justify-center items-center'>
+                  <div className='flex sm:hidden justify-center items-center col-span-2 xsm:col-span-1'>
                     <Button
-                      text='Details'
+                      text='Type'
                       onClick={() => handleSort('type')}
                       icon={faSort}
                       iconAlign='right'
@@ -218,7 +234,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'type' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
-                  <div className='hidden col-span-3 sm:flex justify-end items-center sm:col-span-2'>
+                  <div className='flex items-center col-span-4 sm:col-span-3 justify-end sm:justify-start'>
                     <Button
                       text='Asset'
                       onClick={() => handleSort('assetName')}
@@ -229,6 +245,29 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                       classes={`${sort.by === 'assetName' ? 'font-bold' : 'font-normal'} py-0 px-0`}
                     />
                   </div>
+                  <div className='hidden sm:flex justify-center items-center col-span-1'>
+                    <Button
+                      text='Type'
+                      onClick={() => handleSort('type')}
+                      icon={faSort}
+                      iconAlign='right'
+                      hasBg={false}
+                      iconSize='xs'
+                      classes={`${sort.by === 'type' ? 'font-bold' : 'font-normal'} py-0 px-0`}
+                    />
+                  </div>
+                  <div className='hidden sm:flex sm:col-span-2 justify-end items-center'>
+                    <Button
+                      text='Quantity'
+                      onClick={() => handleSort('type')}
+                      icon={faSort}
+                      iconAlign='right'
+                      hasBg={false}
+                      iconSize='xs'
+                      classes={`${sort.by === 'type' ? 'font-bold' : 'font-normal'} py-0 px-0`}
+                    />
+                  </div>
+
                   <div className='col-span-1' />
                 </div>
 
@@ -246,33 +285,39 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                     return (
                       <div
                         key={i}
-                        className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm px-2 rounded-md'
+                        className='grid grid-cols-12 py-3 text-xs text-black dark:text-white xsm:text-sm gap-2 px-2 rounded-md'
                       >
-                        <div className='col-span-4 flex flex-wrap items-center sm:col-span-2'>
+                        <div className='col-span-2 hidden xsm:flex flex-wrap items-center'>
                           {getEuropeanYear(new Date(createdAt))}
                         </div>
-                        <div className='col-span-6 flex flex-wrap items-center sm:col-span-3'>
+                        <div className='flex flex-wrap items-center col-span-4 sm:col-span-3'>
                           <TransactionAmountInfo
                             amount={amount}
                             type={type}
                             isFullTable
                           />
                         </div>
-                        <div className='col-span-2 flex flex-col flex-wrap justify-center items-center gap-1 sm:col-span-2'>
-                          <span className='font-medium text-sm'>
-                            {type.toUpperCase()}
-                          </span>
-                          {numUnits && (
-                            <span className='text-xs text-gray-3 dark:text-white'>
-                              {`${numUnits} ${numUnits === 1 ? `Share` : 'Shares'}`}
-                            </span>
-                          )}
+                        <div className='col-span-2 flex flex-wrap justify-center items-center sm:hidden xsm:col-span-1'>
+                          <span className='text-sm'>{type.toUpperCase()}</span>
                         </div>
-                        <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
+                        <div className='col-span-4 sm:col-span-3 flex flex-wrap items-center justify-end sm:justify-start text-end'>
                           {asset.name}
                         </div>
+                        <div className='hidden sm:flex flex-wrap justify-center items-center sm:col-span-1'>
+                          <span className='text-sm'>{type.toUpperCase()}</span>
+                        </div>
+                        <div className='hidden col-span-3 sm:flex flex-wrap justify-end items-center sm:col-span-2'>
+                          <span className=''>
+                            {getQuantityString(
+                              amount,
+                              numUnits,
+                              asset.category
+                            )}
+                          </span>
+                        </div>
+
                         {!isFirst && (
-                          <div className='col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
+                          <div className='col-span-2 xsm:col-span-1 flex flex-wrap justify-end items-center gap-2.5'>
                             <IconButton
                               onClick={() => {
                                 setSelectedTransaction(transaction);
@@ -327,7 +372,24 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                   : undefined
               }
             />
-            <div className='mt-8 2lg:mt-0'>
+            <div className='mt-4 2lg:mt-0'>
+              {paginatedTransactions &&
+                paginatedTransactions.transactions.length > 0 && (
+                  <div className='grid grid-cols-12 text-xs font-medium text-black dark:text-white xsm:text-sm items-center 2lg:hidden'>
+                    <div className='col-span-4 xsm:col-span-3 flex items-center'>
+                      Amount
+                    </div>
+                    <div className='col-span-4 xsm:col-span-3 2lg:col-span-6 flex justify-center items-center'>
+                      Asset
+                    </div>
+                    <div className='col-span-3 hidden xsm:flex justify-center items-center 2lg:hidden'>
+                      Type
+                    </div>
+                    <div className='col-span-4 xsm:col-span-3 flex justify-end items-center'>
+                      Date
+                    </div>
+                  </div>
+                )}
               {paginatedTransactions &&
               paginatedTransactions.transactions.length > 0 ? (
                 paginatedTransactions.transactions.map(
@@ -337,24 +399,26 @@ const TransactionsTable = ({ showFullData }: IProps) => {
 
                     return (
                       <div
-                        className='grid grid-cols-12 pb-9 text-xs text-black dark:text-white xsm:text-sm'
+                        className='grid grid-cols-12 pt-4 pb-9 text-xs text-black dark:text-white xsm:text-sm items-center gap-2'
                         key={i}
                       >
-                        <TransactionAmountInfo
-                          amount={amount}
-                          type={type}
-                          assetName={asset.name}
-                        />
-                        <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
+                        <div className='col-span-4 xsm:col-span-3 2lg:col-span-9 flex gap-4 items-center'>
+                          <TransactionAmountInfo
+                            amount={amount}
+                            type={type}
+                            assetName={asset.name}
+                          />
+                        </div>
+                        <div className='col-span-4 xsm:col-span-3 2lg:col-span-4 justify-center items-center flex 2lg:hidden text-center'>
                           {asset?.name}
                         </div>
                         <div className='hidden col-span-3 justify-center items-center xsm:flex 2lg:hidden'>
-                          {asset?.category}
+                          {type}
                         </div>
                         <div className='hidden gap-1 col-span-3 justify-end items-center xsm:flex 2lg:hidden'>
                           {getEuropeanYear(date)}
                         </div>
-                        <div className='gap-1 col-span-2 flex flex-col justify-center items-end xsm:hidden 2lg:flex'>
+                        <div className='gap-1 col-span-4 xsm:col-span-3 2lg:col-span-3 flex flex-col justify-center items-end xsm:hidden 2lg:flex 2lg:justify-end'>
                           <p>{getMonthDate(date)}</p>
                           <p>{getTime(date)}</p>
                         </div>
