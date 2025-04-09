@@ -25,16 +25,17 @@ import IconButton from '../Common/IconButton';
 
 interface IProps {
   showFullData?: boolean;
+  setShouldRefetchNetworth?: (loading: boolean) => void;
 }
 
-const AssetsTable = ({ showFullData }: IProps) => {
+const AssetsTable = ({ showFullData, setShouldRefetchNetworth }: IProps) => {
   const { data: session, status } = useSession();
   const isAuthenticated = session && status === 'authenticated';
   const [sort, setSort] = useState<ISort>({
     by: 'createdAt',
     order: 'desc',
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -122,6 +123,9 @@ const AssetsTable = ({ showFullData }: IProps) => {
     setShowAddModal(false);
     setShowDeleteModal(false);
     setShowEditModal(false);
+    if (!showFullData && setShouldRefetchNetworth) {
+      setShouldRefetchNetworth(true);
+    }
   };
 
   useEffect(() => {

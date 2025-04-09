@@ -27,9 +27,13 @@ import { CATEGORIES } from '@/constants';
 
 interface IProps {
   showFullData?: boolean;
+  setShouldRefetchNetworth?: (loading: boolean) => void;
 }
 
-const TransactionsTable = ({ showFullData }: IProps) => {
+const TransactionsTable = ({
+  showFullData,
+  setShouldRefetchNetworth,
+}: IProps) => {
   const router = useRouter();
   const { data: session, status } = useSession();
   const isAuthenticated = session && status === 'authenticated';
@@ -37,7 +41,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     by: 'createdAt',
     order: 'desc',
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
@@ -117,6 +121,9 @@ const TransactionsTable = ({ showFullData }: IProps) => {
     setIsLoading(false);
     setShowAddModal(false);
     setShowDeleteModal(false);
+    if (!showFullData && setShouldRefetchNetworth) {
+      setShouldRefetchNetworth(true);
+    }
   };
 
   useEffect(() => {
@@ -395,7 +402,7 @@ const TransactionsTable = ({ showFullData }: IProps) => {
                         className='grid grid-cols-12 pt-4 pb-9 text-xs text-black dark:text-white xsm:text-sm items-center gap-2'
                         key={i}
                       >
-                        <div className='col-span-4 xsm:col-span-3 2lg:col-span-9 flex gap-4'>
+                        <div className='col-span-4 xsm:col-span-3 2lg:col-span-9 flex gap-4 items-center'>
                           <TransactionAmountInfo
                             amount={amount}
                             type={type}
