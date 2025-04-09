@@ -7,9 +7,9 @@ declare interface ITransactionData {
   userId?: string;
   assetId?: string;
   type?: TransactionType | string;
-  amount?: number;
-  numUnits?: number;
-  pricePerUnit?: number;
+  amount?: string;
+  numUnits?: string;
+  pricePerUnit?: string;
   isFirst?: boolean;
 }
 
@@ -23,11 +23,11 @@ declare interface IAssetData {
   userId?: string;
   name?: string;
   category?: string;
-  cost?: number;
-  value?: number;
-  marketValue?: number;
-  numUnits?: number;
-  avgPricePerUnit?: number;
+  cost?: string;
+  value?: string;
+  marketValue?: string;
+  numUnits?: string;
+  avgPricePerUnit?: string;
   address?: string;
   details?: string;
   accountType?: AccountType | string;

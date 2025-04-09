@@ -29,9 +29,9 @@ const TransactionForm = ({
     _id: '',
     assetId: '',
     type: '',
-    amount: undefined,
-    numUnits: undefined,
-    pricePerUnit: undefined,
+    amount: '',
+    numUnits: '',
+    pricePerUnit: '',
   });
   const [selectedAsset, setSelectedAsset] = useState<IAssetListData | null>(
     null
@@ -82,9 +82,9 @@ const TransactionForm = ({
       _id: '',
       assetId: '',
       type: '',
-      amount: undefined,
-      numUnits: undefined,
-      pricePerUnit: undefined,
+      amount: '',
+      numUnits: '',
+      pricePerUnit: '',
     });
   };
 
