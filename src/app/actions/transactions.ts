@@ -7,7 +7,7 @@ import Transaction from '@/models/Transaction';
 import { getSessionUser } from '@/utils/getSessionUser';
 import { isStocksOrCrypto } from '@/utils/misc';
 
-export const addTransaction = async (transactionData: ITransactionData) => {
+export const addTransaction = async (transactionData: ITransactionFormData) => {
   await connectDB();
 
   const sessionUser = await getSessionUser();

@@ -18,17 +18,17 @@ interface IProps {
 }
 
 const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
-  const [assetData, setAssetData] = useState<IAssetData>({
+  const [assetData, setAssetData] = useState<IAssetFormData>({
     _id: '',
     name: '',
     category: '',
-    cost: undefined,
-    value: undefined,
-    numUnits: undefined,
+    cost: '',
+    value: '',
+    numUnits: '',
     address: '',
     accountType: '',
     details: '',
-    marketValue: undefined,
+    marketValue: '',
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -61,6 +61,13 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
     setAssetData({
       ...assetData,
       category,
+      cost: '',
+      value: '',
+      numUnits: '',
+      address: '',
+      accountType: '',
+      details: '',
+      marketValue: '',
     });
   };
 
@@ -76,13 +83,13 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       _id: '',
       name: '',
       category: '',
-      cost: undefined,
-      value: undefined,
-      numUnits: undefined,
+      cost: '',
+      value: '',
+      numUnits: '',
       address: '',
       accountType: '',
       details: '',
-      marketValue: undefined,
+      marketValue: '',
     });
   };
 
@@ -95,12 +102,12 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
         _id: asset?._id,
         name: asset?.name,
         category: asset?.category,
-        cost: asset?.cost,
-        value: asset?.value,
-        numUnits: asset?.numUnits,
+        cost: asset?.cost.toString(),
+        value: asset?.value.toString(),
+        numUnits: asset?.numUnits?.toString(),
         address: asset?.address,
         accountType: asset?.accountType as AccountType,
-        marketValue: asset?.marketValue,
+        marketValue: asset?.marketValue?.toString(),
         details: asset?.details,
       });
     }

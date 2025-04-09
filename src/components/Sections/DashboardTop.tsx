@@ -9,11 +9,19 @@ import DateFilterButtons from './DateFilterButtons';
 import { getNetWorth } from '@/utils/api';
 import TablesContainer from '@/components/Containers/TablesContainer';
 
-const DashboardTopSection = () => {
+interface IProps {
+  shouldRefetchNetworth: boolean;
+  setShouldRefetchNetworth: (loading: boolean) => void;
+}
+
+const DashboardTopSection = ({
+  shouldRefetchNetworth,
+  setShouldRefetchNetworth,
+}: IProps) => {
   const [networth, setNetworth] = useState<INetworth | null>(null);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [totalNetworth, setTotalNetworth] = useState<number>(0);
-  const [isLoading, setLoading] = useState<boolean>(false);
+  const [isLoading, setLoading] = useState<boolean>(true);
   const [activeTab, setActiveTab] = useState<DashboardTab>('Chart');
   const [activeFilter, setActiveFilter] = useState<DateFilter>('week');
 
@@ -25,24 +33,29 @@ const DashboardTopSection = () => {
     setActiveFilter(filter);
   };
 
-  useEffect(() => {
+  const fetchData = async () => {
     setLoading(true);
-    const fetchData = async () => await getNetWorth(activeFilter);
+    const networth = await getNetWorth(activeFilter);
+    const total =
+      networth.results.length > 0
+        ? networth.results[networth.results.length - 1].total
+        : 0;
+    setNetworth(networth);
+    setTotalNetworth(total);
+    setCategories(networth.categories);
+    setLoading(false);
+    setShouldRefetchNetworth(false);
+  };
 
-    fetchData()
-      .then((networth) => {
-        const total =
-          networth.results.length > 0
-            ? networth.results[networth.results.length - 1].total
-            : 0;
-        setNetworth(networth);
-        setTotalNetworth(total);
-        setCategories(networth.categories);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+  useEffect(() => {
+    fetchData();
   }, [activeFilter]);
+
+  useEffect(() => {
+    if (shouldRefetchNetworth) {
+      fetchData();
+    }
+  }, [shouldRefetchNetworth]);
 
   return (
     <>

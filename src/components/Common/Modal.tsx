@@ -1,6 +1,8 @@
 import { faClose } from '@fortawesome/free-solid-svg-icons';
 
 import Icon from './Icon';
+import { useRef } from 'react';
+import useOnClickOutside from '@/hooks/useClickOutside';
 
 interface IProps {
   children: React.ReactNode;
@@ -10,11 +12,22 @@ interface IProps {
 }
 
 const Modal = ({ children, show, onClose, heading }: IProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useOnClickOutside(ref, () => {
+    onClose();
+  });
+
+  if (!show) {
+    return null;
+  }
+
   return (
-    <div
-      className={`${show ? 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20' : 'hidden'}`}
-    >
-      <div className='bg-white rounded-lg shadow-sm dark:bg-gray-700'>
+    <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20'>
+      <div
+        ref={ref}
+        className='bg-white rounded-lg shadow-sm dark:bg-gray-700 z-25'
+      >
         <div className='flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200 w-96'>
           <h3 className='text-xl font-semibold text-gray-900 dark:text-white'>
             {heading}

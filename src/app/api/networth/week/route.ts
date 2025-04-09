@@ -55,6 +55,7 @@ export const GET = async () => {
                   $gte: startDate,
                   $lte: today,
                 },
+                userId: userId,
               },
             },
             {
@@ -76,6 +77,7 @@ export const GET = async () => {
                   $gte: startDate,
                   $lte: today,
                 },
+                userId: userId,
               },
             },
             {
@@ -114,7 +116,9 @@ export const GET = async () => {
       // Step 2: Simplify the filtered data
       {
         $project: {
-          baseNetworth: { $arrayElemAt: ['$baseNetworth.total', 0] },
+          baseNetworth: {
+            $ifNull: [{ $arrayElemAt: ['$baseNetworth.total', 0] }, 0],
+          },
           existingData: '$afterStartDateTotals',
           categories: '$categories',
         },
