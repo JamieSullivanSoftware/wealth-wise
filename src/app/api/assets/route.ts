@@ -52,6 +52,7 @@ export const GET = async (request: NextRequest) => {
                 createdAt: 1,
                 userId: 1,
                 name: 1,
+                nameSort: { $toLower: '$name' },
                 category: 1,
                 cost: 1,
                 value: 1,
@@ -94,6 +95,7 @@ export const GET = async (request: NextRequest) => {
                 ...(sortBy === 'diffPercentage'
                   ? { diffPercentage: order }
                   : {}),
+                ...(sortBy === 'name' ? { nameSort: order } : {}),
                 ...{ [sortBy]: order },
                 _id: order,
               },

@@ -261,7 +261,7 @@ const TransactionsTable = ({
                   <div className='hidden sm:flex sm:col-span-2 justify-end items-center'>
                     <Button
                       text='Quantity'
-                      onClick={() => handleSort('type')}
+                      onClick={() => handleSort('numUnits')}
                       icon={faSort}
                       iconAlign='right'
                       hasBg={false}
@@ -292,7 +292,7 @@ const TransactionsTable = ({
                         <div className='col-span-2 hidden xsm:flex flex-wrap items-center'>
                           {getEuropeanYear(new Date(createdAt))}
                         </div>
-                        <div className='flex flex-wrap items-center col-span-4 sm:col-span-3'>
+                        <div className='flex flex-wrap items-center col-span-4 sm:col-span-3 gap-4 items-center'>
                           <TransactionAmountInfo
                             amount={amount}
                             type={type}
