@@ -26,7 +26,7 @@ import IconButton from '../Common/IconButton';
 interface IProps {
   showFullData?: boolean;
   setShouldRefetchNetworth?: (loading: boolean) => void;
-  shouldRefetchNetworth: boolean;
+  shouldRefetchNetworth?: boolean;
 }
 
 const AssetsTable = ({

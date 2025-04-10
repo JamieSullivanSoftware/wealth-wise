@@ -27,7 +27,7 @@ import { CATEGORIES } from '@/constants';
 
 interface IProps {
   showFullData?: boolean;
-  shouldRefetchNetworth: boolean;
+  shouldRefetchNetworth?: boolean;
   setShouldRefetchNetworth?: (loading: boolean) => void;
 }
 
