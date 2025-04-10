@@ -7,7 +7,7 @@ import DashboardTop from '../Sections/DashboardTop';
 
 const Dashboard = () => {
   const [shouldRefetchNetworth, setShouldRefetchNetworth] =
-    useState<boolean>(false);
+    useState<boolean>(true);
 
   return (
     <>
@@ -20,6 +20,7 @@ const Dashboard = () => {
           }}
         />
         <DashboardBottom
+          shouldRefetchNetworth={shouldRefetchNetworth}
           setShouldRefetchNetworth={(loading: boolean) => {
             setShouldRefetchNetworth(loading);
           }}

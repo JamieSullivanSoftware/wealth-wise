@@ -27,12 +27,14 @@ import { CATEGORIES } from '@/constants';
 
 interface IProps {
   showFullData?: boolean;
+  shouldRefetchNetworth: boolean;
   setShouldRefetchNetworth?: (loading: boolean) => void;
 }
 
 const TransactionsTable = ({
   showFullData,
   setShouldRefetchNetworth,
+  shouldRefetchNetworth,
 }: IProps) => {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -41,7 +43,7 @@ const TransactionsTable = ({
     by: 'createdAt',
     order: 'desc',
   });
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showAddModal, setShowAddModal] = useState<boolean>(false);
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
@@ -121,7 +123,7 @@ const TransactionsTable = ({
     setIsLoading(false);
     setShowAddModal(false);
     setShowDeleteModal(false);
-    if (!showFullData && setShouldRefetchNetworth) {
+    if (!showFullData && setShouldRefetchNetworth && !shouldRefetchNetworth) {
       setShouldRefetchNetworth(true);
     }
   };
