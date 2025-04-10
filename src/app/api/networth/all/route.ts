@@ -1,4 +1,4 @@
-import type { PipelineStage } from 'mongoose';
+import { Types, type PipelineStage } from 'mongoose';
 
 import {
   formatCategories,
@@ -15,17 +15,21 @@ export const GET = async () => {
     await connectDB();
 
     const sessionUser = await getSessionUser();
-    let userId = process.env.DEFAULT_USER_ID;
-
-    if (sessionUser && sessionUser.userId) {
-      userId = sessionUser.userId;
-    }
+    const userId =
+      sessionUser && sessionUser.userId
+        ? new Types.ObjectId(sessionUser.userId)
+        : new Types.ObjectId(process.env.DEFAULT_USER_ID);
 
     const pipeline: PipelineStage[] = [
       // Step 1: Filter documents for the base total before start date and all totals after start date
       {
         $facet: {
           categories: [
+            {
+              $match: {
+                userId: userId,
+              },
+            },
             {
               $group: {
                 _id: '$category',
@@ -41,7 +45,7 @@ export const GET = async () => {
           afterStartDateTotals: [
             {
               $match: {
-                user_id: userId,
+                userId: userId,
               },
             },
             {

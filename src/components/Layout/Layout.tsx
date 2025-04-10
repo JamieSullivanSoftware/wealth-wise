@@ -14,10 +14,7 @@ const Layout = ({ children }: IProps) => {
   return (
     <>
       <div className='flex'>
-        <Sidebar
-          sidebarOpen={sidebarOpen}
-          setSidebarOpen={setSidebarOpen}
-        />
+        <Sidebar sidebarOpen={sidebarOpen} />
         <div className='relative flex flex-1 flex-col 2lg:ml-72.5'>
           <Header
             sidebarOpen={sidebarOpen}

@@ -10,14 +10,16 @@ import type { IconDefinition } from '@fortawesome/fontawesome-common-types';
 interface Props {
   text: string;
   type?: BtnType;
-  onClick: () => void;
+  onClick?: () => void;
   btnSize?: BtnSize;
   icon?: IconDefinition;
   iconSize?: SizeProp;
   iconColor?: string;
   iconAlign?: BtnIconAlign;
   hasBg?: boolean;
+  isPrimary?: boolean;
   classes?: string;
+  isDisabled?: boolean;
 }
 
 const Button = ({
@@ -29,18 +31,23 @@ const Button = ({
   iconSize,
   iconAlign,
   hasBg = true,
-  classes = '',
+  isPrimary,
+  classes = 'py-2 px-4',
+  isDisabled = false,
 }: Props) => {
   const classNames = clsx(
-    'rounded-md font-medium',
+    'font-medium rounded-md ',
     hasBg
-      ? 'bg-black text-white hover:bg-opacity-50 dark:text-black dark:bg-gray-1 dark:hover:bg-opacity-75 py-2 px-4'
+      ? isPrimary
+        ? 'text-white bg-primary enabled:hover:bg-primary-dark focus:ring-4 focus:outline-none focus:ring-primary-dark'
+        : 'enabled:hover:bg-opacity-50 enabled:dark:hover:bg-opacity-75'
       : 'bg-transparent',
     btnSize === 'sm' && 'text-sm',
     btnSize === 'md' && 'text-base',
     btnSize === 'lg' && 'text-lg',
     icon && 'flex gap-2 justify-between items-center',
-    classes
+    classes,
+    isDisabled && 'opacity-50 cursor-not-allowed'
   );
 
   return (
@@ -48,6 +55,7 @@ const Button = ({
       type={type}
       onClick={onClick}
       className={classNames}
+      disabled={isDisabled}
     >
       {icon && iconAlign !== 'right' && (
         <Icon

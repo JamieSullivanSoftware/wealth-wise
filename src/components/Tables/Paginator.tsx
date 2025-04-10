@@ -68,7 +68,7 @@ const Paginator = ({
   );
 
   return (
-    <div className='flex items-center justify-between text-white'>
+    <div className='flex items-center justify-between text-white px-2'>
       {/* md - below 768px */}
       <div className='flex flex-col flex-1 items-center justify-center md:hidden'>
         <div className='flex flex-1 justify-between items-center w-full mb-6'>
@@ -94,7 +94,7 @@ const Paginator = ({
         </div>
         <ShowResults />
       </div>
-      {/* md - below 768px */}
+      {/* md - above 768px */}
       <div className='hidden md:flex md:flex-1 sm:items-center md:justify-between'>
         <ShowResults />
         <div className='flex justify-between items-center gap-4'>

@@ -1,21 +1,28 @@
+'use client';
+import { useState } from 'react';
+
 import PageHeader from '../Common/PageHeader';
 import DashboardBottom from '../Sections/DashboardBottom';
 import DashboardTop from '../Sections/DashboardTop';
 
-interface IProps {
-  transactions: IPaginatedTransactions;
-  assets: IPaginatedAssets;
-}
+const Dashboard = () => {
+  const [shouldRefetchNetworth, setShouldRefetchNetworth] =
+    useState<boolean>(false);
 
-const Dashboard = ({ transactions, assets }: IProps) => {
   return (
     <>
       <PageHeader title='Dashboard' />
       <div className='grid grid-rows-auto grid-cols-1 gap-8 sm:gap-4'>
-        <DashboardTop />
+        <DashboardTop
+          shouldRefetchNetworth={shouldRefetchNetworth}
+          setShouldRefetchNetworth={(loading: boolean) => {
+            setShouldRefetchNetworth(loading);
+          }}
+        />
         <DashboardBottom
-          transactions={transactions}
-          assets={assets}
+          setShouldRefetchNetworth={(loading: boolean) => {
+            setShouldRefetchNetworth(loading);
+          }}
         />
       </div>
     </>
