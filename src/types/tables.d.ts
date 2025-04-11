@@ -61,14 +61,13 @@ declare type AssetSortBy =
   | 'createdAt'
   | 'name'
   | 'category'
-  | 'numShares'
+  | 'gainsLossPercentage'
   | 'cost'
-  | 'value'
-  | 'gainsLossPercentage';
+  | 'value';
 
 declare type TransactionSortBy =
   | 'createdAt'
   | 'amount'
   | 'type'
-  | 'assetName'
-  | 'assetCategory';
+  | 'numUnits'
+  | 'assetName';

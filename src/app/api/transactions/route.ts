@@ -58,6 +58,7 @@ export const GET = async (request: NextRequest) => {
                 'asset._id': 1,
                 'asset.name': 1,
                 'asset.category': 1,
+                nameSort: { $toLower: '$asset.name' },
                 amount: 1,
                 type: 1,
                 numUnits: 1,
@@ -68,13 +69,11 @@ export const GET = async (request: NextRequest) => {
             },
             {
               $sort: {
-                ...(sortBy === 'assetName' ? { 'asset.name': order } : {}),
-                ...(sortBy === 'assetCategory'
-                  ? { 'asset.category': order }
+                ...(sortBy === 'assetName' ? { nameSort: order } : {}),
+                ...(sortBy === 'numUnits'
+                  ? { numUnits: order, amount: order }
                   : {}),
-                ...(sortBy !== 'assetName' && sortBy !== 'assetCategory'
-                  ? { [sortBy]: order }
-                  : {}),
+                ...{ [sortBy]: order },
                 _id: order,
               },
             },
