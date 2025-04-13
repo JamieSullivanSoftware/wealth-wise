@@ -1,11 +1,12 @@
 'use client';
+import { ChangeEvent, FocusEvent, useEffect, useState } from 'react';
+
 import Label from './Label';
 import Input from './Input';
 import Select from './Select';
 import { CATEGORIES, TRANSACTION_TYPES } from '@/constants';
 import Button from '../Common/Button';
 import { addTransaction } from '@/app/actions/transactions';
-import { ChangeEvent, useEffect, useState } from 'react';
 import {
   isAccount,
   isRealEstateCarOrOther,
@@ -33,12 +34,24 @@ const TransactionForm = ({
     numUnits: '',
     pricePerUnit: '',
   });
+  const [errors, setErrors] = useState<ITransactionFormErrors>({
+    assetId: '',
+    type: '',
+    amount: '',
+    numUnits: '',
+    pricePerUnit: '',
+  });
+
   const [selectedAsset, setSelectedAsset] = useState<IAssetListData | null>(
     null
   );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (hasErrors()) {
+      return;
+    }
 
     try {
       await addTransaction(transactionData);
@@ -56,6 +69,15 @@ const TransactionForm = ({
     });
   };
 
+  const handleOnBlur = (e: FocusEvent<IFormElement>) => {
+    e.preventDefault();
+    const { id } = e.target;
+    setErrors(() => ({
+      ...errors,
+      [id]: '',
+    }));
+  };
+
   const handleOnAssetSelect = (assetId: string) => {
     const asset = assetList.find(
       (asset: IAssetListData) => asset._id === assetId
@@ -70,6 +92,14 @@ const TransactionForm = ({
         numUnits: '',
         pricePerUnit: '',
       });
+      setErrors(() => ({
+        ...errors,
+        assetId: '',
+        type: '',
+        amount: '',
+        numUnits: '',
+        pricePerUnit: '',
+      }));
     }
   };
 
@@ -109,6 +139,70 @@ const TransactionForm = ({
     return [];
   };
 
+  const hasErrors = () => {
+    const errorsCopy = Object.assign(errors);
+
+    if (!selectedAsset) {
+      errorsCopy.assetId = 'Asset is required';
+      setErrors({ ...errorsCopy });
+      return true;
+    }
+
+    errorsCopy.type = !transactionData.type
+      ? 'Transaction type is required'
+      : '';
+
+    switch (selectedAsset?.category) {
+      case CATEGORIES.accounts:
+        const assetValue = selectedAsset.value || 0;
+        const transactionAmount = transactionData.amount
+          ? parseFloat(transactionData.amount)
+          : 0;
+
+        errorsCopy.amount = transactionAmount <= 0 ? 'Amount is required' : '';
+
+        if (
+          transactionAmount > assetValue &&
+          transactionData.type === TRANSACTION_TYPES.withdraw
+        ) {
+          errorsCopy.amount = 'Withdraw amount cannot exceed balance';
+        }
+        break;
+      case CATEGORIES.stocks:
+      case CATEGORIES.crypto:
+        const unitsLabel =
+          selectedAsset.category === CATEGORIES.stocks ? 'share' : 'coin';
+        const assetNumUnits = selectedAsset.numUnits || 0;
+        const transactionNumUnits = transactionData.numUnits
+          ? parseFloat(transactionData.numUnits)
+          : 0;
+        const transactionPricePerUnit = transactionData.pricePerUnit
+          ? parseFloat(transactionData.pricePerUnit)
+          : 0;
+
+        errorsCopy.pricePerUnit =
+          transactionPricePerUnit <= 0 ? 'Price per unit is required' : '';
+        errorsCopy.numUnits =
+          transactionNumUnits <= 0
+            ? `Number of ${unitsLabel}s is required`
+            : '';
+
+        if (
+          transactionData.type === TRANSACTION_TYPES.sell &&
+          transactionNumUnits > assetNumUnits
+        ) {
+          errorsCopy.numUnits = `Number of ${unitsLabel} cannot exceed available ${unitsLabel}`;
+        }
+        break;
+      default:
+    }
+
+    setErrors({ ...errorsCopy });
+    return Object.keys(errorsCopy).some(
+      (key: string) => errorsCopy[key].length > 0
+    );
+  };
+
   useEffect(() => {
     if (isModalVisible) {
       resetFormData();
@@ -141,6 +235,8 @@ const TransactionForm = ({
             }))}
           value={transactionData.assetId}
           onSelect={handleOnAssetSelect}
+          onBlur={handleOnBlur}
+          errorMessage={errors.assetId}
         />
       </div>
       {selectedAsset?.category && (
@@ -159,6 +255,8 @@ const TransactionForm = ({
             }))}
             value={transactionData.type}
             onSelect={handleOnTypeSelect}
+            onBlur={handleOnBlur}
+            errorMessage={errors.type}
           />
         </div>
       )}
@@ -175,9 +273,10 @@ const TransactionForm = ({
             name='amount'
             id='amount'
             placeholder='1000'
-            required
             value={transactionData.amount}
             onChange={handleOnChange}
+            onBlur={handleOnBlur}
+            errorMessage={errors.amount}
           />
         </div>
       )}
@@ -199,9 +298,10 @@ const TransactionForm = ({
               name='numUnits'
               id='numUnits'
               placeholder='5'
-              required
               value={transactionData.numUnits}
               onChange={handleOnChange}
+              onBlur={handleOnBlur}
+              errorMessage={errors.numUnits}
             />
           </div>
           <div>
@@ -214,9 +314,10 @@ const TransactionForm = ({
               name='price-per-unit'
               id='pricePerUnit'
               placeholder='100'
-              required
               value={transactionData.pricePerUnit}
               onChange={handleOnChange}
+              onBlur={handleOnBlur}
+              errorMessage={errors.pricePerUnit}
             />
           </div>
         </>
