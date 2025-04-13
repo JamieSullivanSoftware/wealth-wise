@@ -32,7 +32,7 @@ const Input = ({
   errorMessage,
 }: IProps) => {
   const classNames = clsx(
-    `bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white ${classes}`
+    `bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white no-spinner ${classes}`
   );
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
