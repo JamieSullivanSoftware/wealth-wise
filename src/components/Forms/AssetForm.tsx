@@ -66,10 +66,6 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       ...assetData,
       [id]: value,
     });
-    setErrors(() => ({
-      ...errors,
-      [id]: '',
-    }));
   };
 
   const handleOnBlur = (e: FocusEvent<IFormElement>) => {

@@ -38,6 +38,14 @@ declare interface IAssetFormErrors {
   accountType?: AccountType | string;
 }
 
+declare interface ITransactionFormErrors {
+  assetId: '';
+  type: '';
+  amount: '';
+  numUnits: '';
+  pricePerUnit: '';
+}
+
 declare type IFormElement =
   | HTMLInputElement
   | HTMLTextAreaElement
