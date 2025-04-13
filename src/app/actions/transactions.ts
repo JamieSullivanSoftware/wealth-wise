@@ -55,10 +55,17 @@ export const addTransaction = async (transactionData: ITransactionFormData) => {
           break;
         case TRANSACTION_TYPES.sell:
           asset.numUnits -= transaction.numUnits;
-          asset.cost -= unitAmount;
-          asset.marketValue = transaction.pricePerUnit;
-          asset.value = asset.numUnits * asset.marketValue;
-          asset.avgPricePerUnit = asset.totalCostBasis / asset.numUnits;
+          if (asset.numUnits === 0) {
+            asset.cost = 0;
+            asset.marketValue = 0;
+            asset.value = 0;
+            asset.avgPricePerUnit = 0;
+          } else {
+            asset.cost -= unitAmount;
+            asset.marketValue = transaction.pricePerUnit;
+            asset.value = asset.numUnits * asset.marketValue;
+            asset.avgPricePerUnit = asset.totalCostBasis / asset.numUnits;
+          }
           transaction.amount = unitAmount;
           break;
         default:

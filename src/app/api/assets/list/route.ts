@@ -30,6 +30,8 @@ export const GET = async () => {
           _id: 1,
           name: 1,
           category: 1,
+          value: 1,
+          numUnits: 1,
         },
       },
     ];
