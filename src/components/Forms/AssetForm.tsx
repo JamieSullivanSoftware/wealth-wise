@@ -95,9 +95,7 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       cost: '',
       value: '',
       numUnits: '',
-      address: '',
       accountType: '',
-      details: '',
       marketValue: '',
     }));
   };
