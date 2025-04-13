@@ -47,7 +47,7 @@ export const addAsset = async (assetData: IAssetFormData) => {
         totalCostBasis: amount,
         value: amount,
         marketValue: data.marketValue, // Market value is the current value of 1 unit
-        avgPricePerUnit: amount / data.numUnits, // Avg price per unit
+        avgPricePerUnit: data.marketValue, // Avg price per unit
       };
 
       asset = new Asset(data);
@@ -58,7 +58,7 @@ export const addAsset = async (assetData: IAssetFormData) => {
         type: TRANSACTION_TYPES.buy as TransactionType,
         amount,
         numUnits: data.numUnits,
-        pricePerUnit: data.cost,
+        pricePerUnit: data.marketValue,
         isFirst: true,
       };
 
