@@ -1,4 +1,4 @@
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, FocusEvent } from 'react';
 
 interface IProps {
   name: string;
@@ -8,6 +8,8 @@ interface IProps {
   required?: boolean;
   value?: string | number | undefined;
   onSelect?: (value: string) => void;
+  onBlur?: (e: FocusEvent<HTMLSelectElement>) => void;
+  errorMessage?: string;
 }
 
 const Select = ({
@@ -18,6 +20,8 @@ const Select = ({
   required,
   value,
   onSelect,
+  onBlur,
+  errorMessage,
 }: IProps) => {
   const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     if (onSelect) {
@@ -26,24 +30,30 @@ const Select = ({
   };
 
   return (
-    <select
-      name={name}
-      id={id}
-      className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white cursor-pointer'
-      required={required}
-      value={value}
-      onChange={handleChange}
-    >
-      <option value=''>{placeholder}</option>
-      {options.map((option) => (
-        <option
-          key={option.value}
-          value={option.value}
-        >
-          {option.label}
-        </option>
-      ))}
-    </select>
+    <>
+      <select
+        name={name}
+        id={id}
+        className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:text-white cursor-pointer'
+        required={required}
+        value={value}
+        onChange={handleChange}
+        onBlur={onBlur}
+      >
+        <option value=''>{placeholder}</option>
+        {options.map((option) => (
+          <option
+            key={option.value}
+            value={option.value}
+          >
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {errorMessage && (
+        <div className='mt-2 text-sm text-light-red'>{errorMessage}</div>
+      )}
+    </>
   );
 };
 

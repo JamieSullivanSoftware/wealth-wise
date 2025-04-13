@@ -4,7 +4,7 @@ import Select from './Select';
 import { ACCOUNT_TYPES, CATEGORIES } from '@/constants';
 import Button from '../Common/Button';
 import { addAsset, editAsset } from '@/app/actions/assets';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FocusEvent, useEffect, useState } from 'react';
 import {
   isAccount,
   isRealEstateCarOrOther,
@@ -30,9 +30,22 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
     details: '',
     marketValue: '',
   });
+  const [errors, setErrors] = useState<IAssetFormErrors>({
+    name: '',
+    category: '',
+    cost: '',
+    value: '',
+    numUnits: '',
+    accountType: '',
+    marketValue: '',
+  });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (hasErrors()) {
+      return;
+    }
 
     try {
       if (asset) {
@@ -47,14 +60,25 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
     }
   };
 
-  const handleOnChange = (
-    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
-  ) => {
+  const handleOnChange = (e: ChangeEvent<IFormElement>) => {
     const { id, value } = e.target;
     setAssetData({
       ...assetData,
       [id]: value,
     });
+    setErrors(() => ({
+      ...errors,
+      [id]: '',
+    }));
+  };
+
+  const handleOnBlur = (e: FocusEvent<IFormElement>) => {
+    e.preventDefault();
+    const { id } = e.target;
+    setErrors(() => ({
+      ...errors,
+      [id]: '',
+    }));
   };
 
   const handleOnSelectCategory = (category: string = '') => {
@@ -69,6 +93,17 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       details: '',
       marketValue: '',
     });
+    setErrors(() => ({
+      ...errors,
+      category: '',
+      cost: '',
+      value: '',
+      numUnits: '',
+      address: '',
+      accountType: '',
+      details: '',
+      marketValue: '',
+    }));
   };
 
   const handleOnSelectAccountType = (accountType: string = '') => {
@@ -76,6 +111,10 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       ...assetData,
       accountType: accountType as AccountType,
     });
+    setErrors(() => ({
+      ...errors,
+      accountType: '',
+    }));
   };
 
   const resetFormData = () => {
@@ -91,6 +130,55 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
       details: '',
       marketValue: '',
     });
+  };
+
+  const hasErrors = () => {
+    const errorsCopy = Object.assign(errors);
+    errorsCopy.name = !assetData.name ? 'Name is required' : '';
+    errorsCopy.category = !assetData.category ? 'Category is required' : '';
+
+    switch (assetData.category) {
+      case CATEGORIES.accounts:
+        errorsCopy.accountType = !assetData.accountType
+          ? 'Account type is required'
+          : '';
+        errorsCopy.value =
+          !assetData.value || parseFloat(assetData.value) <= 0
+            ? 'Account balance is required'
+            : '';
+        break;
+      case CATEGORIES.stocks:
+      case CATEGORIES.crypto:
+        const unitsLabel =
+          assetData.category === CATEGORIES.stocks ? 'share' : 'coin';
+        errorsCopy.numUnits =
+          !assetData.numUnits || parseFloat(assetData.numUnits) <= 0
+            ? `Number of ${unitsLabel}s is required`
+            : '';
+        errorsCopy.marketValue =
+          !assetData.marketValue || parseFloat(assetData.marketValue) <= 0
+            ? `Price per ${unitsLabel} is required`
+            : '';
+        break;
+      case CATEGORIES.cars:
+      case CATEGORIES.realEstate:
+      case CATEGORIES.other:
+        errorsCopy.cost =
+          !assetData.cost || parseFloat(assetData.cost) <= 0
+            ? 'Purchase price is required'
+            : '';
+        errorsCopy.marketValue =
+          !assetData.marketValue || parseFloat(assetData.marketValue) <= 0
+            ? 'Market value is required'
+            : '';
+        break;
+      default:
+    }
+
+    setErrors({ ...errorsCopy });
+    return Object.keys(errorsCopy).some(
+      (key: string) => errorsCopy[key].length > 0
+    );
   };
 
   useEffect(() => {
@@ -128,10 +216,11 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
           name='name'
           id='name'
           placeholder='Asset name'
-          maxLength={50}
-          required
+          maxValue={50}
           value={assetData.name}
           onChange={handleOnChange}
+          onBlur={handleOnBlur}
+          errorMessage={errors.name}
         />
       </div>
 
@@ -152,6 +241,8 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
             }))}
             value={assetData.category}
             onSelect={handleOnSelectCategory}
+            onBlur={handleOnBlur}
+            errorMessage={errors.category}
           />
         </div>
       )}
@@ -170,9 +261,10 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
                 name='num-units'
                 id='numUnits'
                 placeholder='5'
-                required
                 value={assetData.numUnits}
                 onChange={handleOnChange}
+                onBlur={handleOnBlur}
+                errorMessage={errors.numUnits}
               />
             </div>
           )}
@@ -186,9 +278,10 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
               name='pricePerUnit'
               id='marketValue'
               placeholder='100'
-              required
               value={assetData.marketValue}
               onChange={handleOnChange}
+              onBlur={handleOnBlur}
+              errorMessage={errors.marketValue}
             />
           </div>
         </>
@@ -207,9 +300,10 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
               name='cost'
               id='cost'
               placeholder='50,000'
-              required
               value={assetData.cost}
               onChange={handleOnChange}
+              onBlur={handleOnBlur}
+              errorMessage={errors.cost}
             />
           </div>
           <div>
@@ -222,9 +316,10 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
               name='marketValue'
               id='marketValue'
               placeholder='50,000'
-              required
               value={assetData.marketValue}
               onChange={handleOnChange}
+              onBlur={handleOnBlur}
+              errorMessage={errors.marketValue}
             />
           </div>
           {assetData.category === CATEGORIES.realEstate && (
@@ -242,6 +337,7 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
                 placeholder='Address of the property...'
                 value={assetData.address}
                 onChange={handleOnChange}
+                onBlur={handleOnBlur}
               />
             </div>
           )}
@@ -265,6 +361,7 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
                 }
                 value={assetData.details}
                 onChange={handleOnChange}
+                onBlur={handleOnBlur}
               />
             </div>
           )}
@@ -289,6 +386,8 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
               }))}
               value={assetData.accountType}
               onSelect={handleOnSelectAccountType}
+              onBlur={handleOnBlur}
+              errorMessage={errors.accountType}
             />
           </div>
           {!asset && (
@@ -302,9 +401,10 @@ const AssetForm = ({ onAssetAdded, asset, isModalVisible }: IProps) => {
                 name='value'
                 id='value'
                 placeholder='1000'
-                required
                 value={assetData.value}
                 onChange={handleOnChange}
+                onBlur={handleOnBlur}
+                errorMessage={errors.value}
               />
             </div>
           )}

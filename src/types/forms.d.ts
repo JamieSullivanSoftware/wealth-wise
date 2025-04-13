@@ -27,3 +27,18 @@ declare interface IAssetFormData {
   details?: string;
   accountType?: AccountType | string;
 }
+
+declare interface IAssetFormErrors {
+  name?: string;
+  category?: string;
+  cost?: string;
+  value?: string;
+  marketValue?: string;
+  numUnits?: string;
+  accountType?: AccountType | string;
+}
+
+declare type IFormElement =
+  | HTMLInputElement
+  | HTMLTextAreaElement
+  | HTMLSelectElement;
