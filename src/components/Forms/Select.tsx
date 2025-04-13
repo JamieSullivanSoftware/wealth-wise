@@ -1,4 +1,5 @@
 import type { ChangeEvent, FocusEvent } from 'react';
+import ErrorMessage from '../Common/ErrorMessage';
 
 interface IProps {
   name: string;
@@ -50,9 +51,7 @@ const Select = ({
           </option>
         ))}
       </select>
-      {errorMessage && (
-        <div className='mt-2 text-sm text-light-red'>{errorMessage}</div>
-      )}
+      {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
     </>
   );
 };

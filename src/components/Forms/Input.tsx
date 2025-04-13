@@ -1,5 +1,6 @@
 import clsx from 'clsx/lite';
 import type { ChangeEvent, FocusEvent, KeyboardEvent } from 'react';
+import ErrorMessage from '../Common/ErrorMessage';
 
 interface IProps {
   type?: string;
@@ -68,9 +69,7 @@ const Input = ({
         }}
         onBlur={onBlur}
       />
-      {errorMessage && (
-        <div className='mt-2 text-sm text-light-red'>{errorMessage}</div>
-      )}
+      {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
     </>
   );
 };
