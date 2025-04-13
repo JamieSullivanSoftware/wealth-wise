@@ -78,7 +78,7 @@ export const GET = async (request: NextRequest) => {
                             },
                             then: 0,
                             else: {
-                              $divide: ['$diffTotal', '$cost'],
+                              $divide: ['$diffTotal', { $abs: '$cost' }],
                             },
                           },
                         },

@@ -97,10 +97,10 @@ const AssetsTable = ({
         details = `${asset.accountType} Account`;
         break;
       case CATEGORIES.crypto:
-        details = `${asset.numUnits} Coin${asset.numUnits && asset.numUnits > 1 ? 's' : ''}`;
+        details = `${asset.numUnits} Coin${asset.numUnits && asset.numUnits === 1 ? '' : 's'}`;
         break;
       case CATEGORIES.stocks:
-        details = `${asset.numUnits} Share${asset.numUnits && asset.numUnits > 1 ? 's' : ''}`;
+        details = `${asset.numUnits} Share${asset.numUnits && asset.numUnits === 1 ? '' : 's'}`;
         break;
       case CATEGORIES.realEstate:
         details = asset.address || '';
