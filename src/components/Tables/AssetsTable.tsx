@@ -137,6 +137,12 @@ const AssetsTable = ({
     fetchAssets();
   }, [sort.by, sort.order, page, limit]);
 
+  useEffect(() => {
+    if (shouldRefetchNetworth) {
+      fetchAssets();
+    }
+  }, [shouldRefetchNetworth]);
+
   if (isLoading) {
     return (
       <div className='grid col-span-12'>
