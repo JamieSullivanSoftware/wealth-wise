@@ -29,6 +29,7 @@ export const addAsset = async (assetData: IAssetFormData) => {
     marketValue: parseFloat(assetData.marketValue?.toString() || '0'),
     numUnits: parseFloat(assetData.numUnits?.toString() || '0'),
     avgPricePerUnit: 0,
+    totalCostBasis: 0,
     address: assetData.address || '',
     accountType: assetData.accountType || '',
     details: assetData.details || '',
@@ -39,13 +40,14 @@ export const addAsset = async (assetData: IAssetFormData) => {
 
     // First transaction only added for stocks and crypto
     if (isStocksOrCrypto(data.category)) {
-      const amount = data.numUnits * data.cost;
+      const amount = data.numUnits * data.marketValue;
       data = {
         ...data,
         cost: amount,
+        totalCostBasis: amount,
         value: amount,
-        marketValue: data.cost, // Market value is the current value of 1 unit
-        avgPricePerUnit: amount / data.numUnits, // Avg price per unit
+        marketValue: data.marketValue, // Market value is the current value of 1 unit
+        avgPricePerUnit: data.marketValue, // Avg price per unit
       };
 
       asset = new Asset(data);
@@ -56,7 +58,7 @@ export const addAsset = async (assetData: IAssetFormData) => {
         type: TRANSACTION_TYPES.buy as TransactionType,
         amount,
         numUnits: data.numUnits,
-        pricePerUnit: data.cost,
+        pricePerUnit: data.marketValue,
         isFirst: true,
       };
 

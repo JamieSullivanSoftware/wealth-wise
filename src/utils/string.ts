@@ -29,7 +29,11 @@ export const getTime = (date: Date) => {
 
 export const getMonthDate = (date: Date) => {
   if (!date) return;
-  return `${date.getDay()} ${Intl.DateTimeFormat('en', {
+  const day = Intl.DateTimeFormat('en', {
+    day: 'numeric',
+  }).format(new Date(date));
+  const month = Intl.DateTimeFormat('en', {
     month: 'short',
-  }).format(new Date(date))}`;
+  }).format(new Date(date));
+  return `${day} ${month}`;
 };

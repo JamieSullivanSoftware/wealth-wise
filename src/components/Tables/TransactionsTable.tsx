@@ -132,6 +132,12 @@ const TransactionsTable = ({
     fetchTransactions();
   }, [sort.by, sort.order, page, limit]);
 
+  useEffect(() => {
+    if (shouldRefetchNetworth) {
+      fetchTransactions();
+    }
+  }, [shouldRefetchNetworth]);
+
   if (isLoading) {
     return (
       <div className='grid col-span-12'>
@@ -353,7 +359,7 @@ const TransactionsTable = ({
                 subtitle={
                   hasAssetList ? undefined : 'Please create an asset first'
                 }
-                btnText={hasAssetList ? 'Add Transaction' : 'Add Asset'}
+                btnText={hasAssetList ? 'Add Transaction' : 'Go to Assets'}
                 onClick={
                   hasAssetList
                     ? () => setShowAddModal(true)

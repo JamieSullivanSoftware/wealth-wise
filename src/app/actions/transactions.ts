@@ -60,6 +60,7 @@ export const addTransaction = async (transactionData: ITransactionFormData) => {
             asset.marketValue = 0;
             asset.value = 0;
             asset.avgPricePerUnit = 0;
+            asset.totalCostBasis = 0;
           } else {
             asset.cost -= unitAmount;
             asset.marketValue = transaction.pricePerUnit;
