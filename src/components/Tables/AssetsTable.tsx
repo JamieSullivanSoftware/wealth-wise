@@ -366,6 +366,7 @@ const AssetsTable = ({
             <div className='flex flex-col justify-center min-h-[500px]'>
               <NoResults
                 title='No Assets Available'
+                subtitle={isAuthenticated ? undefined : 'Login to add data'}
                 btnText='Add Asset'
                 onClick={() => setShowAddModal(true)}
               />
