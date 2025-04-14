@@ -97,10 +97,10 @@ const AssetsTable = ({
         details = `${asset.accountType} Account`;
         break;
       case CATEGORIES.crypto:
-        details = `${asset.numUnits} Coin${asset.numUnits && asset.numUnits > 1 ? 's' : ''}`;
+        details = `${asset.numUnits} Coin${asset.numUnits && asset.numUnits === 1 ? '' : 's'}`;
         break;
       case CATEGORIES.stocks:
-        details = `${asset.numUnits} Share${asset.numUnits && asset.numUnits > 1 ? 's' : ''}`;
+        details = `${asset.numUnits} Share${asset.numUnits && asset.numUnits === 1 ? '' : 's'}`;
         break;
       case CATEGORIES.realEstate:
         details = asset.address || '';
@@ -136,6 +136,12 @@ const AssetsTable = ({
   useEffect(() => {
     fetchAssets();
   }, [sort.by, sort.order, page, limit]);
+
+  useEffect(() => {
+    if (shouldRefetchNetworth) {
+      fetchAssets();
+    }
+  }, [shouldRefetchNetworth]);
 
   if (isLoading) {
     return (
@@ -360,6 +366,7 @@ const AssetsTable = ({
             <div className='flex flex-col justify-center min-h-[500px]'>
               <NoResults
                 title='No Assets Available'
+                subtitle={isAuthenticated ? undefined : 'Login to add data'}
                 btnText='Add Asset'
                 onClick={() => setShowAddModal(true)}
               />

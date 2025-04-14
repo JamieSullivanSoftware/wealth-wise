@@ -33,6 +33,8 @@ declare interface IAssetListData {
   _id: string;
   name: string;
   category: string;
+  value?: number;
+  numUnits?: number;
 }
 
 declare interface ITransactionAssetData {

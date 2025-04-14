@@ -132,6 +132,12 @@ const TransactionsTable = ({
     fetchTransactions();
   }, [sort.by, sort.order, page, limit]);
 
+  useEffect(() => {
+    if (shouldRefetchNetworth) {
+      fetchTransactions();
+    }
+  }, [shouldRefetchNetworth]);
+
   if (isLoading) {
     return (
       <div className='grid col-span-12'>
@@ -351,9 +357,13 @@ const TransactionsTable = ({
               <NoResults
                 title='No Transactions Available'
                 subtitle={
-                  hasAssetList ? undefined : 'Please create an asset first'
+                  hasAssetList
+                    ? undefined
+                    : isAuthenticated
+                      ? 'Please create an asset first'
+                      : 'Login to add data'
                 }
-                btnText={hasAssetList ? 'Add Transaction' : 'Add Asset'}
+                btnText={hasAssetList ? 'Add Transaction' : 'Go to Assets'}
                 onClick={
                   hasAssetList
                     ? () => setShowAddModal(true)
@@ -434,7 +444,9 @@ const TransactionsTable = ({
                     title='No Transactions Yet'
                     subtitle={
                       assetList && assetList.length === 0
-                        ? 'Please create an asset first'
+                        ? isAuthenticated
+                          ? 'Please create an asset first'
+                          : 'Login to add data'
                         : undefined
                     }
                     btnText={

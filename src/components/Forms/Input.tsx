@@ -1,5 +1,6 @@
 import clsx from 'clsx/lite';
-import { ChangeEvent } from 'react';
+import type { ChangeEvent, FocusEvent, KeyboardEvent } from 'react';
+import ErrorMessage from '../Common/ErrorMessage';
 
 interface IProps {
   type?: string;
@@ -10,8 +11,10 @@ interface IProps {
   required?: boolean;
   defaultValue?: number | string | undefined;
   value?: number | string | undefined;
-  maxLength?: number | undefined;
+  maxValue?: number | undefined;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: (e: FocusEvent<HTMLInputElement>) => void;
+  errorMessage?: string;
 }
 
 const Input = ({
@@ -23,25 +26,51 @@ const Input = ({
   required = false,
   defaultValue,
   value,
-  maxLength,
+  maxValue,
   onChange,
+  onBlur,
+  errorMessage,
 }: IProps) => {
   const classNames = clsx(
-    `bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white ${classes}`
+    `bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white no-spinner ${classes}`
   );
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (
+      type === 'number' &&
+      (e.code === 'Minus' || e.code === 'NumpadSubtract')
+    ) {
+      e.preventDefault();
+    }
+  };
+
+  const handleFocus = (e: FocusEvent<HTMLInputElement>) => {
+    e.target.select();
+  };
+
   return (
-    <input
-      type={type}
-      name={name}
-      id={id}
-      className={classNames}
-      placeholder={placeholder}
-      required={required}
-      defaultValue={defaultValue}
-      value={value}
-      max={maxLength}
-      onChange={onChange}
-    />
+    <>
+      <input
+        type={type}
+        name={name}
+        id={id}
+        className={classNames}
+        placeholder={placeholder}
+        required={required}
+        defaultValue={defaultValue}
+        value={value}
+        max={maxValue}
+        onChange={onChange}
+        onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+          handleKeyDown(e);
+        }}
+        onFocus={(e: FocusEvent<HTMLInputElement>) => {
+          handleFocus(e);
+        }}
+        onBlur={onBlur}
+      />
+      {errorMessage && <ErrorMessage errorMessage={errorMessage} />}
+    </>
   );
 };
 
