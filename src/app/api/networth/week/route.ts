@@ -30,7 +30,7 @@ export const GET = async () => {
           baseNetworth: [
             {
               $match: {
-                createdAt: { $lt: startDate },
+                updatedAt: { $lt: startDate },
                 userId: userId,
               },
             },
@@ -51,7 +51,7 @@ export const GET = async () => {
           categories: [
             {
               $match: {
-                createdAt: {
+                updatedAt: {
                   $gte: startDate,
                   $lte: today,
                 },
@@ -73,7 +73,7 @@ export const GET = async () => {
           afterStartDateTotals: [
             {
               $match: {
-                createdAt: {
+                updatedAt: {
                   $gte: startDate,
                   $lte: today,
                 },
@@ -83,10 +83,10 @@ export const GET = async () => {
             {
               $group: {
                 _id: {
-                  $dayOfWeek: '$createdAt',
+                  $dayOfWeek: '$updatedAt',
                 },
                 date: {
-                  $first: '$createdAt',
+                  $first: '$updatedAt',
                 },
                 total: {
                   $sum: {

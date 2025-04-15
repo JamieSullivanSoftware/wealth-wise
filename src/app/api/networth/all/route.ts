@@ -51,10 +51,10 @@ export const GET = async () => {
             {
               $group: {
                 _id: {
-                  $year: '$createdAt',
+                  $year: '$updatedAt',
                 },
                 date: {
-                  $last: '$createdAt',
+                  $last: '$updatedAt',
                 },
                 total: {
                   $sum: {
