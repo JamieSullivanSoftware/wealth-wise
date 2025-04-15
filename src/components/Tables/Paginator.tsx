@@ -62,7 +62,7 @@ const Paginator = ({
   const ShowResults = () => (
     <div>
       <p className='text-xs xsm:text-sm text-black dark:text-white'>
-        {`Showing ${currentPage} to ${totalPages} of ${totalCount} results`}
+        {`Showing ${currentPage === 1 ? 1 : (currentPage - 1) * limit} to ${currentPage * limit} of ${totalCount} results`}
       </p>
     </div>
   );
